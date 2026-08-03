@@ -1,8 +1,23 @@
 import streamlit as st
 from PIL import Image
 
+from src.recognition import predict_category
+from src.colour_detection import predict_colour
+from src.recommendation import recommend_outfit
+
+
+st.set_page_config(
+    page_title="AI Outfit Recommendation Prototype",
+    layout="centered"
+)
+
 st.title("AI Outfit Recommendation Prototype")
-st.write("Environment setup successful.")
+st.caption("Development version: automatic colour detection")
+
+st.write(
+    "Upload a clothing image. The system will identify the item category "
+    "and colour, then generate a simple outfit recommendation."
+)
 
 uploaded_file = st.file_uploader(
     "Upload a clothing image",
@@ -11,15 +26,32 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded image", use_container_width=True)
+
+    st.subheader("Uploaded Image")
+    st.image(image, caption="Uploaded clothing image", use_container_width=True)
+
+    category = predict_category(image)
+    colour = predict_colour(image)
 
     st.subheader("Recognition Result")
-    st.write("Category: Jeans")
-    st.write("Colour: Black")
+    st.write(f"Category: **{category}**")
+    st.write(f"Colour: **{colour}**")
+
+    recommendation = recommend_outfit(category, colour)
 
     st.subheader("Recommended Outfit")
-    st.write("1. White T-shirt")
-    st.write("2. Grey jacket")
-    st.write("3. White trainers")
+
+    for item in recommendation["items"]:
+        st.success(item)
+
+    st.subheader("Recommendation Explanation")
+    st.write(recommendation["explanation"])
+
+    st.info(
+        "Phase 1 uses placeholder recognition and a rule-based recommendation method. "
+        "Later phases will replace the placeholder functions with computer vision methods."
+    )
+
 else:
-    st.info("Please upload a clothing image.")
+    st.info("Please upload a clothing image to start.")
+    
