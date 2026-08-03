@@ -48,8 +48,9 @@ if uploaded_file is not None:
     st.write(recommendation["explanation"])
 
     st.info(
-        "Phase 1 uses placeholder recognition and a rule-based recommendation method. "
-        "Later phases will replace the placeholder functions with computer vision methods."
+        "The current prototype uses CLIP zero-shot category recognition, "
+    "automatic dominant colour detection, and a general rule-based "
+    "outfit recommendation baseline."
     )
 
 else:
