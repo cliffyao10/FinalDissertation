@@ -7,4 +7,6 @@ scikit-learn
 torch
 torchvision
 transformers
-streamlit-drawable-canvas
+streamlit-drawable-canvas-bogaczm
+sentencepiece
+protobuf

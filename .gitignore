@@ -1,8 +1,8 @@
 .venv/
 __pycache__/
 *.pyc
-.env
-.DS_Store
 
-results/screenshots/
-models/saved/
+results/
+data/recognition_test/
+batch_test_recognition.py
+recognition_test_labels_example.csv
