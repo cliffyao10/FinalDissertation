@@ -5,17 +5,99 @@ from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
 from src.recognition import (
+    extract_image_embedding,
     predict_category_with_confidence,
     predict_semantic_colour,
     predict_style,
 )
 from src.colour_detection import predict_colour_details
 from src.recommendation import recommend_outfit
+from src.weather import WeatherServiceError, get_city_weather
 
 
 FRAME_WIDTH = 520
 FRAME_HEIGHT = 400
 FRAME_BACKGROUND = (246, 247, 249)
+
+# Product mode shows recommendations only. Change this to True while
+# collecting dissertation evidence or diagnosing recognition failures.
+DEVELOPER_MODE = False
+
+STYLE_OPTIONS = [
+    "Casual",
+    "Outdoor",
+    "Sporty",
+    "Formal",
+    "Business",
+    "Streetwear",
+    "Minimalist",
+    "Party",
+    "Beachwear",
+]
+
+ICON_COLOURS = {
+    "Black": "#26272b",
+    "White": "#f7f7f5",
+    "Grey": "#8b9098",
+    "Blue": "#527db5",
+    "Navy": "#293f62",
+    "Red": "#bd4b51",
+    "Green": "#66846a",
+    "Olive": "#77744e",
+    "Brown": "#87654e",
+    "Beige": "#d7c4a5",
+    "Cream": "#eee2c5",
+    "Purple": "#806591",
+    "Pink": "#d99aaa",
+    "Orange": "#d4864a",
+    "Yellow": "#d8ba4c",
+}
+
+CATEGORY_CHOICES = [
+    "Tank Top",
+    "T-Shirt",
+    "Shirt",
+    "Blouse",
+    "Sweater",
+    "Hoodie",
+    "Jacket",
+    "Blazer",
+    "Coat",
+    "Jeans",
+    "Trousers",
+    "Shorts",
+    "Skirt",
+    "Dress",
+    "Bikini",
+    "Swimsuit",
+    "Shoes",
+]
+
+CATEGORY_RECOMMENDATION_ALIASES = {
+    "Tank Top": "T-Shirt",
+    "Blouse": "Shirt",
+    "Blazer": "Jacket",
+}
+
+CATEGORY_PARENTS = {
+    "Tank Top": "Top",
+    "T-Shirt": "Top",
+    "Shirt": "Top",
+    "Blouse": "Top",
+    "Sweater": "Top",
+    "Hoodie": "Top",
+    "Jacket": "Outerwear",
+    "Blazer": "Outerwear",
+    "Coat": "Outerwear",
+    "Jeans": "Bottom",
+    "Trousers": "Bottom",
+    "Shorts": "Bottom",
+    "Skirt": "Bottom",
+    "Dress": "One-piece",
+    "Bikini": "Swimwear",
+    "Swimsuit": "Swimwear",
+    "Shoes": "Footwear",
+}
 
 
 st.set_page_config(
@@ -142,6 +224,10 @@ def initialise_state():
         "uploader_version": 0,
         "uploaded_bytes": None,
         "uploaded_name": None,
+        "city": "London",
+        "city_input": "London",
+        "weather_data": None,
+        "weather_error": None,
     }
 
     for state_name, default_value in defaults.items():
@@ -408,6 +494,7 @@ def crop_from_drawing(
 def analyse_clothing(
     selected_image,
     original_image,
+    weather_data=None,
 ):
     """
     Use SigLIP as the primary recognition model.
@@ -439,8 +526,60 @@ def analyse_clothing(
         selected_image
     )
 
+    input_embedding = extract_image_embedding(selected_image)
+
     pixel_colour = pixel_colour_result["primary_colour"]
     semantic_colour = semantic_colour_result["colour"]
+
+    pixel_distribution = pixel_colour_result.get(
+        "colour_distribution",
+        {},
+    )
+
+    ranked_pixel_colours = sorted(
+        pixel_distribution.items(),
+        key=lambda item: item[1],
+        reverse=True,
+    )
+
+    colour_palette = [semantic_colour]
+
+    # Black/Grey, White/Grey and White/Beige commonly describe shadows or
+    # illumination on one neutral garment rather than intentional multicolour
+    # design. Keep the palette conservative for these combinations.
+    neutral_shading_pairs = [
+        {"Black", "Grey"},
+        {"White", "Grey"},
+        {"White", "Beige"},
+    ]
+
+    # A second colour is retained only when the pixel method finds two
+    # substantial regions and SigLIP agrees with one of those colours.
+    if len(ranked_pixel_colours) >= 2:
+        first_colour, first_share = ranked_pixel_colours[0]
+        second_colour, second_share = ranked_pixel_colours[1]
+        dominant_pair = {first_colour, second_colour}
+
+        if (
+            first_share >= 0.25
+            and second_share >= 0.25
+            and semantic_colour in dominant_pair
+            and dominant_pair not in neutral_shading_pairs
+        ):
+            other_colour = (
+                second_colour
+                if semantic_colour == first_colour
+                else first_colour
+            )
+
+            if other_colour != semantic_colour:
+                colour_palette.append(other_colour)
+
+    secondary_colour = (
+        colour_palette[1]
+        if len(colour_palette) > 1
+        else None
+    )
 
     models_agree = (
         pixel_colour == semantic_colour
@@ -474,35 +613,30 @@ def analyse_clothing(
         else 0.0
     )
 
-    # Agreement is accepted immediately. When the methods
-    # disagree, SigLIP is accepted only if its first result
-    # has a clear relative lead over its second result.
-    minimum_relative_margin = 0.35
+    # The final product never interrupts the user with recognition choices.
+    # SigLIP supplies the semantic colour; the pixel result remains available
+    # only as an interpretable baseline in developer mode.
+    final_colour = semantic_colour
+
+    recognised_styles = [
+        item["style"]
+        for item in style_result.get("styles", [])
+    ]
+
+    recommendation = recommend_outfit(
+        recommendation_category,
+        final_colour,
+        styles=recognised_styles,
+        weather=weather_data,
+        input_embedding=input_embedding,
+    )
 
     if models_agree:
-        final_colour = semantic_colour
-
-        recommendation = recommend_outfit(
-            recommendation_category,
-            final_colour,
-        )
-
         confirmation_source = "model_agreement"
-
-    elif relative_siglip_margin >= minimum_relative_margin:
-        final_colour = semantic_colour
-
-        recommendation = recommend_outfit(
-            recommendation_category,
-            final_colour,
-        )
-
+    elif relative_siglip_margin >= 0.35:
         confirmation_source = "siglip_clear_lead"
-
     else:
-        final_colour = None
-        recommendation = None
-        confirmation_source = "awaiting_user"
+        confirmation_source = "siglip_automatic_fallback"
 
     return {
         "category": category,
@@ -513,6 +647,9 @@ def analyse_clothing(
         "pixel_colour_result": pixel_colour_result,
         "semantic_colour": semantic_colour,
         "semantic_colour_result": semantic_colour_result,
+        "colour_palette": colour_palette,
+        "secondary_colour": secondary_colour,
+        "is_multicolour": len(colour_palette) > 1,
         "models_agree": models_agree,
         "colour": final_colour,
         "recommendation": recommendation,
@@ -520,6 +657,49 @@ def analyse_clothing(
         "siglip_margin": siglip_margin,
         "siglip_relative_margin": relative_siglip_margin,
         "siglip_second_score": second_siglip_score,
+        "weather": weather_data,
+        "input_embedding": input_embedding,
+    }
+
+
+@st.cache_data(ttl=900, show_spinner=False)
+def get_cached_weather(city):
+    """Cache a city's forecast for fifteen minutes."""
+
+    return get_city_weather(city)
+
+
+def analyse_with_current_weather(selected_image, original_image):
+    """Run recognition with weather, falling back safely if unavailable."""
+
+    try:
+        weather_data = get_cached_weather(
+            st.session_state.city.strip()
+        )
+        st.session_state.weather_data = weather_data
+        st.session_state.weather_error = None
+    except WeatherServiceError as error:
+        weather_data = None
+        st.session_state.weather_data = None
+        st.session_state.weather_error = str(error)
+
+    return analyse_clothing(
+        selected_image,
+        original_image,
+        weather_data=weather_data,
+    )
+
+
+def recommendation_inputs(result):
+    """Preserve model inputs when a user changes style, category or colour."""
+
+    return {
+        "styles": [
+            item["style"]
+            for item in result.get("style_result", {}).get("styles", [])
+        ],
+        "weather": result.get("weather"),
+        "input_embedding": result.get("input_embedding"),
     }
 
 def prepare_score_rows(score_distribution, limit=6):
@@ -534,10 +714,17 @@ def prepare_score_rows(score_distribution, limit=6):
         reverse=True,
     )
 
+    highest_score = float(sorted_scores[0][1]) if sorted_scores else 0.0
+
     return [
         {
             "Label": label,
-            "Score": f"{float(score):.1%}",
+            "Raw score": f"{float(score):.3%}",
+            "Relative": (
+                f"{float(score) / highest_score:.0%}"
+                if highest_score > 0
+                else "0%"
+            ),
         }
         for label, score in sorted_scores[:limit]
     ]
@@ -646,10 +833,25 @@ def show_debug_report(
                 result["category"],
             )
 
-            st.caption(
-                "Parent: "
-                f"{category_result.get('parent_category', 'Unknown')}"
-            )
+            if category_result.get("fine_category_confident", False):
+                st.caption(
+                    "Parent: "
+                    f"{category_result.get('parent_category', 'Unknown')}"
+                )
+            elif result["category"] != "Unknown":
+                likely_categories = category_result.get(
+                    "likely_fine_categories",
+                    [],
+                )
+                st.caption(
+                    "Possible fine categories: "
+                    + " / ".join(likely_categories[:2])
+                )
+            else:
+                st.caption(
+                    "Suggested category: "
+                    f"{category_result.get('predicted_fine_category', 'Unknown')}"
+                )
 
         with summary_two:
             st.metric(
@@ -671,6 +873,11 @@ def show_debug_report(
         st.caption(
             "Recognised style cues: "
             f"{recognised_styles or 'Unknown'}"
+        )
+
+        st.caption(
+            "Colour palette: "
+            + " + ".join(result.get("colour_palette", []))
         )
 
         summary_four, summary_five, summary_six = (
@@ -726,10 +933,16 @@ def show_debug_report(
         st.markdown("#### Recommendation state")
 
         if recommendation is None:
-            st.warning(
-                "Recommendation is waiting for colour "
-                "confirmation."
-            )
+            if result["category"] == "Unknown":
+                st.warning(
+                    "Recommendation is waiting for category "
+                    "confirmation."
+                )
+            else:
+                st.warning(
+                    "Recommendation is waiting for colour "
+                    "confirmation."
+                )
         else:
             recommended_items = " | ".join(
                 recommendation.get("items", [])
@@ -875,6 +1088,7 @@ def render_results(
     ]
 
     category = result["category"]
+    category_result = result["category_result"]
     recommendation_category = result.get(
         "recommendation_category",
         category,
@@ -897,15 +1111,25 @@ def render_results(
                 category,
             )
 
-            st.caption(
-                "Parent: "
-                f"{result['category_result'].get('parent_category', 'Unknown')}"
-            )
-
-            if not result["category_result"].get(
+            if category_result.get(
                 "fine_category_confident",
-                True,
+                False,
             ):
+                st.caption(
+                    "Parent: "
+                    f"{category_result.get('parent_category', 'Unknown')}"
+                )
+            elif category != "Unknown":
+                likely_categories = category_result.get(
+                    "likely_fine_categories",
+                    [],
+                )
+
+                st.caption(
+                    "Possible: "
+                    + " / ".join(likely_categories[:2])
+                )
+
                 st.caption(
                     "Fine category uncertain; the broad category "
                     "is used for recommendation."
@@ -931,13 +1155,22 @@ def render_results(
         with colour_column:
             final_colour = (
                 result["colour"]
-                or "Confirm below"
+                if result["colour"] is not None
+                else "Confirm below"
             )
 
             st.metric(
                 "Final colour",
                 final_colour,
             )
+
+            colour_palette = result.get("colour_palette", [])
+
+            if len(colour_palette) > 1:
+                st.caption(
+                    "Palette: "
+                    + " + ".join(colour_palette)
+                )
 
         st.markdown("#### Colour Comparison")
 
@@ -984,6 +1217,74 @@ def render_results(
                 selected_image,
             )
 
+        needs_category_confirmation = (
+            category == "Unknown"
+        )
+
+        if needs_category_confirmation:
+            predicted_fine_category = result[
+                "category_result"
+            ].get(
+                "predicted_fine_category",
+                "Unknown",
+            )
+
+            st.warning(
+                "The garment does not strongly match the current "
+                "category set. Please confirm its category."
+            )
+
+            suggested_index = (
+                CATEGORY_CHOICES.index(predicted_fine_category)
+                if predicted_fine_category in CATEGORY_CHOICES
+                else 0
+            )
+
+            confirmed_category = st.selectbox(
+                "Confirm clothing category",
+                CATEGORY_CHOICES,
+                index=suggested_index,
+                key="unknown_category_choice",
+            )
+
+            if st.button(
+                "Use Confirmed Category",
+                type="primary",
+                use_container_width=True,
+                key="confirm_category_button",
+            ):
+                result["category"] = confirmed_category
+                result["recommendation_category"] = (
+                    CATEGORY_RECOMMENDATION_ALIASES.get(
+                        confirmed_category,
+                        confirmed_category,
+                    )
+                )
+                result["category_result"][
+                    "category_out_of_scope"
+                ] = False
+                result["category_result"][
+                    "parent_category"
+                ] = CATEGORY_PARENTS[confirmed_category]
+                result["category_result"][
+                    "fine_category_confident"
+                ] = True
+                result["category_confirmation_source"] = (
+                    "user_confirmation"
+                )
+
+                if result["colour"] is not None:
+                    result["recommendation"] = recommend_outfit(
+                        result["recommendation_category"],
+                        result["colour"],
+                        **recommendation_inputs(result),
+                    )
+
+                st.session_state.analysis_result = result
+                st.rerun()
+
+            return
+
         needs_confirmation = (
             result["colour"] is None
         )
@@ -1017,10 +1318,14 @@ def render_results(
                 key="confirm_colour_button",
             ):
                 result["colour"] = selected_colour
+                result["colour_palette"] = [selected_colour]
+                result["secondary_colour"] = None
+                result["is_multicolour"] = False
 
                 result["recommendation"] = recommend_outfit(
                     recommendation_category,
                     selected_colour,
+                    **recommendation_inputs(result),
                 )
 
                 result["confirmation_source"] = (
@@ -1065,6 +1370,62 @@ def render_results(
                 recommendation["explanation"]
             )
 
+        with st.expander("Correct category manually"):
+            predicted_fine_category = category_result.get(
+                "predicted_fine_category",
+                category,
+            )
+
+            category_index = (
+                CATEGORY_CHOICES.index(predicted_fine_category)
+                if predicted_fine_category in CATEGORY_CHOICES
+                else 0
+            )
+
+            corrected_category = st.selectbox(
+                "Correct category",
+                CATEGORY_CHOICES,
+                index=category_index,
+                key="manual_category_override",
+            )
+
+            if st.button(
+                "Apply Category Correction",
+                use_container_width=True,
+                key="apply_category_correction",
+            ):
+                corrected_recommendation_category = (
+                    CATEGORY_RECOMMENDATION_ALIASES.get(
+                        corrected_category,
+                        corrected_category,
+                    )
+                )
+
+                result["category"] = corrected_category
+                result["recommendation_category"] = (
+                    corrected_recommendation_category
+                )
+                result["category_result"][
+                    "predicted_fine_category"
+                ] = corrected_category
+                result["category_result"][
+                    "parent_category"
+                ] = CATEGORY_PARENTS[corrected_category]
+                result["category_result"][
+                    "fine_category_confident"
+                ] = True
+                result["category_confirmation_source"] = (
+                    "manual_correction"
+                )
+                result["recommendation"] = recommend_outfit(
+                    corrected_recommendation_category,
+                    result["colour"],
+                    **recommendation_inputs(result),
+                )
+
+                st.session_state.analysis_result = result
+                st.rerun()
+
         # Manual correction remains available even when models agree.
         with st.expander("Correct colour manually"):
             current_colour = result["colour"]
@@ -1086,10 +1447,14 @@ def render_results(
                 key="apply_colour_correction",
             ):
                 result["colour"] = corrected_colour
+                result["colour_palette"] = [corrected_colour]
+                result["secondary_colour"] = None
+                result["is_multicolour"] = False
 
                 result["recommendation"] = recommend_outfit(
                     recommendation_category,
                     corrected_colour,
+                    **recommendation_inputs(result),
                 )
 
                 result["confirmation_source"] = (
@@ -1150,6 +1515,236 @@ def render_results(
             )
 
 
+def garment_icon_svg(slot, colour, item_type=""):
+    """Return a compact garment icon coloured to match the recommendation."""
+
+    fill = ICON_COLOURS.get(colour, "#8b9098")
+    stroke = "#34363d"
+
+    paths = {
+        "inner_top": (
+            '<path d="M27 18 38 11h20l11 7 13 18-12 8-8-10v48H34V34l-8 10-12-8z"/>'
+        ),
+        "tank_top": (
+            '<path d="M37 11h8c0 8 6 11 11 0h7l7 17-9 5v49H35V33l-8-5z"/>'
+            '<path d="M43 12c0 9 10 9 12 0" fill="none"/>'
+        ),
+        "shorts": (
+            '<path d="M31 15h34l3 48-17-1-3-20-3 20-17 1z"/>'
+            '<path d="M31 28h34" fill="none"/>'
+        ),
+        "skirt": (
+            '<path d="M36 14h24l13 66H23z"/>'
+            '<path d="M34 27h28" fill="none"/>'
+        ),
+        "dress": (
+            '<path d="M39 10h18l5 18 18 53H16l18-53z"/>'
+            '<path d="M36 30h24" fill="none"/>'
+        ),
+        "no_layer": (
+            '<circle cx="48" cy="48" r="18"/>'
+            '<path d="M48 10v12M48 74v12M10 48h12M74 48h12M21 21l9 9M66 66l9 9M75 21l-9 9M30 66l-9 9" fill="none"/>'
+        ),
+        "outer_top": (
+            '<path d="M28 17 40 10h16l12 7 14 20-12 7-8-12v50H34V32l-8 12-12-7z"/>'
+            '<path d="M48 11v71M39 34h18" fill="none"/>'
+        ),
+        "bottom": (
+            '<path d="M34 12h28l5 70H52l-4-44-4 44H29z"/>'
+            '<path d="M34 25h28" fill="none"/>'
+        ),
+        "shoes": (
+            '<path d="M17 53c13 0 19-8 25-18l12 15c5 6 12 9 24 10v14H17z"/>'
+            '<path d="M53 68h25" fill="none"/>'
+        ),
+        "trainers": (
+            '<path d="M15 54c14 0 21-7 28-20l12 15c6 7 13 10 27 12v13H15z"/>'
+            '<path d="m43 44 15 13M37 51l9 7M16 67h66" fill="none"/>'
+        ),
+        "leather_shoes": (
+            '<path d="M17 52c15 1 24-5 31-16l9 14c6 7 12 8 23 10v14H17z"/>'
+            '<path d="M45 48h15M17 68h63" fill="none"/>'
+        ),
+        "boots": (
+            '<path d="M30 13h28v42c5 4 12 6 23 7v13H26V55h4z"/>'
+            '<path d="M31 52h28M26 68h55" fill="none"/>'
+        ),
+        "sandals": (
+            '<path d="M18 63c15 0 24-5 33-17 8 8 17 12 29 15v13H18z"/>'
+            '<path d="M39 53 53 68M54 50l12 16M18 68h62" fill="none"/>'
+        ),
+    }
+
+    item_name = item_type.casefold()
+    if "too hot" in item_name or "no outer" in item_name:
+        icon_name = "no_layer"
+    elif any(name in item_name for name in ("tank", "vest", "cami")):
+        icon_name = "tank_top"
+    elif "short" in item_name:
+        icon_name = "shorts"
+    elif "skirt" in item_name:
+        icon_name = "skirt"
+    elif "dress" in item_name and slot != "shoes":
+        icon_name = "dress"
+    elif "sandal" in item_name:
+        icon_name = "sandals"
+    elif "boot" in item_name:
+        icon_name = "boots"
+    elif any(
+        name in item_name
+        for name in ("loafer", "leather", "dress shoe")
+    ):
+        icon_name = "leather_shoes"
+    elif any(
+        name in item_name
+        for name in ("trainer", "sneaker", "running", "trail")
+    ):
+        icon_name = "trainers"
+    else:
+        icon_name = slot
+
+    path = paths.get(icon_name, paths["inner_top"])
+    return (
+        '<svg viewBox="0 0 96 96" width="76" height="76" '
+        'aria-hidden="true" xmlns="http://www.w3.org/2000/svg">'
+        f'<g fill="{fill}" stroke="{stroke}" stroke-width="3" '
+        f'stroke-linejoin="round">{path}</g></svg>'
+    )
+
+
+def render_outfit_cards(outfit):
+    """Render one three-item outfit with coloured category icons."""
+
+    columns = st.columns(3, gap="medium")
+
+    for column, item in zip(columns, outfit["items"]):
+        with column:
+            st.markdown(
+                (
+                    '<div style="min-height:190px;padding:18px 12px;'
+                    'border:1px solid #e2e6e3;border-radius:18px;'
+                    'background:#fbfcfb;text-align:center">'
+                    f'{garment_icon_svg(item["slot"], item["colour"], item["type"])}'
+                    f'<div style="font-size:.78rem;color:#858a91;'
+                    f'margin-top:4px">{item["slot_label"]}</div>'
+                    f'<div style="font-weight:650;margin-top:7px">'
+                    f'{item["type"]}</div>'
+                    f'<div style="color:#666c73;margin-top:3px">'
+                    f'{item["colour"]}</div></div>'
+                ),
+                unsafe_allow_html=True,
+            )
+
+
+def render_recommendations_only(result):
+    """Render weather, recognised styles and two complete recommendations."""
+
+    recommendation = result["recommendation"]
+
+    # Rebuild results created before the four-slot recommender was loaded.
+    if "primary" not in recommendation:
+        recognised_styles = [
+            item["style"]
+            for item in result["style_result"].get("styles", [])
+        ]
+        recommendation = recommend_outfit(
+            result["recommendation_category"],
+            result["colour"],
+            styles=recognised_styles,
+            weather=result.get("weather"),
+            input_embedding=result.get("input_embedding"),
+        )
+        result["recommendation"] = recommendation
+
+    weather = result.get("weather")
+    if weather:
+        with st.container(border=True):
+            st.subheader(f'{weather["city"]} Weather')
+            weather_columns = st.columns(4)
+            weather_columns[0].metric(
+                "Temperature", f'{weather["temperature"]:.0f}°C'
+            )
+            weather_columns[1].metric(
+                "Feels like", f'{weather["feels_like"]:.0f}°C'
+            )
+            weather_columns[2].metric(
+                "Condition", weather["condition"]
+            )
+            weather_columns[3].metric(
+                "Rain chance", f'{weather["rain_probability"]:.0f}%'
+            )
+    else:
+        with st.container(border=True):
+            st.subheader("Weather")
+            st.caption(
+                "Live weather is temporarily unavailable. The outfit uses "
+                "colour and style information only."
+            )
+
+    recognised_styles = [
+        item["style"]
+        for item in result["style_result"].get("styles", [])
+    ] or ["Casual"]
+
+    with st.container(border=True):
+        st.subheader("Style")
+        st.caption(
+            "Recognised: " + ", ".join(recognised_styles)
+        )
+
+        style_column, button_column = st.columns([1.35, 0.65])
+        with style_column:
+            selected_style = st.selectbox(
+                "Choose a style",
+                STYLE_OPTIONS,
+                index=STYLE_OPTIONS.index(recognised_styles[0])
+                if recognised_styles[0] in STYLE_OPTIONS
+                else 0,
+                key="recommendation_style_choice",
+            )
+        with button_column:
+            st.write("")
+            if st.button(
+                "Recommend Again",
+                use_container_width=True,
+                type="primary",
+            ):
+                result["recommendation"] = recommend_outfit(
+                    result["recommendation_category"],
+                    result["colour"],
+                    styles=recognised_styles,
+                    weather=weather,
+                    selected_style=selected_style,
+                    input_embedding=result.get("input_embedding"),
+                )
+                st.session_state.analysis_result = result
+                st.rerun()
+
+    recommendation = result["recommendation"]
+
+    with st.container(border=True):
+        st.subheader(
+            f'Primary Outfit · {recommendation["primary"]["style"]}'
+        )
+        if "model_score" in recommendation["primary"]:
+            st.caption(
+                "Lightweight model match: "
+                f'{recommendation["primary"]["model_score"]:.1f}/100'
+            )
+        render_outfit_cards(recommendation["primary"])
+
+    with st.container(border=True):
+        st.subheader(
+            f'Alternative Outfit · {recommendation["alternative"]["style"]}'
+        )
+        if "model_score" in recommendation["alternative"]:
+            st.caption(
+                "Lightweight model match: "
+                f'{recommendation["alternative"]["model_score"]:.1f}/100'
+            )
+        render_outfit_cards(recommendation["alternative"])
+
+
 initialise_state()
 
 
@@ -1195,6 +1790,34 @@ if st.session_state.image_mode is None:
         """,
         unsafe_allow_html=True,
     )
+
+    with st.form("weather_city_form", border=False):
+        city_column, save_city_column = st.columns([0.78, 0.22])
+        with city_column:
+            st.text_input(
+                "City for today's weather",
+                key="city_input",
+                placeholder="For example: Shanghai",
+                help=(
+                    "Press Enter or choose Save City. The city is used for "
+                    "today's temperature, rain and wind."
+                ),
+            )
+        with save_city_column:
+            st.write("")
+            city_submitted = st.form_submit_button(
+                "Save City",
+                use_container_width=True,
+            )
+
+        if city_submitted:
+            entered_city = st.session_state.city_input.strip()
+            if entered_city:
+                st.session_state.city = entered_city
+                st.session_state.weather_data = None
+                st.session_state.weather_error = None
+
+    st.caption(f'Weather location: **{st.session_state.city}**')
 
     product_column, lifestyle_column = (
         st.columns(
@@ -1370,7 +1993,7 @@ with left_column:
         ):
             with st.spinner("Analysing..."):
                 st.session_state.analysis_result = (
-                    analyse_clothing(
+                    analyse_with_current_weather(
                         original_image,
                         original_image,
                     )
@@ -1514,7 +2137,7 @@ with left_column:
                         "Analysing..."
                     ):
                         st.session_state.analysis_result = (
-                            analyse_clothing(
+                            analyse_with_current_weather(
                                 selected_image,
                                 original_image,
                             )
@@ -1540,8 +2163,13 @@ with right_column:
         )
 
     else:
-        render_results(
-            st.session_state.analysis_result,
-            original_image,
-            st.session_state.selected_image,
-        )
+        if DEVELOPER_MODE:
+            render_results(
+                st.session_state.analysis_result,
+                original_image,
+                st.session_state.selected_image,
+            )
+        else:
+            render_recommendations_only(
+                st.session_state.analysis_result
+            )

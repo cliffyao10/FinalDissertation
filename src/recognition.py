@@ -14,6 +14,8 @@ from functools import lru_cache
 import torch
 from transformers import pipeline
 
+from recommendation_training.embedding import pooled_image_features
+
 
 MODEL_NAME = "google/siglip-base-patch16-224"
 
@@ -56,11 +58,15 @@ CATEGORY_PROMPTS = {
         "Jacket",
         "Outerwear",
     ),
+    "a photo of a short hip-length zipped technical shell jacket": (
+        "Jacket",
+        "Outerwear",
+    ),
     "a photo of a structured blazer or suit jacket": (
         "Blazer",
         "Outerwear",
     ),
-    "a photo of a long heavy outer coat": (
+    "a photo of a long heavy outer coat extending below the hips or knees": (
         "Coat",
         "Outerwear",
     ),
@@ -83,6 +89,14 @@ CATEGORY_PROMPTS = {
     "a photo of a one-piece dress": (
         "Dress",
         "One-piece",
+    ),
+    "a photo of a two-piece bikini swimsuit": (
+        "Bikini",
+        "Swimwear",
+    ),
+    "a photo of a one-piece swimsuit or swimming costume": (
+        "Swimsuit",
+        "Swimwear",
     ),
     "a photo of footwear or shoes": (
         "Shoes",
@@ -121,6 +135,7 @@ STYLE_PROMPTS = {
     "urban streetwear clothing": "Streetwear",
     "minimalist clothing with a simple clean design": "Minimalist",
     "party or evening social-event clothing": "Party",
+    "beachwear, swimwear, or clothing for swimming": "Beachwear",
 }
 
 
@@ -138,6 +153,7 @@ PARENT_RECOMMENDATION_ALIASES = {
     "Bottom": "Trousers",
     "One-piece": "Dress",
     "Footwear": "Shoes",
+    "Swimwear": "Swimwear",
 }
 
 
@@ -152,6 +168,22 @@ def load_siglip_classifier():
         model=MODEL_NAME,
         device=device,
     )
+
+
+def extract_image_embedding(image):
+    """Return the frozen SigLIP image vector used by recommendation training."""
+
+    classifier = load_siglip_classifier()
+    processor = classifier.image_processor
+    inputs = processor(images=image.convert("RGB"), return_tensors="pt")
+    model_device = classifier.model.device
+    inputs = {name: value.to(model_device) for name, value in inputs.items()}
+    with torch.inference_mode():
+        embedding = pooled_image_features(
+            classifier.model.get_image_features(**inputs)
+        )
+        embedding = torch.nn.functional.normalize(embedding, dim=-1)
+    return embedding[0].detach().cpu()
 
 
 def _rank_prompt_predictions(image, candidate_prompts):
@@ -232,6 +264,11 @@ def predict_category_with_confidence(image):
     fine_summary = _prediction_summary(ranked_fine)
     fine_category = fine_summary["label"]
 
+    # SigLIP scores are similarities rather than calibrated probabilities.
+    # This conservative threshold only catches extremely weak evidence where
+    # every supplied category prompt is a poor visual match.
+    category_out_of_scope = fine_summary["confidence"] < 0.001
+
     fine_to_parent = {
         fine: parent
         for fine, parent in CATEGORY_PROMPTS.values()
@@ -253,25 +290,51 @@ def predict_category_with_confidence(image):
     )
 
     parent_summary = _prediction_summary(ranked_parents)
-    fine_category_confident = fine_summary["relative_margin"] >= 0.20
-
-    recommendation_category = (
-        RECOMMENDATION_CATEGORY_ALIASES.get(
-            fine_category,
-            fine_category,
-        )
-        if fine_category_confident
-        else PARENT_RECOMMENDATION_ALIASES[parent_summary["label"]]
+    fine_category_confident = (
+        fine_summary["relative_margin"] >= 0.20
+        and not category_out_of_scope
     )
 
+    # Recommendation intentionally uses the broad garment group. Fine labels
+    # remain available for evaluation, but Jacket versus Coat should not alter
+    # the user flow or create unnecessary recommendation branches.
+    recommendation_category = PARENT_RECOMMENDATION_ALIASES[
+        parent_summary["label"]
+    ]
+
+    likely_fine_categories = [
+        candidate_category
+        for candidate_category, _ in ranked_fine
+        if fine_to_parent[candidate_category] == parent_summary["label"]
+    ][:3]
+
+    if category_out_of_scope:
+        displayed_category = "Unknown"
+    elif fine_category_confident:
+        displayed_category = fine_category
+    else:
+        displayed_category = parent_summary["label"]
+
+    displayed_parent = (
+        "Unknown"
+        if category_out_of_scope
+        else parent_summary["label"]
+    )
+
+    if category_out_of_scope:
+        recommendation_category = "Unknown"
+
     return {
-        "category": fine_category,
-        "parent_category": parent_summary["label"],
+        "category": displayed_category,
+        "predicted_fine_category": fine_category,
+        "likely_fine_categories": likely_fine_categories,
+        "parent_category": displayed_parent,
         "recommendation_category": recommendation_category,
         "confidence": fine_summary["confidence"],
         "margin": fine_summary["margin"],
         "relative_margin": fine_summary["relative_margin"],
         "fine_category_confident": fine_category_confident,
+        "category_out_of_scope": category_out_of_scope,
         "score_distribution": fine_summary["score_distribution"],
         "parent_score_distribution": parent_summary["score_distribution"],
         "model": MODEL_NAME,
