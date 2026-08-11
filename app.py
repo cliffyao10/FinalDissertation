@@ -668,6 +668,238 @@ st.markdown(
         .weather-fog .weather-sparkles,
         .weather-thunderstorm .weather-sparkles { display: none; }
 
+        .weather-neighbourhood {
+            position: absolute;
+            right: 1%;
+            bottom: -1%;
+            left: 1%;
+            z-index: 4;
+            height: 34%;
+            color: rgba(70, 80, 82, .64);
+        }
+        .weather-neighbourhood::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            bottom: .25rem;
+            left: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(80,88,86,.22) 15% 85%, transparent);
+        }
+
+        .weather-house {
+            position: absolute;
+            bottom: .35rem;
+            width: 8.3rem;
+            height: 5.8rem;
+            border: 1px solid rgba(255,255,255,.34);
+            border-radius: 8px 8px 2px 2px;
+            background: linear-gradient(145deg, rgba(127,132,132,.48), rgba(93,105,105,.36));
+            box-shadow: 0 12px 26px rgba(68,76,76,.11);
+        }
+        .weather-house.one { left: 5%; }
+        .weather-house.two { right: 7%; width: 6.8rem; height: 4.8rem; opacity: .82; }
+        .weather-house .roof {
+            position: absolute;
+            right: -.65rem;
+            bottom: calc(100% - .15rem);
+            left: -.65rem;
+            height: 3rem;
+            background: rgba(83, 93, 95, .55);
+            clip-path: polygon(50% 0, 100% 100%, 0 100%);
+        }
+        .weather-house.two .roof { background: rgba(104, 104, 105, .48); }
+        .weather-house .chimney {
+            position: absolute;
+            right: 1.25rem;
+            bottom: calc(100% + 1.1rem);
+            width: .65rem;
+            height: 1.7rem;
+            border-radius: 2px 2px 0 0;
+            background: rgba(81,89,90,.54);
+        }
+        .weather-house .chimney::after {
+            content: "";
+            position: absolute;
+            top: -1.1rem;
+            left: -.35rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            background: rgba(255,255,255,.22);
+            filter: blur(4px);
+            animation: weather-chimney-smoke 5s ease-in-out infinite;
+        }
+        .weather-house .lit-window {
+            position: absolute;
+            top: 1.25rem;
+            width: 1.35rem;
+            height: 1.65rem;
+            border: 2px solid rgba(78,82,81,.28);
+            border-radius: 5px 5px 2px 2px;
+            background: rgba(255, 218, 143, .88);
+            box-shadow: 0 0 19px rgba(255,211,125,.32);
+        }
+        .weather-house .lit-window.left { left: 1.15rem; }
+        .weather-house .lit-window.right { right: 1.15rem; }
+        .weather-house .door {
+            position: absolute;
+            bottom: 0;
+            left: calc(50% - .8rem);
+            width: 1.6rem;
+            height: 2.45rem;
+            border-radius: 999px 999px 0 0;
+            background: rgba(66,78,77,.5);
+        }
+        .weather-snow .weather-house .roof::after {
+            content: "";
+            position: absolute;
+            right: 5%;
+            bottom: 7%;
+            left: 5%;
+            height: .55rem;
+            border-radius: 50%;
+            background: rgba(255,255,255,.78);
+            filter: blur(.4px);
+        }
+
+        .weather-tree {
+            position: absolute;
+            right: 31%;
+            bottom: .4rem;
+            width: .48rem;
+            height: 4.7rem;
+            border-radius: 999px 999px 2px 2px;
+            background: rgba(87,82,68,.45);
+        }
+        .weather-tree::before,
+        .weather-tree::after {
+            content: "";
+            position: absolute;
+            border-radius: 48% 52% 50% 50%;
+            background: rgba(91, 119, 99, .68);
+            box-shadow: 0 9px 20px rgba(62,85,70,.11);
+        }
+        .weather-tree::before { right: -.9rem; bottom: 2.5rem; width: 2.8rem; height: 3.4rem; transform: rotate(8deg); }
+        .weather-tree::after { right: -1.8rem; bottom: 1.75rem; width: 3rem; height: 2.8rem; transform: rotate(-13deg); }
+        .weather-snow .weather-tree::before,
+        .weather-snow .weather-tree::after { background: rgba(181,201,191,.72); box-shadow: inset 0 .38rem rgba(255,255,255,.65); }
+        .weather-fog .weather-tree,
+        .weather-fog .weather-house.two { opacity: .32; }
+
+        .weather-streetlamp {
+            position: absolute;
+            right: 43%;
+            bottom: .35rem;
+            width: .28rem;
+            height: 5.7rem;
+            border-radius: 999px 999px 0 0;
+            background: rgba(65,73,75,.52);
+        }
+        .weather-streetlamp::before {
+            content: "";
+            position: absolute;
+            top: -.4rem;
+            left: -.58rem;
+            width: 1.45rem;
+            height: 1.25rem;
+            border: 2px solid rgba(65,73,75,.45);
+            border-radius: 50% 50% 45% 45%;
+            background: rgba(255,221,147,.92);
+            box-shadow: 0 0 28px rgba(255,214,131,.58);
+        }
+
+        .weather-person {
+            position: absolute;
+            bottom: .35rem;
+            left: 52%;
+            width: 2.3rem;
+            height: 5.2rem;
+            animation: weather-walk 6s ease-in-out infinite alternate;
+        }
+        .weather-person .head {
+            position: absolute;
+            top: 0;
+            left: .75rem;
+            width: 1.05rem;
+            height: 1.05rem;
+            border-radius: 50%;
+            background: #a97862;
+        }
+        .weather-person .body {
+            position: absolute;
+            top: .9rem;
+            left: .48rem;
+            width: 1.55rem;
+            height: 2.7rem;
+            border-radius: 999px 999px 8px 8px;
+            background: #d58d82;
+        }
+        .weather-person .body::before,
+        .weather-person .body::after {
+            content: "";
+            position: absolute;
+            top: 2.25rem;
+            width: .42rem;
+            height: 1.7rem;
+            border-radius: 999px;
+            background: rgba(69,78,82,.72);
+        }
+        .weather-person .body::before { left: .25rem; transform: rotate(5deg); }
+        .weather-person .body::after { right: .25rem; transform: rotate(-5deg); }
+        .weather-person .umbrella {
+            display: none;
+            position: absolute;
+            top: -.75rem;
+            left: -1.65rem;
+            width: 5.5rem;
+            height: 2.4rem;
+            border-radius: 999px 999px 8px 8px;
+            background: #e9bbb0;
+            clip-path: ellipse(50% 48% at 50% 100%);
+        }
+        .weather-person .umbrella::after {
+            content: "";
+            position: absolute;
+            top: 1.5rem;
+            left: calc(50% - 1px);
+            width: 2px;
+            height: 3.6rem;
+            border-radius: 999px;
+            background: rgba(64,73,76,.66);
+        }
+        .weather-rain .weather-person .umbrella,
+        .weather-thunderstorm .weather-person .umbrella { display: block; }
+        .weather-rain .weather-person .body,
+        .weather-thunderstorm .weather-person .body { background: #7e91a8; }
+        .weather-snow .weather-person .body { background: #b88999; box-shadow: inset 0 .55rem #ead1c4; }
+
+        .weather-clothesline {
+            position: absolute;
+            bottom: 5.6rem;
+            left: 28%;
+            width: 8rem;
+            height: 2.6rem;
+            border-top: 1px solid rgba(72,78,77,.38);
+            transform: rotate(2deg);
+        }
+        .weather-clothesline i {
+            position: absolute;
+            top: -.05rem;
+            width: 1.35rem;
+            height: 1.7rem;
+            border-radius: 3px 3px 7px 7px;
+            background: rgba(239, 186, 168, .78);
+            transform-origin: top center;
+            animation: weather-laundry-sway 4s ease-in-out infinite alternate;
+        }
+        .weather-clothesline i:first-child { left: 1.3rem; }
+        .weather-clothesline i:last-child { right: 1.6rem; height: 1.35rem; background: rgba(238,224,181,.8); animation-delay: -2s; }
+        .weather-rain .weather-clothesline,
+        .weather-snow .weather-clothesline,
+        .weather-fog .weather-clothesline,
+        .weather-thunderstorm .weather-clothesline { display: none; }
+
         .weather-precipitation {
             position: absolute;
             top: 58%;
@@ -782,6 +1014,9 @@ st.markdown(
         @keyframes weather-cloud-float { 50% { transform: translateY(-7px); } }
         @keyframes weather-face-bob { 50% { margin-top: -7px; } }
         @keyframes weather-twinkle { 50% { opacity: .28; transform: rotate(28deg) scale(.72); } }
+        @keyframes weather-chimney-smoke { 50% { transform: translate(.25rem,-.35rem) scale(1.18); opacity: .35; } }
+        @keyframes weather-walk { to { transform: translateX(1.2rem); } }
+        @keyframes weather-laundry-sway { to { transform: rotate(5deg); } }
         @keyframes weather-rain-drop {
             0% { transform: translate(8px, -18px) rotate(12deg); opacity: 0; }
             18% { opacity: .9; }
@@ -980,6 +1215,9 @@ st.markdown(
             .weather-cloud-shadow,
             .weather-face,
             .weather-sparkles i,
+            .weather-house .chimney::after,
+            .weather-person,
+            .weather-clothesline i,
             .weather-precipitation i,
             .weather-mist i,
             .weather-bolt {
@@ -1734,6 +1972,23 @@ def render_weather_window(weather=None, error=None):
                     <i class="cheek left"></i><i class="cheek right"></i>
                 </div>
                 <div class="weather-sparkles"><i></i><i></i></div>
+                <div class="weather-neighbourhood">
+                    <div class="weather-house one">
+                        <i class="roof"></i><i class="chimney"></i>
+                        <i class="lit-window left"></i><i class="lit-window right"></i>
+                        <i class="door"></i>
+                    </div>
+                    <div class="weather-house two">
+                        <i class="roof"></i><i class="lit-window left"></i>
+                        <i class="lit-window right"></i><i class="door"></i>
+                    </div>
+                    <div class="weather-tree"></div>
+                    <div class="weather-streetlamp"></div>
+                    <div class="weather-person">
+                        <i class="head"></i><i class="body"></i><i class="umbrella"></i>
+                    </div>
+                    <div class="weather-clothesline"><i></i><i></i></div>
+                </div>
                 <div class="weather-precipitation">
                     <i style="--drop: 0"></i><i style="--drop: 1"></i>
                     <i style="--drop: 2"></i><i style="--drop: 3"></i>
