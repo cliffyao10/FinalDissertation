@@ -809,71 +809,6 @@ st.markdown(
             box-shadow: 0 0 28px rgba(255,214,131,.58);
         }
 
-        .weather-person {
-            position: absolute;
-            bottom: .35rem;
-            left: 52%;
-            width: 2.3rem;
-            height: 5.2rem;
-            animation: weather-walk 6s ease-in-out infinite alternate;
-        }
-        .weather-person .head {
-            position: absolute;
-            top: 0;
-            left: .75rem;
-            width: 1.05rem;
-            height: 1.05rem;
-            border-radius: 50%;
-            background: #a97862;
-        }
-        .weather-person .body {
-            position: absolute;
-            top: .9rem;
-            left: .48rem;
-            width: 1.55rem;
-            height: 2.7rem;
-            border-radius: 999px 999px 8px 8px;
-            background: #d58d82;
-        }
-        .weather-person .body::before,
-        .weather-person .body::after {
-            content: "";
-            position: absolute;
-            top: 2.25rem;
-            width: .42rem;
-            height: 1.7rem;
-            border-radius: 999px;
-            background: rgba(69,78,82,.72);
-        }
-        .weather-person .body::before { left: .25rem; transform: rotate(5deg); }
-        .weather-person .body::after { right: .25rem; transform: rotate(-5deg); }
-        .weather-person .umbrella {
-            display: none;
-            position: absolute;
-            top: -.75rem;
-            left: -1.65rem;
-            width: 5.5rem;
-            height: 2.4rem;
-            border-radius: 999px 999px 8px 8px;
-            background: #e9bbb0;
-            clip-path: ellipse(50% 48% at 50% 100%);
-        }
-        .weather-person .umbrella::after {
-            content: "";
-            position: absolute;
-            top: 1.5rem;
-            left: calc(50% - 1px);
-            width: 2px;
-            height: 3.6rem;
-            border-radius: 999px;
-            background: rgba(64,73,76,.66);
-        }
-        .weather-rain .weather-person .umbrella,
-        .weather-thunderstorm .weather-person .umbrella { display: block; }
-        .weather-rain .weather-person .body,
-        .weather-thunderstorm .weather-person .body { background: #7e91a8; }
-        .weather-snow .weather-person .body { background: #b88999; box-shadow: inset 0 .55rem #ead1c4; }
-
         .weather-clothesline {
             position: absolute;
             bottom: 5.6rem;
@@ -1015,7 +950,6 @@ st.markdown(
         @keyframes weather-face-bob { 50% { margin-top: -7px; } }
         @keyframes weather-twinkle { 50% { opacity: .28; transform: rotate(28deg) scale(.72); } }
         @keyframes weather-chimney-smoke { 50% { transform: translate(.25rem,-.35rem) scale(1.18); opacity: .35; } }
-        @keyframes weather-walk { to { transform: translateX(1.2rem); } }
         @keyframes weather-laundry-sway { to { transform: rotate(5deg); } }
         @keyframes weather-rain-drop {
             0% { transform: translate(8px, -18px) rotate(12deg); opacity: 0; }
@@ -1216,7 +1150,6 @@ st.markdown(
             .weather-face,
             .weather-sparkles i,
             .weather-house .chimney::after,
-            .weather-person,
             .weather-clothesline i,
             .weather-precipitation i,
             .weather-mist i,
@@ -1366,7 +1299,11 @@ def render_theme_css():
                 border-radius: 999px !important;
             }}
             .garment-card {{
-                min-height: 190px;
+                display: grid;
+                grid-template-rows: 96px 1.5rem 3.35rem 1.5rem;
+                align-content: start;
+                height: 265px;
+                box-sizing: border-box;
                 padding: 18px 12px;
                 border: 1px solid color-mix(in srgb, var(--fashion-primary) 20%, #e7e7e4);
                 border-radius: 26px 26px 12px 26px;
@@ -1390,12 +1327,24 @@ def render_theme_css():
                 box-shadow: inset 0 0 0 1px rgba(255,255,255,.72);
             }}
             .garment-card-slot {{
+                display: grid;
                 margin-top: 4px;
+                place-items: center;
                 color: var(--fashion-muted);
                 font-size: .78rem;
             }}
-            .garment-card-type {{ margin-top: 7px; font-weight: 650; }}
-            .garment-card-colour {{ margin-top: 3px; }}
+            .garment-card-type {{
+                display: grid;
+                margin: 0;
+                place-items: center;
+                font-weight: 650;
+                line-height: 1.45;
+            }}
+            .garment-card-colour {{
+                display: grid;
+                margin: 0;
+                place-items: center;
+            }}
 
             div[data-testid="stVerticalBlockBorderWrapper"]:has(.recommendation-panel-marker) {{
                 padding: .35rem .35rem .5rem;
@@ -1984,9 +1933,6 @@ def render_weather_window(weather=None, error=None):
                     </div>
                     <div class="weather-tree"></div>
                     <div class="weather-streetlamp"></div>
-                    <div class="weather-person">
-                        <i class="head"></i><i class="body"></i><i class="umbrella"></i>
-                    </div>
                     <div class="weather-clothesline"><i></i><i></i></div>
                 </div>
                 <div class="weather-precipitation">
@@ -3190,17 +3136,122 @@ if st.session_state.image_mode is None:
                 font-size: .76rem;
             }
 
+            .home-wordmark {
+                max-width: 1180px;
+                margin: .25rem auto 1rem;
+            }
+
+            .weather-window-scene {
+                min-height: 650px;
+                max-width: 910px;
+                margin: .25rem 0 0 auto;
+            }
+
+            .weather-neighbourhood {
+                left: 15%;
+            }
+
+            .weather-scene-label {
+                left: 34%;
+            }
+
+            .weather-window-info {
+                right: 1.4rem;
+                left: auto;
+                width: 320px;
+            }
+
+            .home-intro-panel {
+                position: absolute;
+                top: 5.2rem;
+                left: 0;
+                z-index: 18;
+                width: min(455px, 42vw);
+                padding: 1.55rem 1.65rem 1.45rem;
+                border: 1px solid rgba(255,255,255,.72);
+                border-radius: 30px 30px 12px 30px;
+                background: rgba(255,252,247,.82);
+                box-shadow: 0 24px 58px rgba(67,63,57,.14);
+                backdrop-filter: blur(22px) saturate(1.08);
+            }
+
+            .home-intro-panel .opening-subtitle {
+                margin-bottom: 0;
+            }
+
+            .home-dock-marker {
+                height: 0;
+                overflow: hidden;
+            }
+
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker) {
+                position: relative;
+                z-index: 20;
+                width: min(790px, calc(100% - 2.5rem));
+                margin: -220px 0 3.5rem 0;
+                padding: 1rem 1.15rem .95rem;
+                border: 1px solid rgba(255,255,255,.72) !important;
+                border-radius: 28px 28px 12px 28px !important;
+                background: rgba(255, 252, 247, .88) !important;
+                box-shadow: 0 24px 58px rgba(65,61,54,.15) !important;
+                backdrop-filter: blur(24px) saturate(1.08);
+            }
+
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker)
+            > div[data-testid="stVerticalBlock"] {
+                gap: .55rem;
+            }
+
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker)
+            div[data-testid="stVerticalBlockBorderWrapper"]:has(.city-panel-marker) {
+                margin-bottom: .7rem;
+                background: rgba(255,255,255,.48);
+                box-shadow: none;
+            }
+
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker)
+            .city-panel-marker {
+                margin-bottom: .25rem;
+            }
+
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker)
+            .home-greeting {
+                margin-top: .45rem;
+            }
+
             @media (max-width: 760px) {
                 .opening-title {
-                    font-size: clamp(2.25rem, 11vw, 3.25rem);
+                    font-size: clamp(1.9rem, 9vw, 2.65rem);
                     line-height: 1;
                 }
                 .home-wordmark { margin-bottom: 1.2rem; }
-                .weather-window-scene { min-height: 520px; margin-top: 1.4rem; }
+                .home-intro-panel {
+                    position: relative;
+                    top: auto;
+                    left: auto;
+                    width: 100%;
+                    margin-bottom: 1rem;
+                }
+                .weather-window-scene {
+                    min-height: 500px;
+                    margin-top: 0;
+                }
+                div[data-testid="stLayoutWrapper"]:has(.home-dock-marker) {
+                    width: calc(100% - 1.2rem);
+                    margin: -62px auto 2rem;
+                    padding: 1.3rem 1rem 1rem;
+                }
                 .weather-illustration { inset: 3rem .65rem 6rem; }
                 .weather-orb { width: 8rem; right: 9%; }
                 .weather-cloud-form { left: 10%; width: 66%; }
                 .weather-window-temperature { font-size: 1.7rem; }
+                .weather-neighbourhood { left: 2%; }
+                .weather-scene-label { left: 1.75rem; }
+                .weather-window-info {
+                    right: 1.4rem;
+                    left: 1.4rem;
+                    width: auto;
+                }
             }
         </style>
         """,
@@ -3210,29 +3261,41 @@ if st.session_state.image_mode is None:
     home_weather = st.session_state.weather_data
     home_weather_error = st.session_state.weather_error
 
-    copy_column, image_column = st.columns(
-        [0.88, 1.12],
-        gap="large",
-        vertical_alignment="center",
-    )
-
-    with copy_column:
-        st.markdown(
-            """
-            <div class="home-wordmark">
-                <span class="home-brand">Your Wardrobe</span>
-                <span class="home-edition">Daily styling</span>
-            </div>
+    st.markdown(
+        """
+        <div class="home-wordmark">
+            <span class="home-brand">Your Wardrobe</span>
+            <span class="home-edition">Daily styling</span>
+        </div>
+        <div class="home-intro-panel">
             <div class="opening-kicker">Your daily outfit companion</div>
             <div class="opening-title">Start with one piece.</div>
             <div class="opening-subtitle">
                 We’ll style the rest around your mood and the weather outside.
             </div>
-            """,
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    render_weather_window(
+        home_weather,
+        home_weather_error,
+    )
+
+    with st.container(border=False):
+        st.markdown(
+            '<div class="home-dock-marker"></div>',
             unsafe_allow_html=True,
         )
 
-        with st.container(border=True):
+        city_controls, style_controls = st.columns(
+            [0.94, 1.06],
+            gap="large",
+            vertical_alignment="center",
+        )
+
+        with city_controls:
             st.markdown(
                 """
                 <div class="city-panel-marker">
@@ -3271,32 +3334,27 @@ if st.session_state.image_mode is None:
                             home_weather = ensure_current_weather()
                         home_weather_error = st.session_state.weather_error
 
-        st.radio(
-            "Choose your mood",
-            list(THEMES),
-            horizontal=True,
-            key="theme",
-        )
+        with style_controls:
+            st.radio(
+                "Choose your mood",
+                list(THEMES),
+                horizontal=True,
+                key="theme",
+            )
 
-        if st.button(
-            "START WITH A PIECE  →",
-            type="primary",
-            use_container_width=True,
-            key="style_mode_button",
-        ):
-            select_mode("lifestyle")
-            st.rerun()
+            if st.button(
+                "START WITH A PIECE  →",
+                type="primary",
+                use_container_width=True,
+                key="style_mode_button",
+            ):
+                select_mode("lifestyle")
+                st.rerun()
 
-        st.markdown(
-            '<div class="home-greeting">Your clothes, your mood, your little world.</div>',
-            unsafe_allow_html=True,
-        )
-
-    with image_column:
-        render_weather_window(
-            home_weather,
-            home_weather_error,
-        )
+            st.markdown(
+                '<div class="home-greeting">Your clothes, your mood, your little world.</div>',
+                unsafe_allow_html=True,
+            )
 
     st.stop()
 
