@@ -12,4 +12,6 @@ recognition_test_labels_example.csv
 data/polyvore/
 data/polyvore_source/
 data/processed/
+data/incoming/
+data/zara_products/
 models/*.pt

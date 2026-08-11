@@ -45,10 +45,22 @@ full dataset. Existing `polyvore_item_embeddings.pt` is reused.
 
 ## Prepare the Zara candidate catalogue
 
-Fill `data/catalogue.csv`. Required columns are `item_id`, `slot`, `type`,
-`colour`, and `image_path`. Optional fields are `style`,
-`minimum_temperature`, `maximum_temperature`, and semicolon-separated
-`weather_tags` such as `rain;waterproof`.
+Place the published secondary-data archive at `data/incoming/archive.zip`.
+The preparation command reads its bundled metadata and images locally; it
+does not request Zara pages or scrape current product data. It selects a
+balanced 40-product catalogue, extracts one representative image per product,
+and assigns colour/style labels with the frozen SigLIP encoder.
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.prepare_zara_catalogue `
+  --archive data/incoming/archive.zip `
+  --catalogue data/catalogue.csv `
+  --per-slot 10
+```
+
+The generated catalogue contains the required `item_id`, `slot`, `type`,
+`colour`, and `image_path` fields plus weather and source metadata. Cache its
+image vectors with:
 
 ```powershell
 .\.venv\Scripts\python.exe -m recommendation_training.embed_catalogue `

@@ -1,3 +1,4 @@
+import html
 import io
 
 import streamlit as st
@@ -205,6 +206,300 @@ st.markdown(
         div[data-testid="stDialog"] h4 {
             margin-top: 0.25rem !important;
             margin-bottom: 0.35rem !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# Shared visual language for the opening screen, workspace and weather card.
+st.markdown(
+    """
+    <style>
+        .block-container {
+            padding-top: 1.45rem;
+            padding-bottom: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 3.1vw, 2.75rem) !important;
+            letter-spacing: -0.045em;
+        }
+
+        .stApp {
+            background:
+                radial-gradient(circle at 8% 8%, rgba(220, 236, 228, .62), transparent 31rem),
+                radial-gradient(circle at 90% 20%, rgba(236, 222, 205, .44), transparent 28rem),
+                #f8faf8;
+        }
+
+        .stApp::before,
+        .stApp::after {
+            content: "";
+            position: fixed;
+            width: 28rem;
+            height: 28rem;
+            border-radius: 999px;
+            filter: blur(80px);
+            opacity: .22;
+            pointer-events: none;
+            z-index: 0;
+            animation: ambient-light 14s ease-in-out infinite alternate;
+        }
+
+        .stApp::before {
+            top: 4%;
+            left: -10rem;
+            background: #9fc9ad;
+        }
+
+        .stApp::after {
+            right: -8rem;
+            bottom: 3%;
+            background: #e1b98e;
+            animation-delay: -7s;
+        }
+
+        @keyframes ambient-light {
+            from { transform: translate3d(0, -1rem, 0) scale(.92); }
+            to { transform: translate3d(3rem, 2rem, 0) scale(1.08); }
+        }
+
+        .app-wordmark {
+            display: inline-flex;
+            align-items: center;
+            gap: .65rem;
+            margin-bottom: 1.05rem;
+            color: #274737;
+            font-size: .76rem;
+            font-weight: 750;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+
+        .app-wordmark::before {
+            content: "";
+            width: 2.15rem;
+            height: 1px;
+            background: #789986;
+        }
+
+        .opening-hero {
+            max-width: 800px;
+            margin: .65rem auto 1.7rem;
+            text-align: center;
+        }
+
+        .opening-kicker {
+            color: #557565;
+            font-size: .76rem;
+            font-weight: 750;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+        }
+
+        .opening-title {
+            margin: .65rem 0 .7rem;
+            color: #17251e;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(2.5rem, 5.5vw, 4.45rem);
+            font-weight: 500;
+            letter-spacing: -.055em;
+            line-height: .98;
+        }
+
+        .opening-subtitle {
+            max-width: 610px;
+            margin: 0 auto;
+            color: #657069;
+            font-size: clamp(.95rem, 1.5vw, 1.08rem);
+            line-height: 1.7;
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"]:has(.city-panel-marker) {
+            max-width: 880px;
+            margin: 0 auto 1.65rem;
+            padding: .45rem .65rem .55rem;
+            border: 1px solid rgba(126, 158, 139, .32);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, .78);
+            box-shadow: 0 20px 55px rgba(34, 59, 45, .08);
+            backdrop-filter: blur(16px);
+        }
+
+        .city-panel-marker {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+        }
+
+        .city-panel-icon {
+            display: grid;
+            width: 2.6rem;
+            height: 2.6rem;
+            place-items: center;
+            border-radius: 14px;
+            background: #e9f2ec;
+            font-size: 1.15rem;
+        }
+
+        .city-panel-title {
+            color: #20372b;
+            font-size: 1.03rem;
+            font-weight: 720;
+        }
+
+        .city-panel-copy {
+            color: #7b857f;
+            font-size: .82rem;
+        }
+
+        .location-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: .45rem;
+            padding: .38rem .7rem;
+            border-radius: 999px;
+            background: #eef4f0;
+            color: #456553;
+            font-size: .8rem;
+            font-weight: 650;
+        }
+
+        .weather-card {
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+            padding: 1.1rem 1.15rem;
+            border: 1px solid rgba(129, 155, 139, .30);
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(248,252,249,.96), rgba(232,241,235,.92));
+            box-shadow: 0 14px 38px rgba(46, 72, 57, .09);
+        }
+
+        .weather-card::after {
+            content: "";
+            position: absolute;
+            top: -4rem;
+            right: -3rem;
+            width: 10rem;
+            height: 10rem;
+            border-radius: 999px;
+            background: radial-gradient(circle, rgba(255,215,143,.42), transparent 68%);
+            animation: weather-glow 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes weather-glow {
+            from { transform: translate(-.4rem, -.25rem) scale(.9); opacity: .65; }
+            to { transform: translate(.6rem, .45rem) scale(1.12); opacity: 1; }
+        }
+
+        .weather-head,
+        .weather-stats,
+        .weather-advice {
+            position: relative;
+            z-index: 1;
+        }
+
+        .weather-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+        }
+
+        .weather-location {
+            color: #315240;
+            font-size: .76rem;
+            font-weight: 750;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+        }
+
+        .weather-condition {
+            color: #52675b;
+            font-size: .82rem;
+        }
+
+        .weather-icon {
+            font-size: 1.7rem;
+            filter: drop-shadow(0 5px 8px rgba(78, 92, 65, .15));
+            animation: weather-float 3.4s ease-in-out infinite;
+        }
+
+        @keyframes weather-float {
+            50% { transform: translateY(-4px); }
+        }
+
+        .weather-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: .55rem;
+            margin-top: .9rem;
+        }
+
+        .weather-stat {
+            padding: .65rem .55rem;
+            border-radius: 13px;
+            background: rgba(255,255,255,.62);
+        }
+
+        .weather-stat-label {
+            color: #849087;
+            font-size: .68rem;
+        }
+
+        .weather-stat-value {
+            margin-top: .08rem;
+            color: #263e31;
+            font-size: .94rem;
+            font-weight: 720;
+        }
+
+        .weather-advice {
+            margin-top: .8rem;
+            padding-top: .75rem;
+            border-top: 1px solid rgba(115, 143, 126, .2);
+            color: #52675b;
+            font-size: .79rem;
+            line-height: 1.52;
+        }
+
+        .weather-advice strong { color: #284b38; }
+
+        .empty-result {
+            background: rgba(255,255,255,.64);
+            color: #87918b;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.55);
+            backdrop-filter: blur(10px);
+        }
+
+        .stButton > button {
+            border-radius: 13px;
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+
+        .stButton > button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 9px 24px rgba(32, 60, 44, .10);
+        }
+
+        div[data-testid="stVerticalBlockBorderWrapper"] {
+            border-radius: 20px;
+            background: rgba(255,255,255,.72);
+            backdrop-filter: blur(12px);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .stApp::before,
+            .stApp::after,
+            .weather-card::after,
+            .weather-icon {
+                animation: none !important;
+            }
         }
     </style>
     """,
@@ -669,8 +964,8 @@ def get_cached_weather(city):
     return get_city_weather(city)
 
 
-def analyse_with_current_weather(selected_image, original_image):
-    """Run recognition with weather, falling back safely if unavailable."""
+def ensure_current_weather():
+    """Load weather on entry and retain it for analysis and display."""
 
     try:
         weather_data = get_cached_weather(
@@ -682,6 +977,100 @@ def analyse_with_current_weather(selected_image, original_image):
         weather_data = None
         st.session_state.weather_data = None
         st.session_state.weather_error = str(error)
+    return weather_data
+
+
+def weather_dressing_advice(weather):
+    """Turn current conditions into one short wardrobe reminder."""
+
+    feels_like = float(weather.get("feels_like", 20.0))
+    rain_probability = float(weather.get("rain_probability", 0.0))
+    condition = weather.get("condition", "Unknown")
+    if rain_probability >= 50 or condition in {"Rain", "Thunderstorm"}:
+        return "Prioritise a waterproof outer layer and water-resistant shoes."
+    if condition == "Snow" or feels_like <= 5:
+        return "Choose thermal layers, an insulated coat and warm footwear."
+    if feels_like <= 12:
+        return "A warm jacket and a comfortable mid-layer will work well today."
+    if feels_like >= 28:
+        return "Keep it breathable and light; an outer layer is probably unnecessary."
+    if feels_like >= 24:
+        return "Choose breathable fabrics and keep any outer layer lightweight."
+    return "Comfortable layers are ideal; carry a light jacket for temperature changes."
+
+
+def render_compact_weather(weather, error=None):
+    """Render the persistent left-column weather and dressing card."""
+
+    if weather is None:
+        message = html.escape(error or "Live weather is temporarily unavailable.")
+        st.markdown(
+            f"""
+            <div class="weather-card">
+                <div class="weather-head">
+                    <div>
+                        <div class="weather-location">Weather unavailable</div>
+                        <div class="weather-condition">{message}</div>
+                    </div>
+                    <div class="weather-icon">◌</div>
+                </div>
+                <div class="weather-advice"><strong>Dressing cue</strong><br>
+                Use colour and style recommendations until the forecast returns.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        return
+
+    condition = str(weather.get("condition", "Unknown"))
+    weather_icons = {
+        "Clear": "☀️",
+        "Cloudy": "⛅",
+        "Fog": "🌫️",
+        "Rain": "🌧️",
+        "Snow": "❄️",
+        "Thunderstorm": "⛈️",
+    }
+    icon = weather_icons.get(condition, "🌤️")
+    city = html.escape(str(weather.get("city", st.session_state.city)))
+    country = html.escape(str(weather.get("country", "")))
+    location = f"{city}, {country}" if country else city
+    advice = html.escape(weather_dressing_advice(weather))
+    st.markdown(
+        f"""
+        <div class="weather-card">
+            <div class="weather-head">
+                <div>
+                    <div class="weather-location">{location}</div>
+                    <div class="weather-condition">{html.escape(condition)} today</div>
+                </div>
+                <div class="weather-icon">{icon}</div>
+            </div>
+            <div class="weather-stats">
+                <div class="weather-stat">
+                    <div class="weather-stat-label">Feels like</div>
+                    <div class="weather-stat-value">{weather['feels_like']:.0f}°C</div>
+                </div>
+                <div class="weather-stat">
+                    <div class="weather-stat-label">Rain</div>
+                    <div class="weather-stat-value">{weather['rain_probability']:.0f}%</div>
+                </div>
+                <div class="weather-stat">
+                    <div class="weather-stat-label">Wind</div>
+                    <div class="weather-stat-value">{weather['wind_speed']:.0f} km/h</div>
+                </div>
+            </div>
+            <div class="weather-advice"><strong>Dressing cue</strong><br>{advice}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def analyse_with_current_weather(selected_image, original_image):
+    """Run recognition with weather, falling back safely if unavailable."""
+
+    weather_data = ensure_current_weather()
 
     return analyse_clothing(
         selected_image,
@@ -1637,7 +2026,7 @@ def render_outfit_cards(outfit):
 
 
 def render_recommendations_only(result):
-    """Render weather, recognised styles and two complete recommendations."""
+    """Render recognised styles and two complete recommendations."""
 
     recommendation = result["recommendation"]
 
@@ -1657,29 +2046,6 @@ def render_recommendations_only(result):
         result["recommendation"] = recommendation
 
     weather = result.get("weather")
-    if weather:
-        with st.container(border=True):
-            st.subheader(f'{weather["city"]} Weather')
-            weather_columns = st.columns(4)
-            weather_columns[0].metric(
-                "Temperature", f'{weather["temperature"]:.0f}°C'
-            )
-            weather_columns[1].metric(
-                "Feels like", f'{weather["feels_like"]:.0f}°C'
-            )
-            weather_columns[2].metric(
-                "Condition", weather["condition"]
-            )
-            weather_columns[3].metric(
-                "Rain chance", f'{weather["rain_probability"]:.0f}%'
-            )
-    else:
-        with st.container(border=True):
-            st.subheader("Weather")
-            st.caption(
-                "Live weather is temporarily unavailable. The outfit uses "
-                "colour and style information only."
-            )
 
     recognised_styles = [
         item["style"]
@@ -1747,8 +2113,25 @@ def render_recommendations_only(result):
 
 initialise_state()
 
-
-st.title("AI Outfit Recommendation")
+if st.session_state.image_mode is None:
+    st.markdown(
+        """
+        <div class="opening-hero">
+            <div class="opening-kicker">Weather-aware personal styling</div>
+            <div class="opening-title">Dress for your day.</div>
+            <div class="opening-subtitle">
+                Add your location, choose an image type, and receive two
+                coordinated outfits shaped by colour, style and today's weather.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        '<div class="app-wordmark">AI Outfit Recommendation</div>',
+        unsafe_allow_html=True,
+    )
 
 
 # =========================================================
@@ -1762,62 +2145,78 @@ if st.session_state.image_mode is None:
             .stButton > button {
                 min-height: 165px;
                 padding: 1.5rem 1.7rem;
-                border: 1px solid #e5e7eb;
-                border-radius: 22px;
-                background: #ffffff;
+                border: 1px solid rgba(126, 158, 139, .27);
+                border-radius: 24px;
+                background: rgba(255,255,255,.80);
                 box-shadow:
-                    0 8px 26px
-                    rgba(15, 23, 42, 0.06);
-                font-size: 1.05rem;
-                line-height: 1.55;
+                    0 16px 42px
+                    rgba(34, 59, 45, 0.08);
+                color: #25382e;
+                font-size: 1rem;
+                line-height: 1.6;
                 text-align: left;
                 white-space: pre-wrap;
+                backdrop-filter: blur(12px);
                 transition:
-                    transform 0.15s ease,
-                    border-color 0.15s ease,
-                    box-shadow 0.15s ease;
+                    transform 0.2s ease,
+                    border-color 0.2s ease,
+                    box-shadow 0.2s ease;
             }
 
             .stButton > button:hover {
-                transform: translateY(-2px);
-                border-color: #ef5b5b;
-                color: #111827;
+                transform: translateY(-4px);
+                border-color: #86aa94;
+                color: #1d3528;
                 box-shadow:
-                    0 12px 32px
-                    rgba(15, 23, 42, 0.10);
+                    0 22px 52px
+                    rgba(34, 59, 45, 0.13);
             }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-    with st.form("weather_city_form", border=False):
-        city_column, save_city_column = st.columns([0.78, 0.22])
-        with city_column:
-            st.text_input(
-                "City for today's weather",
-                key="city_input",
-                placeholder="For example: Shanghai",
-                help=(
-                    "Press Enter or choose Save City. The city is used for "
-                    "today's temperature, rain and wind."
-                ),
-            )
-        with save_city_column:
-            st.write("")
-            city_submitted = st.form_submit_button(
-                "Save City",
-                use_container_width=True,
-            )
+    with st.container(border=True):
+        st.markdown(
+            """
+            <div class="city-panel-marker">
+                <div class="city-panel-icon">⌖</div>
+                <div>
+                    <div class="city-panel-title">Set today's location</div>
+                    <div class="city-panel-copy">Used only to tailor layers and weather protection.</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        with st.form("weather_city_form", border=False):
+            city_column, save_city_column = st.columns([0.76, 0.24])
+            with city_column:
+                st.text_input(
+                    "City",
+                    key="city_input",
+                    placeholder="For example: Shanghai",
+                    label_visibility="collapsed",
+                    help="The city is used for today's temperature, rain and wind.",
+                )
+            with save_city_column:
+                city_submitted = st.form_submit_button(
+                    "Use this city",
+                    use_container_width=True,
+                )
 
-        if city_submitted:
-            entered_city = st.session_state.city_input.strip()
-            if entered_city:
-                st.session_state.city = entered_city
-                st.session_state.weather_data = None
-                st.session_state.weather_error = None
+            if city_submitted:
+                entered_city = st.session_state.city_input.strip()
+                if entered_city:
+                    st.session_state.city = entered_city
+                    st.session_state.weather_data = None
+                    st.session_state.weather_error = None
 
-    st.caption(f'Weather location: **{st.session_state.city}**')
+        safe_city = html.escape(st.session_state.city)
+        st.markdown(
+            f'<div class="location-pill">● Forecast location&nbsp; {safe_city}</div>',
+            unsafe_allow_html=True,
+        )
 
     product_column, lifestyle_column = (
         st.columns(
@@ -1868,6 +2267,7 @@ mode_title = (
     else "Lifestyle Image"
 )
 
+current_weather = ensure_current_weather()
 
 left_column, right_column = st.columns(
     [0.95, 1.05],
@@ -1940,6 +2340,12 @@ if st.session_state.uploaded_bytes is None:
             </div>
             """,
             unsafe_allow_html=True,
+        )
+
+    with left_column:
+        render_compact_weather(
+            current_weather,
+            st.session_state.weather_error,
         )
 
     st.stop()
@@ -2144,6 +2550,21 @@ with left_column:
                         )
 
                     st.rerun()
+
+
+# The weather card remains at the bottom of the left workflow column before
+# and after analysis, keeping the recommendation column focused and balanced.
+with left_column:
+    displayed_weather = current_weather
+    if st.session_state.analysis_result is not None:
+        displayed_weather = (
+            st.session_state.analysis_result.get("weather")
+            or current_weather
+        )
+    render_compact_weather(
+        displayed_weather,
+        st.session_state.weather_error,
+    )
 
 
 # ---------------------------------------------------------
