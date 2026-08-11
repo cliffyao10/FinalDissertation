@@ -139,7 +139,7 @@ CATEGORY_PARENTS = {
 
 
 st.set_page_config(
-    page_title="AI Outfit Recommendation",
+    page_title="Cove",
     page_icon="👕",
     layout="wide",
 )
@@ -311,10 +311,27 @@ st.markdown(
             gap: .65rem;
             margin-bottom: 1.05rem;
             color: #274737;
-            font-size: .76rem;
-            font-weight: 750;
-            letter-spacing: .16em;
-            text-transform: uppercase;
+        }
+
+        .app-brand-lockup {
+            display: flex;
+            flex-direction: column;
+            gap: .02rem;
+            line-height: 1.05;
+        }
+
+        .app-brand-name {
+            font-family: ui-rounded, "Segoe UI Variable Display", "Trebuchet MS", sans-serif;
+            font-size: 1.22rem;
+            font-weight: 720;
+            letter-spacing: -.045em;
+        }
+
+        .app-brand-tagline {
+            color: var(--fashion-muted);
+            font-size: .67rem;
+            font-weight: 580;
+            letter-spacing: .035em;
         }
 
         .app-wordmark::before {
@@ -361,7 +378,8 @@ st.markdown(
 
         .home-brand {
             font-family: Georgia, "Times New Roman", serif;
-            font-size: 1.25rem;
+            font-size: 1.65rem;
+            line-height: 1;
             letter-spacing: -.035em;
         }
 
@@ -3259,7 +3277,14 @@ render_theme_css()
 
 if st.session_state.image_mode is not None:
     st.markdown(
-        '<div class="app-wordmark">AI Outfit Recommendation</div>',
+        """
+        <div class="app-wordmark">
+            <span class="app-brand-lockup">
+                <span class="app-brand-name">Cove</span>
+                <span class="app-brand-tagline">Your wardrobe</span>
+            </span>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
@@ -3447,7 +3472,14 @@ if st.session_state.image_mode is None:
             .home-brand-lockup {
                 display: flex;
                 flex-direction: column;
-                gap: .16rem;
+                gap: .05rem;
+            }
+
+            .home-tagline {
+                color: var(--fashion-muted);
+                font-size: .72rem;
+                font-weight: 560;
+                letter-spacing: .035em;
             }
 
             .home-dock-marker {
@@ -3572,7 +3604,8 @@ if st.session_state.image_mode is None:
         """
         <div class="home-wordmark">
             <span class="home-brand-lockup">
-                <span class="home-brand">Your Wardrobe</span>
+                <span class="home-brand">Cove</span>
+                <span class="home-tagline">Your wardrobe</span>
             </span>
             <span class="home-edition">Daily styling</span>
         </div>
