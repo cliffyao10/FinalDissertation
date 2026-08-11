@@ -470,31 +470,6 @@ st.markdown(
             --cloud-back: rgba(76, 92, 118, .96);
         }
 
-        .weather-scene-label {
-            position: absolute;
-            top: 1.55rem;
-            left: 1.75rem;
-            z-index: 12;
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            color: rgba(43, 57, 70, .68);
-            font-size: .66rem;
-            font-weight: 760;
-            letter-spacing: .16em;
-            text-transform: uppercase;
-        }
-        .weather-scene-label::before {
-            content: "";
-            width: .46rem;
-            height: .46rem;
-            border: 1px solid currentColor;
-            border-radius: 999px;
-            box-shadow: inset 0 0 0 2px rgba(255,255,255,.25);
-        }
-        .weather-rain .weather-scene-label,
-        .weather-thunderstorm .weather-scene-label { color: rgba(248,250,255,.75); }
-
         .weather-illustration {
             position: absolute;
             inset: 2.8rem 1.3rem 6.2rem;
@@ -2102,7 +2077,6 @@ def render_weather_window(weather=None, error=None):
         f"""
         <div class="weather-window-scene weather-{scene}" role="img"
              aria-label="{html.escape(accessibility)}">
-            <div class="weather-scene-label">Outside · {location}</div>
             <div class="weather-illustration" aria-hidden="true">
                 <div class="weather-orb"></div>
                 <div class="weather-cloud-shadow"></div>
@@ -3433,10 +3407,6 @@ if st.session_state.image_mode is None:
                 transform-origin: bottom center;
             }
 
-            .weather-scene-label {
-                left: 45%;
-            }
-
             .weather-window-info {
                 top: 1.25rem;
                 right: 1.4rem;
@@ -3584,7 +3554,6 @@ if st.session_state.image_mode is None:
                 .weather-cloud-form { left: 10%; width: 66%; }
                 .weather-window-temperature { font-size: 1.7rem; }
                 .weather-neighbourhood { left: 2%; transform: none; }
-                .weather-scene-label { left: 1.75rem; }
                 .weather-window-info {
                     top: auto;
                     right: 1.4rem;
