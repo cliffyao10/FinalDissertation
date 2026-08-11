@@ -320,36 +320,126 @@ st.markdown(
             background: #789986;
         }
 
-        .opening-hero {
-            max-width: 800px;
-            margin: .65rem auto 1.7rem;
-            text-align: center;
-        }
-
         .opening-kicker {
             color: #557565;
-            font-size: .76rem;
+            font-size: .7rem;
             font-weight: 750;
-            letter-spacing: .18em;
+            letter-spacing: .2em;
             text-transform: uppercase;
         }
 
         .opening-title {
-            margin: .65rem 0 .7rem;
+            max-width: 650px;
+            margin: .8rem 0 1rem;
             color: #17251e;
             font-family: Georgia, "Times New Roman", serif;
-            font-size: clamp(2.5rem, 5.5vw, 4.45rem);
+            font-size: clamp(3.35rem, 6.2vw, 6.25rem);
             font-weight: 500;
-            letter-spacing: -.055em;
-            line-height: .98;
+            letter-spacing: -.065em;
+            line-height: .88;
         }
 
         .opening-subtitle {
-            max-width: 610px;
-            margin: 0 auto;
+            max-width: 465px;
+            margin: 0 0 1.5rem;
             color: #657069;
-            font-size: clamp(.95rem, 1.5vw, 1.08rem);
-            line-height: 1.7;
+            font-size: clamp(.95rem, 1.35vw, 1.08rem);
+            line-height: 1.62;
+        }
+
+        .home-wordmark {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: .25rem 0 2rem;
+            color: var(--fashion-ink);
+        }
+
+        .home-brand {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.25rem;
+            letter-spacing: -.035em;
+        }
+
+        .home-edition {
+            color: var(--fashion-muted);
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+        }
+
+        .home-greeting {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            margin-top: 1.25rem;
+            color: var(--fashion-muted);
+            font-size: .75rem;
+        }
+
+        .home-greeting::before {
+            content: "";
+            width: 1.6rem;
+            height: 1px;
+            background: var(--fashion-primary);
+        }
+
+        div[data-testid="stVerticalBlock"]:has(.editorial-image-marker) {
+            position: relative;
+        }
+
+        div[data-testid="stVerticalBlock"]:has(.editorial-image-marker)
+        div[data-testid="stImage"] img {
+            width: 100%;
+            height: min(72vh, 700px);
+            min-height: 560px;
+            border-radius: 34px 34px 12px 34px;
+            object-fit: cover;
+            object-position: center 38%;
+            box-shadow: 0 28px 70px rgba(57, 43, 31, .15);
+        }
+
+        .editorial-image-marker {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: .7rem;
+            color: var(--fashion-muted);
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+
+        .editorial-note {
+            position: relative;
+            z-index: 2;
+            width: calc(100% - 2rem);
+            margin: -5.3rem 1rem 0;
+            padding: 1rem 1.1rem;
+            border: 1px solid rgba(255,255,255,.55);
+            border-radius: 18px 18px 8px 18px;
+            background: rgba(255, 252, 246, .84);
+            color: #362e28;
+            box-shadow: 0 14px 35px rgba(42, 31, 23, .12);
+            backdrop-filter: blur(16px);
+        }
+
+        .editorial-note strong {
+            display: block;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 1.08rem;
+            font-weight: 500;
+        }
+
+        .editorial-note span {
+            display: block;
+            margin-top: .2rem;
+            color: #746a62;
+            font-size: .69rem;
+            letter-spacing: .08em;
+            text-transform: uppercase;
         }
 
         div[data-testid="stVerticalBlockBorderWrapper"]:has(.city-panel-marker) {
@@ -2244,20 +2334,7 @@ def render_recommendations_only(result):
 initialise_state()
 render_theme_css()
 
-if st.session_state.image_mode is None:
-    st.markdown(
-        """
-            <div class="opening-hero">
-            <div class="opening-kicker">Personal styling · today</div>
-            <div class="opening-title">Dress for your day.</div>
-            <div class="opening-subtitle">
-                One item in. Two complete looks out.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-else:
+if st.session_state.image_mode is not None:
     st.markdown(
         '<div class="app-wordmark">AI Outfit Recommendation</div>',
         unsafe_allow_html=True,
@@ -2273,21 +2350,18 @@ if st.session_state.image_mode is None:
         """
         <style>
             .stButton > button {
-                min-height: 94px;
-                padding: 1.2rem 1.7rem;
-                border: 1px solid rgba(126, 158, 139, .27);
-                border-radius: 24px;
-                background: rgba(255,255,255,.80);
-                box-shadow:
-                    0 16px 42px
-                    rgba(34, 59, 45, 0.08);
-                color: var(--fashion-ink);
-                font-size: 1.08rem;
-                letter-spacing: .14em;
+                min-height: 56px;
+                padding: .95rem 1.4rem;
+                border: 1px solid var(--fashion-strong);
+                border-radius: 999px;
+                background: var(--fashion-strong);
+                color: white;
+                box-shadow: 0 13px 30px color-mix(in srgb, var(--fashion-strong) 24%, transparent);
+                font-size: .82rem;
+                letter-spacing: .12em;
                 line-height: 1.2;
                 text-align: center;
                 white-space: pre-wrap;
-                backdrop-filter: blur(12px);
                 transition:
                     transform 0.2s ease,
                     border-color 0.2s ease,
@@ -2295,76 +2369,135 @@ if st.session_state.image_mode is None:
             }
 
             .stButton > button:hover {
-                transform: translateY(-4px);
-                border-color: var(--fashion-primary);
-                color: var(--fashion-strong);
+                transform: translateY(-2px);
+                border-color: var(--fashion-strong);
+                color: white !important;
+                filter: brightness(.94);
                 box-shadow:
-                    0 22px 52px
+                    0 18px 38px
                     color-mix(in srgb, var(--fashion-primary) 22%, transparent);
+            }
+
+            div[data-testid="stRadio"] label p {
+                font-size: .76rem;
+            }
+
+            @media (max-width: 760px) {
+                .opening-title {
+                    font-size: clamp(3rem, 16vw, 4.4rem);
+                    line-height: .92;
+                }
+                .home-wordmark { margin-bottom: 1.2rem; }
+                div[data-testid="stVerticalBlock"]:has(.editorial-image-marker)
+                div[data-testid="stImage"] img {
+                    height: 520px;
+                    min-height: 0;
+                    margin-top: 1.4rem;
+                }
             }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-    with st.container(border=True):
+    copy_column, image_column = st.columns(
+        [0.88, 1.12],
+        gap="large",
+        vertical_alignment="center",
+    )
+
+    with copy_column:
         st.markdown(
             """
-            <div class="city-panel-marker">
-                <div class="city-panel-icon">⌖</div>
-                <div>
-                    <div class="city-panel-title">Set today's location</div>
-                    <div class="city-panel-copy">Used only to tailor layers and weather protection.</div>
-                </div>
+            <div class="home-wordmark">
+                <span class="home-brand">Your Wardrobe</span>
+                <span class="home-edition">Daily styling</span>
+            </div>
+            <div class="opening-kicker">Weather-aware · Personal · Easy</div>
+            <div class="opening-title">Feel good in what you wear.</div>
+            <div class="opening-subtitle">
+                Bring one piece you love. We’ll shape the rest around you
+                and today’s weather.
             </div>
             """,
             unsafe_allow_html=True,
         )
-        with st.form("weather_city_form", border=False):
-            city_column, save_city_column = st.columns([0.76, 0.24])
-            with city_column:
-                st.text_input(
-                    "City",
-                    key="city_input",
-                    placeholder="For example: Shanghai",
-                    label_visibility="collapsed",
-                    help="The city is used for today's temperature, rain and wind.",
-                )
-            with save_city_column:
-                city_submitted = st.form_submit_button(
-                    "Use this city",
-                    use_container_width=True,
-                )
 
-            if city_submitted:
-                entered_city = st.session_state.city_input.strip()
-                if entered_city:
-                    st.session_state.city = entered_city
-                    st.session_state.weather_data = None
-                    st.session_state.weather_error = None
+        with st.container(border=True):
+            st.markdown(
+                """
+                <div class="city-panel-marker">
+                    <div class="city-panel-icon">⌖</div>
+                    <div>
+                        <div class="city-panel-title">Where are you dressing for?</div>
+                        <div class="city-panel-copy">Your forecast sets the layers.</div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            with st.form("weather_city_form", border=False):
+                city_column, save_city_column = st.columns([0.68, 0.32])
+                with city_column:
+                    st.text_input(
+                        "City",
+                        key="city_input",
+                        placeholder="Shanghai",
+                        label_visibility="collapsed",
+                        help="Used for today's temperature, rain and wind.",
+                    )
+                with save_city_column:
+                    city_submitted = st.form_submit_button(
+                        "Set location",
+                        use_container_width=True,
+                    )
 
-        safe_city = html.escape(st.session_state.city)
-        st.markdown(
-            f'<div class="location-pill">● Forecast location&nbsp; {safe_city}</div>',
-            unsafe_allow_html=True,
-        )
+                if city_submitted:
+                    entered_city = st.session_state.city_input.strip()
+                    if entered_city:
+                        st.session_state.city = entered_city
+                        st.session_state.weather_data = None
+                        st.session_state.weather_error = None
 
-    theme_column, action_column = st.columns([0.62, 0.38], gap="large")
-    with theme_column:
         st.radio(
-            "Mood",
+            "Choose your mood",
             list(THEMES),
             horizontal=True,
             key="theme",
         )
-    with action_column:
+
         if st.button(
-            "STYLE",
+            "STYLE MY LOOK  →",
+            type="primary",
             use_container_width=True,
             key="style_mode_button",
         ):
             select_mode("lifestyle")
             st.rerun()
+
+        st.markdown(
+            '<div class="home-greeting">A little guidance, still completely you.</div>',
+            unsafe_allow_html=True,
+        )
+
+    with image_column:
+        st.markdown(
+            '<div class="editorial-image-marker"><span>Your everyday pieces</span><span>01</span></div>',
+            unsafe_allow_html=True,
+        )
+        st.image(
+            "assets/fashion-editorial-hero.png",
+            width="stretch",
+        )
+        st.markdown(
+            """
+            <div class="editorial-note">
+                <strong>Getting dressed should feel easy.</strong>
+                <span>Weather · colour · you</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     st.stop()
 
