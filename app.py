@@ -3450,13 +3450,6 @@ if st.session_state.image_mode is None:
                 gap: .16rem;
             }
 
-            .home-tagline {
-                color: var(--fashion-muted);
-                font-size: .8rem;
-                font-weight: 560;
-                letter-spacing: .015em;
-            }
-
             .home-dock-marker {
                 height: 0;
                 overflow: hidden;
@@ -3580,7 +3573,6 @@ if st.session_state.image_mode is None:
         <div class="home-wordmark">
             <span class="home-brand-lockup">
                 <span class="home-brand">Your Wardrobe</span>
-                <span class="home-tagline">Start with one piece.</span>
             </span>
             <span class="home-edition">Daily styling</span>
         </div>
