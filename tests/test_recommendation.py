@@ -46,6 +46,27 @@ class RecommendationModelTests(unittest.TestCase):
         self.assertIn("very_cold", result["primary"]["constraints_applied"])
         self.assertIn("rain", result["primary"]["constraints_applied"])
 
+    def test_no_outer_layer_has_no_recommended_colour(self):
+        result = recommend_outfit(
+            "T-Shirt",
+            "Blue",
+            selected_style="Casual",
+            weather={
+                "feels_like": 31,
+                "rain_probability": 0,
+                "condition": "Clear",
+            },
+        )
+        outer_layer = next(
+            item
+            for item in result["primary"]["items"]
+            if item["slot"] == "outer_top"
+        )
+
+        self.assertEqual(outer_layer["type"], "TOO HOT - No Outer Layer Needed")
+        self.assertIsNone(outer_layer["colour"])
+        self.assertEqual(outer_layer["label"], outer_layer["type"])
+
     def test_model_is_deterministic(self):
         arguments = ("Dress", "Purple")
         first = recommend_outfit(*arguments, selected_style="Party")

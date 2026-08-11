@@ -54,6 +54,39 @@ ICON_COLOURS = {
     "Yellow": "#d8ba4c",
 }
 
+THEMES = {
+    "Blue": {
+        "primary": "#6486a7", "strong": "#3f6385", "soft": "#e8f0f7",
+        "glow": "#abc9e3", "secondary": "#d8e3ee", "ink": "#172b3d",
+        "muted": "#617486", "surface": "#f8fbfd", "canvas": "#3f6385",
+        "canvas_fill": "rgba(63, 99, 133, 0.12)",
+    },
+    "Green": {
+        "primary": "#789986", "strong": "#456b55", "soft": "#e9f2ec",
+        "glow": "#9fc9ad", "secondary": "#e3d1bc", "ink": "#17251e",
+        "muted": "#657069", "surface": "#f8faf8", "canvas": "#456b55",
+        "canvas_fill": "rgba(69, 107, 85, 0.12)",
+    },
+    "Pink": {
+        "primary": "#c08699", "strong": "#995d72", "soft": "#f6e9ee",
+        "glow": "#e6b7c6", "secondary": "#efd8cc", "ink": "#38242c",
+        "muted": "#7a6870", "surface": "#fdf9fa", "canvas": "#995d72",
+        "canvas_fill": "rgba(153, 93, 114, 0.12)",
+    },
+    "Beige": {
+        "primary": "#a48a6c", "strong": "#775d42", "soft": "#f3ece3",
+        "glow": "#dac3a7", "secondary": "#eadbca", "ink": "#33291f",
+        "muted": "#766c62", "surface": "#fcfaf7", "canvas": "#775d42",
+        "canvas_fill": "rgba(119, 93, 66, 0.12)",
+    },
+    "Minimal White": {
+        "primary": "#8a8a86", "strong": "#b33c45", "soft": "#f1f1ef",
+        "glow": "#e7e7e3", "secondary": "#f4f4f1", "ink": "#20201f",
+        "muted": "#70706d", "surface": "#ffffff", "canvas": "#b33c45",
+        "canvas_fill": "rgba(179, 60, 69, 0.10)",
+    },
+}
+
 CATEGORY_CHOICES = [
     "Tank Top",
     "T-Shirt",
@@ -523,11 +556,108 @@ def initialise_state():
         "city_input": "London",
         "weather_data": None,
         "weather_error": None,
+        "theme": "Green",
     }
 
     for state_name, default_value in defaults.items():
         if state_name not in st.session_state:
             st.session_state[state_name] = default_value
+
+
+def render_theme_css():
+    """Apply the selected visual palette across every application page."""
+
+    theme = THEMES.get(st.session_state.theme, THEMES["Green"])
+    st.markdown(
+        f"""
+        <style>
+            :root {{
+                --fashion-primary: {theme["primary"]};
+                --fashion-strong: {theme["strong"]};
+                --fashion-soft: {theme["soft"]};
+                --fashion-glow: {theme["glow"]};
+                --fashion-secondary: {theme["secondary"]};
+                --fashion-ink: {theme["ink"]};
+                --fashion-muted: {theme["muted"]};
+                --fashion-surface: {theme["surface"]};
+            }}
+
+            .stApp {{
+                background:
+                    radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--fashion-glow) 58%, transparent), transparent 31rem),
+                    radial-gradient(circle at 90% 20%, color-mix(in srgb, var(--fashion-secondary) 52%, transparent), transparent 28rem),
+                    var(--fashion-surface) !important;
+                color: var(--fashion-ink);
+            }}
+
+            .stApp::before {{ background: var(--fashion-glow) !important; }}
+            .stApp::after {{ background: var(--fashion-secondary) !important; }}
+            .app-wordmark, .opening-kicker, .weather-location {{
+                color: var(--fashion-strong) !important;
+            }}
+            .app-wordmark::before {{ background: var(--fashion-primary) !important; }}
+            .opening-title, .city-panel-title, .weather-stat-value {{
+                color: var(--fashion-ink) !important;
+            }}
+            .opening-subtitle, .city-panel-copy, .weather-condition,
+            .weather-advice, .garment-card-colour {{
+                color: var(--fashion-muted) !important;
+            }}
+            .city-panel-icon, .location-pill {{
+                background: var(--fashion-soft) !important;
+                color: var(--fashion-strong) !important;
+            }}
+            .weather-card {{
+                border-color: color-mix(in srgb, var(--fashion-primary) 35%, transparent) !important;
+                background: linear-gradient(145deg, rgba(255,255,255,.96), var(--fashion-soft)) !important;
+                box-shadow: 0 14px 38px color-mix(in srgb, var(--fashion-primary) 15%, transparent) !important;
+            }}
+            .weather-card::after {{
+                background: radial-gradient(circle, color-mix(in srgb, var(--fashion-secondary) 68%, transparent), transparent 68%) !important;
+            }}
+            div[data-testid="stVerticalBlockBorderWrapper"]:has(.city-panel-marker) {{
+                box-shadow: 0 20px 55px color-mix(in srgb, var(--fashion-primary) 14%, transparent) !important;
+            }}
+            .weather-advice strong {{ color: var(--fashion-strong) !important; }}
+            div[data-testid="stVerticalBlockBorderWrapper"] {{
+                border-color: color-mix(in srgb, var(--fashion-primary) 25%, #e7e7e4) !important;
+            }}
+            .stButton > button:hover,
+            .stFormSubmitButton > button:hover {{
+                border-color: var(--fashion-primary) !important;
+                color: var(--fashion-strong) !important;
+            }}
+            .stButton > button[kind="primary"],
+            .stFormSubmitButton > button[kind="primary"] {{
+                border-color: var(--fashion-strong) !important;
+                background: var(--fashion-strong) !important;
+                color: white !important;
+                box-shadow: 0 8px 22px color-mix(in srgb, var(--fashion-strong) 25%, transparent) !important;
+            }}
+            .stButton > button[kind="primary"]:hover,
+            .stFormSubmitButton > button[kind="primary"]:hover {{
+                filter: brightness(.92);
+                color: white !important;
+            }}
+            .garment-card {{
+                min-height: 190px;
+                padding: 18px 12px;
+                border: 1px solid color-mix(in srgb, var(--fashion-primary) 20%, #e7e7e4);
+                border-radius: 18px;
+                background: color-mix(in srgb, var(--fashion-soft) 30%, white);
+                text-align: center;
+            }}
+            .garment-card-slot {{
+                margin-top: 4px;
+                color: var(--fashion-muted);
+                font-size: .78rem;
+            }}
+            .garment-card-type {{ margin-top: 7px; font-weight: 650; }}
+            .garment-card-colour {{ margin-top: 3px; }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def reset_analysis():
@@ -1907,7 +2037,7 @@ def render_results(
 def garment_icon_svg(slot, colour, item_type=""):
     """Return a compact garment icon coloured to match the recommendation."""
 
-    fill = ICON_COLOURS.get(colour, "#8b9098")
+    fill = ICON_COLOURS.get(colour, "#e8c95e")
     stroke = "#34363d"
 
     paths = {
@@ -2008,18 +2138,18 @@ def render_outfit_cards(outfit):
 
     for column, item in zip(columns, outfit["items"]):
         with column:
+            colour_line = (
+                f'<div class="garment-card-colour">{html.escape(item["colour"])}</div>'
+                if item.get("colour")
+                else ""
+            )
             st.markdown(
                 (
-                    '<div style="min-height:190px;padding:18px 12px;'
-                    'border:1px solid #e2e6e3;border-radius:18px;'
-                    'background:#fbfcfb;text-align:center">'
+                    '<div class="garment-card">'
                     f'{garment_icon_svg(item["slot"], item["colour"], item["type"])}'
-                    f'<div style="font-size:.78rem;color:#858a91;'
-                    f'margin-top:4px">{item["slot_label"]}</div>'
-                    f'<div style="font-weight:650;margin-top:7px">'
-                    f'{item["type"]}</div>'
-                    f'<div style="color:#666c73;margin-top:3px">'
-                    f'{item["colour"]}</div></div>'
+                    f'<div class="garment-card-slot">{html.escape(item["slot_label"])}</div>'
+                    f'<div class="garment-card-type">{html.escape(item["type"])}</div>'
+                    f'{colour_line}</div>'
                 ),
                 unsafe_allow_html=True,
             )
@@ -2112,16 +2242,16 @@ def render_recommendations_only(result):
 
 
 initialise_state()
+render_theme_css()
 
 if st.session_state.image_mode is None:
     st.markdown(
         """
-        <div class="opening-hero">
-            <div class="opening-kicker">Weather-aware personal styling</div>
+            <div class="opening-hero">
+            <div class="opening-kicker">Personal styling · today</div>
             <div class="opening-title">Dress for your day.</div>
             <div class="opening-subtitle">
-                Add your location, choose an image type, and receive two
-                coordinated outfits shaped by colour, style and today's weather.
+                One item in. Two complete looks out.
             </div>
         </div>
         """,
@@ -2143,18 +2273,19 @@ if st.session_state.image_mode is None:
         """
         <style>
             .stButton > button {
-                min-height: 165px;
-                padding: 1.5rem 1.7rem;
+                min-height: 94px;
+                padding: 1.2rem 1.7rem;
                 border: 1px solid rgba(126, 158, 139, .27);
                 border-radius: 24px;
                 background: rgba(255,255,255,.80);
                 box-shadow:
                     0 16px 42px
                     rgba(34, 59, 45, 0.08);
-                color: #25382e;
-                font-size: 1rem;
-                line-height: 1.6;
-                text-align: left;
+                color: var(--fashion-ink);
+                font-size: 1.08rem;
+                letter-spacing: .14em;
+                line-height: 1.2;
+                text-align: center;
                 white-space: pre-wrap;
                 backdrop-filter: blur(12px);
                 transition:
@@ -2165,11 +2296,11 @@ if st.session_state.image_mode is None:
 
             .stButton > button:hover {
                 transform: translateY(-4px);
-                border-color: #86aa94;
-                color: #1d3528;
+                border-color: var(--fashion-primary);
+                color: var(--fashion-strong);
                 box-shadow:
                     0 22px 52px
-                    rgba(34, 59, 45, 0.13);
+                    color-mix(in srgb, var(--fashion-primary) 22%, transparent);
             }
         </style>
         """,
@@ -2218,37 +2349,19 @@ if st.session_state.image_mode is None:
             unsafe_allow_html=True,
         )
 
-    product_column, lifestyle_column = (
-        st.columns(
-            2,
-            gap="large",
+    theme_column, action_column = st.columns([0.62, 0.38], gap="large")
+    with theme_column:
+        st.radio(
+            "Mood",
+            list(THEMES),
+            horizontal=True,
+            key="theme",
         )
-    )
-
-    with product_column:
+    with action_column:
         if st.button(
-            (
-                "PRODUCT IMAGE\n\n"
-                "Use a clean catalogue or product "
-                "photo. The complete image will "
-                "be analysed."
-            ),
+            "STYLE",
             use_container_width=True,
-            key="product_mode_button",
-        ):
-            select_mode("product")
-            st.rerun()
-
-    with lifestyle_column:
-        if st.button(
-            (
-                "LIFESTYLE IMAGE\n\n"
-                "Upload a person or lifestyle "
-                "photo and quickly draw around "
-                "one clothing item."
-            ),
-            use_container_width=True,
-            key="lifestyle_mode_button",
+            key="style_mode_button",
         ):
             select_mode("lifestyle")
             st.rerun()
@@ -2260,12 +2373,7 @@ if st.session_state.image_mode is None:
 # Working page
 # =========================================================
 
-mode_title = (
-    "Product Image"
-    if st.session_state.image_mode
-    == "product"
-    else "Lifestyle Image"
-)
+mode_title = "What do you want to wear today?"
 
 current_weather = ensure_current_weather()
 
@@ -2423,10 +2531,8 @@ with left_column:
                 background_image=canvas_frame,
                 drawing_mode="freedraw",
                 stroke_width=6,
-                stroke_color="#FF4B4B",
-                fill_color=(
-                    "rgba(255, 75, 75, 0.10)"
-                ),
+                stroke_color=THEMES[st.session_state.theme]["canvas"],
+                fill_color=THEMES[st.session_state.theme]["canvas_fill"],
                 update_streamlit=True,
                 display_toolbar=True,
                 width=FRAME_WIDTH,

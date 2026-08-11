@@ -336,15 +336,20 @@ def _build_outfit(category, colour, style, weather, ranked_candidate):
             weather,
         )
         constraints.extend(item_constraints)
-        if "TOO HOT" in item_name:
-            item_colour = "Yellow"
+        recommends_no_item = "No Outer Layer Needed" in item_name
+        if recommends_no_item:
+            item_colour = None
         items.append(
             {
                 "slot": slot,
                 "slot_label": SLOT_LABELS[slot],
                 "type": item_name,
                 "colour": item_colour,
-                "label": f"{item_colour} {item_name}",
+                "label": (
+                    item_name
+                    if recommends_no_item
+                    else f"{item_colour} {item_name}"
+                ),
             }
         )
 
