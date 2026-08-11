@@ -18,7 +18,7 @@ from src.weather import WeatherServiceError, get_city_weather
 
 FRAME_WIDTH = 520
 FRAME_HEIGHT = 400
-FRAME_BACKGROUND = (246, 247, 249)
+FRAME_BACKGROUND = (250, 248, 244)
 
 # Product mode shows recommendations only. Change this to True while
 # collecting dissertation evidence or diagnosing recognition failures.
@@ -670,6 +670,8 @@ def render_theme_css():
                 --fashion-ink: {theme["ink"]};
                 --fashion-muted: {theme["muted"]};
                 --fashion-surface: {theme["surface"]};
+                --fashion-cream: #fff9f3;
+                --fashion-blush: #f3dcda;
             }}
 
             .stApp {{
@@ -678,6 +680,19 @@ def render_theme_css():
                     radial-gradient(circle at 90% 20%, color-mix(in srgb, var(--fashion-secondary) 52%, transparent), transparent 28rem),
                     var(--fashion-surface) !important;
                 color: var(--fashion-ink);
+                font-family: "Segoe UI Variable Text", "Aptos", "Segoe UI", sans-serif;
+            }}
+
+            h1, h2, h3, h4,
+            .opening-title, .home-brand,
+            .editorial-note strong {{
+                font-family: ui-rounded, "Segoe UI Variable Display", "Trebuchet MS", sans-serif !important;
+                font-weight: 680 !important;
+                letter-spacing: -.045em;
+            }}
+
+            p, label, input, button {{
+                letter-spacing: .005em;
             }}
 
             .stApp::before {{ background: var(--fashion-glow) !important; }}
@@ -686,6 +701,19 @@ def render_theme_css():
                 color: var(--fashion-strong) !important;
             }}
             .app-wordmark::before {{ background: var(--fashion-primary) !important; }}
+            .app-wordmark::after {{
+                content: "✦";
+                display: grid;
+                width: 1.65rem;
+                height: 1.65rem;
+                margin-left: .1rem;
+                place-items: center;
+                border-radius: 999px;
+                background: color-mix(in srgb, var(--fashion-blush) 78%, white);
+                color: var(--fashion-strong);
+                font-size: .65rem;
+                letter-spacing: 0;
+            }}
             .opening-title, .city-panel-title, .weather-stat-value {{
                 color: var(--fashion-ink) !important;
             }}
@@ -699,6 +727,7 @@ def render_theme_css():
             }}
             .weather-card {{
                 border-color: color-mix(in srgb, var(--fashion-primary) 35%, transparent) !important;
+                border-radius: 28px 28px 14px 28px !important;
                 background: linear-gradient(145deg, rgba(255,255,255,.96), var(--fashion-soft)) !important;
                 box-shadow: 0 14px 38px color-mix(in srgb, var(--fashion-primary) 15%, transparent) !important;
             }}
@@ -711,6 +740,9 @@ def render_theme_css():
             .weather-advice strong {{ color: var(--fashion-strong) !important; }}
             div[data-testid="stVerticalBlockBorderWrapper"] {{
                 border-color: color-mix(in srgb, var(--fashion-primary) 25%, #e7e7e4) !important;
+                border-radius: 26px 26px 14px 26px !important;
+                background: color-mix(in srgb, var(--fashion-cream) 78%, white) !important;
+                box-shadow: 0 14px 38px color-mix(in srgb, var(--fashion-primary) 10%, transparent);
             }}
             .stButton > button:hover,
             .stFormSubmitButton > button:hover {{
@@ -729,13 +761,33 @@ def render_theme_css():
                 filter: brightness(.92);
                 color: white !important;
             }}
+            .stButton > button,
+            .stFormSubmitButton > button {{
+                border-radius: 999px !important;
+            }}
             .garment-card {{
                 min-height: 190px;
                 padding: 18px 12px;
                 border: 1px solid color-mix(in srgb, var(--fashion-primary) 20%, #e7e7e4);
-                border-radius: 18px;
-                background: color-mix(in srgb, var(--fashion-soft) 30%, white);
+                border-radius: 26px 26px 12px 26px;
+                background: linear-gradient(150deg, white, color-mix(in srgb, var(--fashion-soft) 46%, var(--fashion-cream)));
                 text-align: center;
+                box-shadow: 0 11px 28px color-mix(in srgb, var(--fashion-primary) 10%, transparent);
+                transition: transform .2s ease, box-shadow .2s ease;
+            }}
+            .garment-card:hover {{
+                transform: translateY(-3px) rotate(-.25deg);
+                box-shadow: 0 17px 34px color-mix(in srgb, var(--fashion-primary) 16%, transparent);
+            }}
+            .garment-icon-shell {{
+                display: grid;
+                width: 92px;
+                height: 92px;
+                margin: 0 auto .2rem;
+                place-items: center;
+                border-radius: 999px;
+                background: linear-gradient(145deg, white, color-mix(in srgb, var(--fashion-blush) 42%, var(--fashion-soft)));
+                box-shadow: inset 0 0 0 1px rgba(255,255,255,.72);
             }}
             .garment-card-slot {{
                 margin-top: 4px;
@@ -744,6 +796,52 @@ def render_theme_css():
             }}
             .garment-card-type {{ margin-top: 7px; font-weight: 650; }}
             .garment-card-colour {{ margin-top: 3px; }}
+
+            div[data-testid="stVerticalBlockBorderWrapper"]:has(.recommendation-panel-marker) {{
+                padding: .35rem .35rem .5rem;
+                border: 1px solid color-mix(in srgb, var(--fashion-primary) 22%, #ece7e1) !important;
+                border-radius: 28px 28px 14px 28px !important;
+                background: linear-gradient(145deg, rgba(255,255,255,.92), color-mix(in srgb, var(--fashion-cream) 72%, var(--fashion-soft))) !important;
+                box-shadow: 0 18px 46px color-mix(in srgb, var(--fashion-primary) 12%, transparent) !important;
+            }}
+            .recommendation-panel-marker {{
+                width: 2.6rem;
+                height: .34rem;
+                margin: .1rem 0 .15rem;
+                border-radius: 999px;
+                background: linear-gradient(90deg, var(--fashion-primary), var(--fashion-blush));
+            }}
+            .recommendation-panel-marker.alternative {{
+                background: linear-gradient(90deg, var(--fashion-blush), var(--fashion-secondary));
+            }}
+            .match-pill {{
+                display: inline-flex;
+                align-items: center;
+                gap: .35rem;
+                margin: -.1rem 0 .7rem;
+                padding: .3rem .65rem;
+                border-radius: 999px;
+                background: color-mix(in srgb, var(--fashion-soft) 72%, white);
+                color: var(--fashion-strong);
+                font-size: .7rem;
+                font-weight: 680;
+            }}
+            .match-pill::before {{
+                content: "♥";
+                color: color-mix(in srgb, var(--fashion-strong) 72%, #cf7b82);
+                font-size: .66rem;
+            }}
+            div[data-testid="stSelectbox"] > div > div {{
+                border-radius: 14px !important;
+            }}
+            div[data-testid="stFileUploaderDropzone"] {{
+                border-radius: 24px 24px 12px 24px !important;
+                background: color-mix(in srgb, var(--fashion-cream) 70%, white) !important;
+            }}
+            .empty-result {{
+                border-radius: 28px 28px 14px 28px;
+                background: linear-gradient(145deg, rgba(255,255,255,.72), color-mix(in srgb, var(--fashion-cream) 68%, var(--fashion-soft))) !important;
+            }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -2236,7 +2334,9 @@ def render_outfit_cards(outfit):
             st.markdown(
                 (
                     '<div class="garment-card">'
+                    '<div class="garment-icon-shell">'
                     f'{garment_icon_svg(item["slot"], item["colour"], item["type"])}'
+                    '</div>'
                     f'<div class="garment-card-slot">{html.escape(item["slot_label"])}</div>'
                     f'<div class="garment-card-type">{html.escape(item["type"])}</div>'
                     f'{colour_line}</div>'
@@ -2273,6 +2373,10 @@ def render_recommendations_only(result):
     ] or ["Casual"]
 
     with st.container(border=True):
+        st.markdown(
+            '<div class="recommendation-panel-marker"></div>',
+            unsafe_allow_html=True,
+        )
         st.subheader("Style")
         st.caption(
             "Recognised: " + ", ".join(recognised_styles)
@@ -2309,24 +2413,34 @@ def render_recommendations_only(result):
     recommendation = result["recommendation"]
 
     with st.container(border=True):
+        st.markdown(
+            '<div class="recommendation-panel-marker"></div>',
+            unsafe_allow_html=True,
+        )
         st.subheader(
             f'Primary Outfit · {recommendation["primary"]["style"]}'
         )
         if "model_score" in recommendation["primary"]:
-            st.caption(
-                "Lightweight model match: "
-                f'{recommendation["primary"]["model_score"]:.1f}/100'
+            st.markdown(
+                '<div class="match-pill">Outfit match&nbsp; '
+                f'{recommendation["primary"]["model_score"]:.1f}/100</div>',
+                unsafe_allow_html=True,
             )
         render_outfit_cards(recommendation["primary"])
 
     with st.container(border=True):
+        st.markdown(
+            '<div class="recommendation-panel-marker alternative"></div>',
+            unsafe_allow_html=True,
+        )
         st.subheader(
             f'Alternative Outfit · {recommendation["alternative"]["style"]}'
         )
         if "model_score" in recommendation["alternative"]:
-            st.caption(
-                "Lightweight model match: "
-                f'{recommendation["alternative"]["model_score"]:.1f}/100'
+            st.markdown(
+                '<div class="match-pill">Outfit match&nbsp; '
+                f'{recommendation["alternative"]["model_score"]:.1f}/100</div>',
+                unsafe_allow_html=True,
             )
         render_outfit_cards(recommendation["alternative"])
 
