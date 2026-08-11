@@ -14,4 +14,5 @@ data/polyvore_source/
 data/processed/
 data/incoming/
 data/zara_products/
+data/user_preferences.json
 models/*.pt

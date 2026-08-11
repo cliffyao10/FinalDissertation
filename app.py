@@ -1,7 +1,10 @@
 import html
 import io
+import json
+from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v2 as components_v2
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
@@ -19,6 +22,7 @@ from src.weather import WeatherServiceError, get_city_weather
 FRAME_WIDTH = 520
 FRAME_HEIGHT = 400
 FRAME_BACKGROUND = (250, 248, 244)
+USER_PREFERENCES_PATH = Path("data/user_preferences.json")
 
 # Product mode shows recommendations only. Change this to True while
 # collecting dissertation evidence or diagnosing recognition failures.
@@ -942,6 +946,16 @@ st.markdown(
             letter-spacing: -.06em;
             white-space: nowrap;
         }
+        .weather-window-status {
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+        }
+        .weather-favourite-mark {
+            color: #b96f78;
+            font-size: 1.12rem;
+            line-height: 1;
+        }
 
         @keyframes weather-orb-breathe {
             50% { transform: scale(1.035); box-shadow: 0 0 0 31px rgba(255,235,169,.08), 0 24px 62px rgba(235,173,75,.28); }
@@ -1163,6 +1177,161 @@ st.markdown(
 )
 
 
+def load_saved_cities():
+    """Read locally persisted favourite cities without failing app startup."""
+
+    try:
+        payload = json.loads(USER_PREFERENCES_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+
+    raw_cities = payload.get("saved_cities", []) if isinstance(payload, dict) else []
+    saved_cities = []
+    seen = set()
+    for value in raw_cities:
+        city = str(value).strip()
+        city_key = city.casefold()
+        if city and city_key not in seen:
+            saved_cities.append(city)
+            seen.add(city_key)
+    return saved_cities[:6]
+
+
+def save_favourite_cities(cities):
+    """Persist favourite cities atomically in the local data directory."""
+
+    USER_PREFERENCES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = USER_PREFERENCES_PATH.with_suffix(".tmp")
+    temporary_path.write_text(
+        json.dumps({"saved_cities": cities[:6]}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    temporary_path.replace(USER_PREFERENCES_PATH)
+
+
+def toggle_favourite_city(cities, city):
+    """Add or remove one city while preserving a compact, stable order."""
+
+    city = city.strip()
+    if not city:
+        return list(cities)
+
+    matching_index = next(
+        (
+            index
+            for index, saved_city in enumerate(cities)
+            if saved_city.casefold() == city.casefold()
+        ),
+        None,
+    )
+    updated_cities = list(cities)
+    if matching_index is None:
+        updated_cities.append(city)
+    else:
+        updated_cities.pop(matching_index)
+    return updated_cities[-6:]
+
+
+def enable_home_dock_dragging():
+    """Attach lightweight pointer dragging to the homepage control glass."""
+
+    drag_component = components_v2.component(
+        "wardrobe_home_dock_dragger",
+        html="<span aria-hidden='true'></span>",
+        css=":host { display: none; }",
+        js="""
+        export default function(component) {
+          const doc = component.parentElement.ownerDocument;
+          const host = doc.defaultView;
+          const storageKey = "wardrobe-weather-dock-position";
+          const interactive = "button,input,label,[role='radio'],[role='option'],[data-testid='stPills']";
+
+          function clampPanel(panel, bounds, x, y) {
+            const panelRect = panel.getBoundingClientRect();
+            const boundsRect = bounds.getBoundingClientRect();
+            const currentX = Number(panel.dataset.dockX || 0);
+            const currentY = Number(panel.dataset.dockY || 0);
+            const baseLeft = panelRect.left - currentX;
+            const baseTop = panelRect.top - currentY;
+            const inset = 12;
+            return {
+              x: Math.min(
+                boundsRect.right - panelRect.width - inset - baseLeft,
+                Math.max(boundsRect.left + inset - baseLeft, x)
+              ),
+              y: Math.min(
+                boundsRect.bottom - panelRect.height - inset - baseTop,
+                Math.max(boundsRect.top + inset - baseTop, y)
+              )
+            };
+          }
+
+          function applyPosition(panel, bounds, x, y) {
+            const next = clampPanel(panel, bounds, x, y);
+            panel.dataset.dockX = String(next.x);
+            panel.dataset.dockY = String(next.y);
+            panel.style.setProperty("--dock-x", `${next.x}px`);
+            panel.style.setProperty("--dock-y", `${next.y}px`);
+          }
+
+          function initialise() {
+            const panel = doc.querySelector("div[data-testid='stLayoutWrapper']:has(.home-dock-marker)");
+            const bounds = doc.querySelector("[data-testid='stMainBlockContainer']");
+            if (!panel || !bounds || panel.dataset.dragReady === "true") return;
+            panel.dataset.dragReady = "true";
+
+            let saved = {x: 0, y: 0};
+            try { saved = JSON.parse(host.localStorage.getItem(storageKey)) || saved; }
+            catch (_) {}
+            requestAnimationFrame(() => applyPosition(panel, bounds, Number(saved.x || 0), Number(saved.y || 0)));
+
+            panel.addEventListener("pointerdown", (event) => {
+              if (event.button !== 0 || event.target.closest(interactive)) return;
+              event.preventDefault();
+              panel.setPointerCapture(event.pointerId);
+              panel.classList.add("is-dragging");
+              const startClientX = event.clientX;
+              const startClientY = event.clientY;
+              const startX = Number(panel.dataset.dockX || 0);
+              const startY = Number(panel.dataset.dockY || 0);
+
+              const move = (moveEvent) => {
+                applyPosition(
+                  panel,
+                  bounds,
+                  startX + moveEvent.clientX - startClientX,
+                  startY + moveEvent.clientY - startClientY
+                );
+              };
+              const finish = () => {
+                panel.classList.remove("is-dragging");
+                panel.removeEventListener("pointermove", move);
+                panel.removeEventListener("pointerup", finish);
+                panel.removeEventListener("pointercancel", finish);
+                host.localStorage.setItem(storageKey, JSON.stringify({
+                  x: Number(panel.dataset.dockX || 0),
+                  y: Number(panel.dataset.dockY || 0)
+                }));
+              };
+              panel.addEventListener("pointermove", move);
+              panel.addEventListener("pointerup", finish);
+              panel.addEventListener("pointercancel", finish);
+            });
+          }
+
+          initialise();
+          new MutationObserver(initialise).observe(doc.body, {childList: true, subtree: true});
+        }
+        """,
+        isolate_styles=True,
+    )
+    drag_component(
+        key="wardrobe_home_dock_dragger",
+        height=1,
+        width=1,
+    )
+
+
 def initialise_state():
     """Initialise application state."""
 
@@ -1180,6 +1349,7 @@ def initialise_state():
         "weather_data": None,
         "weather_error": None,
         "theme": "Green",
+        "saved_cities": load_saved_cities(),
     }
 
     for state_name, default_value in defaults.items():
@@ -1879,9 +2049,8 @@ def render_weather_window(weather=None, error=None):
         "Thunderstorm": "thunderstorm",
     }
     scene = scene_classes.get(condition, "clear")
-    city = html.escape(
-        str((weather or {}).get("city", st.session_state.city))
-    )
+    raw_city = str((weather or {}).get("city", st.session_state.city))
+    city = html.escape(raw_city)
     country = html.escape(str((weather or {}).get("country", "")))
     location = f"{city}, {country}" if country else city
 
@@ -1903,8 +2072,17 @@ def render_weather_window(weather=None, error=None):
             if error
             else "Set your city to wake the window"
         )
-        temperature = "♡"
+        temperature = "—"
         accessibility = "A calm warm window waiting for a city forecast"
+
+    favourite_mark = (
+        "♥"
+        if any(
+            saved_city.casefold() == raw_city.casefold()
+            for saved_city in st.session_state.saved_cities
+        )
+        else "♡"
+    )
 
     st.markdown(
         f"""
@@ -1949,7 +2127,10 @@ def render_weather_window(weather=None, error=None):
                 <div class="weather-window-copy">
                     <strong>{location}</strong><span>{note}</span>
                 </div>
-                <div class="weather-window-temperature">{temperature}</div>
+                <div class="weather-window-status">
+                    <div class="weather-window-temperature">{temperature}</div>
+                    <span class="weather-favourite-mark">{favourite_mark}</span>
+                </div>
             </div>
         </div>
         """,
@@ -3142,59 +3323,113 @@ if st.session_state.image_mode is None:
             }
 
             .weather-window-scene {
-                min-height: 650px;
-                max-width: 910px;
-                margin: .25rem 0 0 auto;
+                min-height: 720px;
+                max-width: 1080px;
+                margin: .25rem auto 0;
             }
 
             .weather-neighbourhood {
-                left: 15%;
+                right: 3%;
+                left: 8%;
+                height: 39%;
+                transform: scale(1.12);
+                transform-origin: bottom center;
             }
 
             .weather-scene-label {
-                left: 34%;
+                left: 45%;
             }
 
             .weather-window-info {
+                top: 1.25rem;
                 right: 1.4rem;
+                bottom: auto;
                 left: auto;
-                width: 320px;
+                width: 300px;
+                min-height: auto;
+                padding: .4rem .25rem;
+                border: 0;
+                border-radius: 0;
+                background: transparent;
+                box-shadow: none;
+                backdrop-filter: none;
             }
 
-            .home-intro-panel {
-                position: absolute;
-                top: 5.2rem;
-                left: 0;
-                z-index: 18;
-                width: min(455px, 42vw);
-                padding: 1.55rem 1.65rem 1.45rem;
-                border: 1px solid rgba(255,255,255,.72);
-                border-radius: 30px 30px 12px 30px;
-                background: rgba(255,252,247,.82);
-                box-shadow: 0 24px 58px rgba(67,63,57,.14);
-                backdrop-filter: blur(22px) saturate(1.08);
+            .weather-illustration {
+                inset: 1.2rem .4rem 4.2rem;
             }
 
-            .home-intro-panel .opening-subtitle {
-                margin-bottom: 0;
+            .weather-orb {
+                top: 14%;
+                right: 27%;
+                width: 12rem;
+            }
+
+            .weather-clear .weather-face {
+                top: 28%;
+                right: 31.5%;
+            }
+
+            .weather-clear .weather-cloud-form {
+                top: 48%;
+                left: 26%;
+                width: 45%;
+                transform: scale(.9);
+            }
+
+            .home-brand-lockup {
+                display: flex;
+                flex-direction: column;
+                gap: .16rem;
+            }
+
+            .home-tagline {
+                color: var(--fashion-muted);
+                font-size: .8rem;
+                font-weight: 560;
+                letter-spacing: .015em;
             }
 
             .home-dock-marker {
-                height: 0;
-                overflow: hidden;
+                display: flex;
+                justify-content: flex-end;
+                min-height: 1rem;
+                color: var(--fashion-muted);
+                font-size: .64rem;
+                font-weight: 700;
+                letter-spacing: .12em;
+                text-transform: uppercase;
             }
 
             div[data-testid="stLayoutWrapper"]:has(.home-dock-marker) {
                 position: relative;
                 z-index: 20;
-                width: min(790px, calc(100% - 2.5rem));
-                margin: -220px 0 3.5rem 0;
-                padding: 1rem 1.15rem .95rem;
+                width: min(430px, calc(100% - 3rem));
+                margin: -445px 2.35rem 4.25rem auto;
+                padding: 1.15rem 1.2rem 1rem;
                 border: 1px solid rgba(255,255,255,.72) !important;
                 border-radius: 28px 28px 12px 28px !important;
-                background: rgba(255, 252, 247, .88) !important;
+                --dock-x: 0px;
+                --dock-y: 0px;
+                background: rgba(255, 252, 247, .54) !important;
                 box-shadow: 0 24px 58px rgba(65,61,54,.15) !important;
                 backdrop-filter: blur(24px) saturate(1.08);
+                transform: translate(var(--dock-x), var(--dock-y));
+                cursor: grab;
+                touch-action: none;
+                user-select: none;
+            }
+
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker).is-dragging {
+                cursor: grabbing;
+                box-shadow: 0 30px 72px rgba(65,61,54,.22) !important;
+            }
+
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker)
+            :is(input, button, label, [role="radio"], [data-testid="stPills"]) {
+                cursor: auto;
+                user-select: auto;
+                touch-action: auto;
             }
 
             div[data-testid="stLayoutWrapper"]:has(.home-dock-marker)
@@ -3219,36 +3454,50 @@ if st.session_state.image_mode is None:
                 margin-top: .45rem;
             }
 
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker)
+            div[data-testid="stPills"] {
+                margin-top: -.15rem;
+            }
+
+            div[data-testid="stLayoutWrapper"]:has(.home-dock-marker)
+            div[data-testid="stPills"] button {
+                min-height: 34px;
+                padding: .32rem .7rem;
+                letter-spacing: .01em;
+            }
+
             @media (max-width: 760px) {
                 .opening-title {
                     font-size: clamp(1.9rem, 9vw, 2.65rem);
                     line-height: 1;
                 }
                 .home-wordmark { margin-bottom: 1.2rem; }
-                .home-intro-panel {
-                    position: relative;
-                    top: auto;
-                    left: auto;
-                    width: 100%;
-                    margin-bottom: 1rem;
-                }
                 .weather-window-scene {
-                    min-height: 500px;
+                    min-height: 540px;
                     margin-top: 0;
                 }
                 div[data-testid="stLayoutWrapper"]:has(.home-dock-marker) {
                     width: calc(100% - 1.2rem);
-                    margin: -62px auto 2rem;
+                    margin: -76px auto 2rem;
                     padding: 1.3rem 1rem 1rem;
                 }
                 .weather-illustration { inset: 3rem .65rem 6rem; }
                 .weather-orb { width: 8rem; right: 9%; }
+                .weather-clear .weather-face { top: 30%; right: 17.5%; }
+                .weather-clear .weather-cloud-form {
+                    top: 55%;
+                    left: 4%;
+                    width: 42%;
+                    transform: scale(.84);
+                }
                 .weather-cloud-form { left: 10%; width: 66%; }
                 .weather-window-temperature { font-size: 1.7rem; }
-                .weather-neighbourhood { left: 2%; }
+                .weather-neighbourhood { left: 2%; transform: none; }
                 .weather-scene-label { left: 1.75rem; }
                 .weather-window-info {
+                    top: auto;
                     right: 1.4rem;
+                    bottom: 1.35rem;
                     left: 1.4rem;
                     width: auto;
                 }
@@ -3264,15 +3513,11 @@ if st.session_state.image_mode is None:
     st.markdown(
         """
         <div class="home-wordmark">
-            <span class="home-brand">Your Wardrobe</span>
+            <span class="home-brand-lockup">
+                <span class="home-brand">Your Wardrobe</span>
+                <span class="home-tagline">Start with one piece.</span>
+            </span>
             <span class="home-edition">Daily styling</span>
-        </div>
-        <div class="home-intro-panel">
-            <div class="opening-kicker">Your daily outfit companion</div>
-            <div class="opening-title">Start with one piece.</div>
-            <div class="opening-subtitle">
-                We’ll style the rest around your mood and the weather outside.
-            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -3285,76 +3530,116 @@ if st.session_state.image_mode is None:
 
     with st.container(border=False):
         st.markdown(
-            '<div class="home-dock-marker"></div>',
+            '<div class="home-dock-marker">↔ drag anywhere on the page</div>',
             unsafe_allow_html=True,
         )
 
-        city_controls, style_controls = st.columns(
-            [0.94, 1.06],
-            gap="large",
-            vertical_alignment="center",
+        st.markdown(
+            """
+            <div class="city-panel-marker">
+                <div class="city-panel-icon">⌖</div>
+                <div>
+                    <div class="city-panel-title">Where are you dressing for?</div>
+                    <div class="city-panel-copy">Set the forecast, then keep favourites close.</div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-        with city_controls:
-            st.markdown(
-                """
-                <div class="city-panel-marker">
-                    <div class="city-panel-icon">⌖</div>
-                    <div>
-                        <div class="city-panel-title">Where are you dressing for?</div>
-                        <div class="city-panel-copy">Your forecast sets the layers.</div>
-                    </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
+        current_is_saved = any(
+            saved_city.casefold() == st.session_state.city_input.strip().casefold()
+            for saved_city in st.session_state.saved_cities
+        )
+        with st.form("weather_city_form", border=False):
+            city_column, save_city_column, heart_column = st.columns(
+                [0.58, 0.27, 0.15]
             )
-            with st.form("weather_city_form", border=False):
-                city_column, save_city_column = st.columns([0.68, 0.32])
-                with city_column:
-                    st.text_input(
-                        "City",
-                        key="city_input",
-                        placeholder="Shanghai",
-                        label_visibility="collapsed",
-                        help="Used for today's temperature, rain and wind.",
-                    )
-                with save_city_column:
-                    city_submitted = st.form_submit_button(
-                        "Set location",
-                        use_container_width=True,
-                    )
+            with city_column:
+                st.text_input(
+                    "City",
+                    key="city_input",
+                    placeholder="Shanghai",
+                    label_visibility="collapsed",
+                    help="Used for today's temperature, rain and wind.",
+                )
+            with save_city_column:
+                city_submitted = st.form_submit_button(
+                    "Set",
+                    use_container_width=True,
+                )
+            with heart_column:
+                favourite_submitted = st.form_submit_button(
+                    "♥" if current_is_saved else "♡",
+                    use_container_width=True,
+                    help="Save or remove this city from your favourites.",
+                )
 
-                if city_submitted:
-                    entered_city = st.session_state.city_input.strip()
-                    if entered_city:
-                        st.session_state.city = entered_city
-                        st.session_state.weather_data = None
-                        st.session_state.weather_error = None
-                        with st.spinner("Opening your weather window..."):
-                            home_weather = ensure_current_weather()
-                        home_weather_error = st.session_state.weather_error
+        entered_city = st.session_state.city_input.strip()
+        if city_submitted and entered_city:
+            st.session_state.city = entered_city
+            st.session_state.weather_data = None
+            st.session_state.weather_error = None
+            st.session_state.saved_city_choice = None
+            with st.spinner("Opening your weather window..."):
+                ensure_current_weather()
+            st.rerun()
 
-        with style_controls:
-            st.radio(
-                "Choose your mood",
-                list(THEMES),
-                horizontal=True,
-                key="theme",
+        if favourite_submitted and entered_city:
+            updated_cities = toggle_favourite_city(
+                st.session_state.saved_cities,
+                entered_city,
             )
-
-            if st.button(
-                "START WITH A PIECE  →",
-                type="primary",
-                use_container_width=True,
-                key="style_mode_button",
-            ):
-                select_mode("lifestyle")
+            try:
+                save_favourite_cities(updated_cities)
+            except OSError:
+                st.error("This city could not be saved locally.")
+            else:
+                st.session_state.saved_cities = updated_cities
+                st.session_state.saved_city_choice = None
                 st.rerun()
 
-            st.markdown(
-                '<div class="home-greeting">Your clothes, your mood, your little world.</div>',
-                unsafe_allow_html=True,
+        if st.session_state.saved_cities:
+            saved_city_choice = st.pills(
+                "Saved cities  ♥",
+                st.session_state.saved_cities,
+                key="saved_city_choice",
+                width="stretch",
             )
+            if (
+                saved_city_choice
+                and saved_city_choice.casefold() != st.session_state.city.casefold()
+            ):
+                st.session_state.city = saved_city_choice
+                st.session_state.city_input = saved_city_choice
+                st.session_state.weather_data = None
+                st.session_state.weather_error = None
+                with st.spinner("Opening your saved city..."):
+                    ensure_current_weather()
+                st.rerun()
+
+        st.radio(
+            "Choose your mood",
+            list(THEMES),
+            horizontal=True,
+            key="theme",
+        )
+
+        if st.button(
+            "START WITH A PIECE  →",
+            type="primary",
+            use_container_width=True,
+            key="style_mode_button",
+        ):
+            select_mode("lifestyle")
+            st.rerun()
+
+        st.markdown(
+            '<div class="home-greeting">Your clothes, your mood, your little world.</div>',
+            unsafe_allow_html=True,
+        )
+
+    enable_home_dock_dragging()
 
     st.stop()
 
