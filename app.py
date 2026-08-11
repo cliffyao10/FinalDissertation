@@ -329,14 +329,14 @@ st.markdown(
         }
 
         .opening-title {
-            max-width: 650px;
-            margin: .8rem 0 1rem;
+            max-width: 540px;
+            margin: .75rem 0 .85rem;
             color: #17251e;
             font-family: Georgia, "Times New Roman", serif;
-            font-size: clamp(3.35rem, 6.2vw, 6.25rem);
+            font-size: clamp(2.1rem, 3vw, 3.25rem);
             font-weight: 500;
-            letter-spacing: -.065em;
-            line-height: .88;
+            letter-spacing: -.05em;
+            line-height: 1.02;
         }
 
         .opening-subtitle {
@@ -385,61 +385,240 @@ st.markdown(
             background: var(--fashion-primary);
         }
 
-        div[data-testid="stVerticalBlock"]:has(.editorial-image-marker) {
+        .weather-window-scene {
             position: relative;
+            min-height: 610px;
+            overflow: hidden;
+            border: 1px solid rgba(132, 108, 80, .18);
+            border-radius: 34px 34px 14px 34px;
+            background: linear-gradient(135deg, #f3e7d7, #fffaf3 62%);
+            box-shadow: 0 28px 70px rgba(72, 53, 35, .14);
         }
 
-        div[data-testid="stVerticalBlock"]:has(.editorial-image-marker)
-        div[data-testid="stImage"] img {
-            width: 100%;
-            height: min(72vh, 700px);
-            min-height: 560px;
-            border-radius: 34px 34px 12px 34px;
-            object-fit: cover;
-            object-position: center 38%;
-            box-shadow: 0 28px 70px rgba(57, 43, 31, .15);
+        .window-room-glow {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: radial-gradient(circle at 12% 84%, rgba(255,201,132,.34), transparent 34%);
+            pointer-events: none;
         }
 
-        .editorial-image-marker {
+        .window-heading {
+            position: absolute;
+            top: 1.35rem;
+            left: 1.5rem;
+            z-index: 8;
+            color: rgba(69, 54, 42, .72);
+            font-size: .66rem;
+            font-weight: 750;
+            letter-spacing: .17em;
+            text-transform: uppercase;
+        }
+
+        .window-frame {
+            position: absolute;
+            inset: 4.25rem 3.1rem 6.8rem;
+            overflow: hidden;
+            border: 13px solid #a9825d;
+            border-bottom-width: 18px;
+            border-radius: 170px 170px 9px 9px;
+            background: #b8d8dc;
+            box-shadow: 0 18px 38px rgba(68, 48, 31, .19), inset 0 0 0 2px rgba(255,255,255,.28);
+        }
+
+        .window-sky {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            background: linear-gradient(#b9dce5 0%, #e9e2cf 72%, #9fb491 72%);
+            transition: background .4s ease;
+        }
+
+        .weather-cloudy .window-sky,
+        .weather-fog .window-sky {
+            background: linear-gradient(#b8c4c7 0%, #e5e2d9 72%, #96a58f 72%);
+        }
+        .weather-rain .window-sky,
+        .weather-thunderstorm .window-sky {
+            background: linear-gradient(#748b96 0%, #c1c5bd 72%, #70816d 72%);
+        }
+        .weather-snow .window-sky {
+            background: linear-gradient(#c6d5db 0%, #edf0eb 72%, #d9dfd5 72%);
+        }
+
+        .window-sun {
+            position: absolute;
+            top: 3.2rem;
+            right: 3.4rem;
+            width: 4.1rem;
+            height: 4.1rem;
+            border-radius: 999px;
+            background: #f4cd73;
+            box-shadow: 0 0 0 14px rgba(250,219,145,.2), 0 0 44px rgba(255,214,123,.65);
+            animation: window-sun-breathe 5s ease-in-out infinite;
+        }
+        .weather-rain .window-sun,
+        .weather-fog .window-sun,
+        .weather-snow .window-sun,
+        .weather-thunderstorm .window-sun { opacity: .18; }
+
+        .window-cloud {
+            position: absolute;
+            z-index: 2;
+            width: 8rem;
+            height: 2.25rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,.78);
+            box-shadow: 2.2rem -.8rem 0 .15rem rgba(255,255,255,.78), 4rem .1rem 0 -.15rem rgba(255,255,255,.78);
+            animation: window-cloud-drift 18s ease-in-out infinite alternate;
+        }
+        .window-cloud.one { top: 6.5rem; left: -1.5rem; }
+        .window-cloud.two { top: 12.8rem; right: -1.8rem; width: 6rem; height: 1.7rem; animation-delay: -8s; }
+        .weather-clear .window-cloud.two { opacity: .3; }
+        .weather-rain .window-cloud,
+        .weather-thunderstorm .window-cloud { background: rgba(80,96,104,.82); box-shadow: 2.2rem -.8rem 0 .15rem rgba(80,96,104,.82), 4rem .1rem 0 -.15rem rgba(80,96,104,.82); }
+
+        .window-hills {
+            position: absolute;
+            right: -8%;
+            bottom: -12%;
+            width: 75%;
+            height: 36%;
+            border-radius: 55% 0 0 0;
+            background: #789273;
+            box-shadow: -10rem 2rem 0 2rem #91a78a;
+        }
+
+        .window-weather-effect {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .weather-rain .window-weather-effect,
+        .weather-thunderstorm .window-weather-effect {
+            opacity: .7;
+            background-image: repeating-linear-gradient(105deg, transparent 0 12px, rgba(224,242,247,.78) 13px 15px, transparent 16px 27px);
+            background-size: 42px 68px;
+            animation: window-rain .65s linear infinite;
+        }
+        .weather-snow .window-weather-effect {
+            opacity: .9;
+            background-image: radial-gradient(circle, white 0 3px, transparent 4px), radial-gradient(circle, rgba(255,255,255,.8) 0 2px, transparent 3px);
+            background-size: 54px 54px, 82px 82px;
+            background-position: 0 0, 20px 18px;
+            animation: window-snow 8s linear infinite;
+        }
+        .weather-fog .window-weather-effect {
+            opacity: .6;
+            background: linear-gradient(180deg, transparent 18%, rgba(255,255,255,.82) 44%, rgba(255,255,255,.38) 70%, transparent);
+            animation: window-fog 7s ease-in-out infinite alternate;
+        }
+        .weather-thunderstorm .window-weather-effect::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(255,244,190,.7);
+            opacity: 0;
+            animation: window-lightning 7s step-end infinite;
+        }
+
+        .window-mullion-v, .window-mullion-h {
+            position: absolute;
+            z-index: 6;
+            background: #a9825d;
+            box-shadow: 0 2px 5px rgba(65,43,27,.2);
+        }
+        .window-mullion-v { top: 0; bottom: 0; left: calc(50% - 5px); width: 10px; }
+        .window-mullion-h { top: 52%; right: 0; left: 0; height: 9px; }
+
+        .window-curtain {
+            position: absolute;
+            top: 2.5rem;
+            bottom: 5.2rem;
+            z-index: 7;
+            width: 4.5rem;
+            background: repeating-linear-gradient(90deg, #f0e1cd 0 16px, #ddc9ad 17px 25px, #f6ead9 26px 40px);
+            filter: drop-shadow(0 8px 12px rgba(74,48,27,.13));
+        }
+        .window-curtain.left { left: 0; border-radius: 0 0 70% 0; transform: rotate(1.5deg); transform-origin: top; }
+        .window-curtain.right { right: 0; border-radius: 0 0 0 70%; transform: rotate(-1.5deg); transform-origin: top; }
+
+        .window-sill {
+            position: absolute;
+            right: 2.1rem;
+            bottom: 4.9rem;
+            left: 2.1rem;
+            z-index: 9;
+            height: 1.35rem;
+            border-radius: 6px;
+            background: #bc936b;
+            box-shadow: 0 12px 20px rgba(70,45,24,.18);
+        }
+        .window-mug {
+            position: absolute;
+            right: 4.2rem;
+            bottom: 6.25rem;
+            z-index: 10;
+            width: 2.8rem;
+            height: 2.5rem;
+            border-radius: 6px 6px 14px 14px;
+            background: #d88f83;
+            box-shadow: inset -7px -4px 0 rgba(135,76,68,.11);
+        }
+        .window-mug::after {
+            content: "";
+            position: absolute;
+            top: .5rem;
+            right: -.9rem;
+            width: 1.1rem;
+            height: 1.15rem;
+            border: 5px solid #d88f83;
+            border-left: 0;
+            border-radius: 0 999px 999px 0;
+        }
+        .window-mug::before {
+            content: "";
+            position: absolute;
+            left: .8rem;
+            bottom: 2.65rem;
+            width: .5rem;
+            height: 1.6rem;
+            border-radius: 999px;
+            border-left: 2px solid rgba(255,255,255,.7);
+            animation: window-steam 3s ease-in-out infinite;
+        }
+
+        .window-note {
+            position: absolute;
+            right: 1.25rem;
+            bottom: 1.15rem;
+            left: 1.25rem;
+            z-index: 12;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: .7rem;
-            color: var(--fashion-muted);
-            font-size: .65rem;
-            font-weight: 700;
-            letter-spacing: .16em;
-            text-transform: uppercase;
-        }
-
-        .editorial-note {
-            position: relative;
-            z-index: 2;
-            width: calc(100% - 2rem);
-            margin: -5.3rem 1rem 0;
-            padding: 1rem 1.1rem;
-            border: 1px solid rgba(255,255,255,.55);
+            gap: 1rem;
+            padding: .85rem 1rem;
+            border: 1px solid rgba(255,255,255,.62);
             border-radius: 18px 18px 8px 18px;
-            background: rgba(255, 252, 246, .84);
-            color: #362e28;
-            box-shadow: 0 14px 35px rgba(42, 31, 23, .12);
-            backdrop-filter: blur(16px);
+            background: rgba(255,250,242,.88);
+            color: #493a30;
+            box-shadow: 0 12px 30px rgba(66,45,29,.12);
+            backdrop-filter: blur(14px);
         }
+        .window-note strong { display: block; font-size: .92rem; }
+        .window-note span { display: block; margin-top: .15rem; color: #817166; font-size: .7rem; }
+        .window-temperature { font-size: 1.25rem; font-weight: 720; white-space: nowrap; }
 
-        .editorial-note strong {
-            display: block;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 1.08rem;
-            font-weight: 500;
-        }
-
-        .editorial-note span {
-            display: block;
-            margin-top: .2rem;
-            color: #746a62;
-            font-size: .69rem;
-            letter-spacing: .08em;
-            text-transform: uppercase;
+        @keyframes window-sun-breathe { 50% { transform: scale(1.06); box-shadow: 0 0 0 18px rgba(250,219,145,.14), 0 0 54px rgba(255,214,123,.72); } }
+        @keyframes window-cloud-drift { to { transform: translateX(2.2rem); } }
+        @keyframes window-rain { to { background-position: -18px 68px; } }
+        @keyframes window-snow { to { background-position: 22px 108px, -14px 164px; } }
+        @keyframes window-fog { to { transform: translateY(1.3rem); opacity: .42; } }
+        @keyframes window-lightning { 0%, 91%, 94%, 100% { opacity: 0; } 92%, 93% { opacity: .72; } }
+        @keyframes window-steam { 50% { transform: translate(.25rem,-.35rem) scaleX(1.2); opacity: .25; } }
         }
 
         div[data-testid="stVerticalBlockBorderWrapper"]:has(.city-panel-marker) {
@@ -620,7 +799,12 @@ st.markdown(
             .stApp::before,
             .stApp::after,
             .weather-card::after,
-            .weather-icon {
+            .weather-icon,
+            .window-sun,
+            .window-cloud,
+            .window-weather-effect,
+            .window-weather-effect::after,
+            .window-mug::before {
                 animation: none !important;
             }
         }
@@ -685,7 +869,7 @@ def render_theme_css():
 
             h1, h2, h3, h4,
             .opening-title, .home-brand,
-            .editorial-note strong {{
+            .window-note strong {{
                 font-family: ui-rounded, "Segoe UI Variable Display", "Trebuchet MS", sans-serif !important;
                 font-weight: 680 !important;
                 letter-spacing: -.045em;
@@ -1315,6 +1499,69 @@ def weather_dressing_advice(weather):
     if feels_like >= 24:
         return "Choose breathable fabrics and keep any outer layer lightweight."
     return "Comfortable layers are ideal; carry a light jacket for temperature changes."
+
+
+def render_weather_window(weather=None, error=None):
+    """Render a lightweight animated window driven by the selected city."""
+
+    condition = str((weather or {}).get("condition", "Clear"))
+    scene_classes = {
+        "Clear": "clear",
+        "Cloudy": "cloudy",
+        "Fog": "fog",
+        "Rain": "rain",
+        "Snow": "snow",
+        "Thunderstorm": "thunderstorm",
+    }
+    scene = scene_classes.get(condition, "clear")
+    city = html.escape(
+        str((weather or {}).get("city", st.session_state.city))
+    )
+    country = html.escape(str((weather or {}).get("country", "")))
+    location = f"{city}, {country}" if country else city
+
+    if weather:
+        note = f"{html.escape(condition)} outside · your room stays warm"
+        temperature = f'{float(weather.get("temperature", weather.get("feels_like", 20))):.0f}°'
+        accessibility = f"Animated {condition.lower()} window for {location}"
+    else:
+        note = (
+            "The forecast is resting — your room stays warm"
+            if error
+            else "Set your city to wake the window"
+        )
+        temperature = "♡"
+        accessibility = "A calm warm window waiting for a city forecast"
+
+    st.markdown(
+        f"""
+        <div class="weather-window-scene weather-{scene}" role="img"
+             aria-label="{html.escape(accessibility)}">
+            <div class="window-room-glow"></div>
+            <div class="window-heading">A little view of {location}</div>
+            <div class="window-frame">
+                <div class="window-sky">
+                    <div class="window-sun"></div>
+                    <div class="window-cloud one"></div>
+                    <div class="window-cloud two"></div>
+                    <div class="window-hills"></div>
+                    <div class="window-weather-effect"></div>
+                </div>
+                <div class="window-mullion-v"></div>
+                <div class="window-mullion-h"></div>
+            </div>
+            <div class="window-curtain left"></div>
+            <div class="window-curtain right"></div>
+            <div class="window-sill"></div>
+            <div class="window-mug"></div>
+            <div class="window-note">
+                <div><strong>{location}</strong><span>{note}</span></div>
+                <div class="window-temperature">{temperature}</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_compact_weather(weather, error=None):
@@ -2498,21 +2745,20 @@ if st.session_state.image_mode is None:
 
             @media (max-width: 760px) {
                 .opening-title {
-                    font-size: clamp(3rem, 16vw, 4.4rem);
-                    line-height: .92;
+                    font-size: clamp(2.25rem, 11vw, 3.25rem);
+                    line-height: 1;
                 }
                 .home-wordmark { margin-bottom: 1.2rem; }
-                div[data-testid="stVerticalBlock"]:has(.editorial-image-marker)
-                div[data-testid="stImage"] img {
-                    height: 520px;
-                    min-height: 0;
-                    margin-top: 1.4rem;
-                }
+                .weather-window-scene { min-height: 520px; margin-top: 1.4rem; }
+                .window-frame { inset: 4rem 2rem 6.7rem; }
             }
         </style>
         """,
         unsafe_allow_html=True,
     )
+
+    home_weather = st.session_state.weather_data
+    home_weather_error = st.session_state.weather_error
 
     copy_column, image_column = st.columns(
         [0.88, 1.12],
@@ -2527,11 +2773,10 @@ if st.session_state.image_mode is None:
                 <span class="home-brand">Your Wardrobe</span>
                 <span class="home-edition">Daily styling</span>
             </div>
-            <div class="opening-kicker">Weather-aware · Personal · Easy</div>
-            <div class="opening-title">Feel good in what you wear.</div>
+            <div class="opening-kicker">Your daily outfit companion</div>
+            <div class="opening-title">Start with one piece.</div>
             <div class="opening-subtitle">
-                Bring one piece you love. We’ll shape the rest around you
-                and today’s weather.
+                We’ll style the rest around your mood and the weather outside.
             </div>
             """,
             unsafe_allow_html=True,
@@ -2572,6 +2817,9 @@ if st.session_state.image_mode is None:
                         st.session_state.city = entered_city
                         st.session_state.weather_data = None
                         st.session_state.weather_error = None
+                        with st.spinner("Opening your weather window..."):
+                            home_weather = ensure_current_weather()
+                        home_weather_error = st.session_state.weather_error
 
         st.radio(
             "Choose your mood",
@@ -2581,7 +2829,7 @@ if st.session_state.image_mode is None:
         )
 
         if st.button(
-            "STYLE MY LOOK  →",
+            "START WITH A PIECE  →",
             type="primary",
             use_container_width=True,
             key="style_mode_button",
@@ -2590,27 +2838,14 @@ if st.session_state.image_mode is None:
             st.rerun()
 
         st.markdown(
-            '<div class="home-greeting">A little guidance, still completely you.</div>',
+            '<div class="home-greeting">Your clothes, your mood, your little world.</div>',
             unsafe_allow_html=True,
         )
 
     with image_column:
-        st.markdown(
-            '<div class="editorial-image-marker"><span>Your everyday pieces</span><span>01</span></div>',
-            unsafe_allow_html=True,
-        )
-        st.image(
-            "assets/fashion-editorial-hero.png",
-            width="stretch",
-        )
-        st.markdown(
-            """
-            <div class="editorial-note">
-                <strong>Getting dressed should feel easy.</strong>
-                <span>Weather · colour · you</span>
-            </div>
-            """,
-            unsafe_allow_html=True,
+        render_weather_window(
+            home_weather,
+            home_weather_error,
         )
 
     st.stop()
