@@ -1232,6 +1232,19 @@ def toggle_favourite_city(cities, city):
     return updated_cities[-6:]
 
 
+def apply_saved_city_choice():
+    """Apply a favourite city before Streamlit recreates the city input."""
+
+    saved_city = st.session_state.get("saved_city_choice")
+    if not saved_city:
+        return
+    st.session_state.city = saved_city
+    st.session_state.city_input = saved_city
+    st.session_state.weather_data = None
+    st.session_state.weather_error = None
+    st.session_state.weather_refresh_requested = True
+
+
 def enable_home_dock_dragging():
     """Attach lightweight pointer dragging to the homepage control glass."""
 
@@ -1327,8 +1340,8 @@ def enable_home_dock_dragging():
     )
     drag_component(
         key="wardrobe_home_dock_dragger",
-        height=1,
-        width=1,
+        height="content",
+        width="content",
     )
 
 
@@ -1350,6 +1363,7 @@ def initialise_state():
         "weather_error": None,
         "theme": "Green",
         "saved_cities": load_saved_cities(),
+        "weather_refresh_requested": False,
     }
 
     for state_name, default_value in defaults.items():
@@ -3507,6 +3521,11 @@ if st.session_state.image_mode is None:
         unsafe_allow_html=True,
     )
 
+    if st.session_state.weather_refresh_requested:
+        with st.spinner("Opening your saved city..."):
+            ensure_current_weather()
+        st.session_state.weather_refresh_requested = False
+
     home_weather = st.session_state.weather_data
     home_weather_error = st.session_state.weather_error
 
@@ -3605,18 +3624,8 @@ if st.session_state.image_mode is None:
                 st.session_state.saved_cities,
                 key="saved_city_choice",
                 width="stretch",
+                on_change=apply_saved_city_choice,
             )
-            if (
-                saved_city_choice
-                and saved_city_choice.casefold() != st.session_state.city.casefold()
-            ):
-                st.session_state.city = saved_city_choice
-                st.session_state.city_input = saved_city_choice
-                st.session_state.weather_data = None
-                st.session_state.weather_error = None
-                with st.spinner("Opening your saved city..."):
-                    ensure_current_weather()
-                st.rerun()
 
         st.radio(
             "Choose your mood",
