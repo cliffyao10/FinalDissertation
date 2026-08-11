@@ -3327,8 +3327,91 @@ if st.session_state.image_mode is None:
                     color-mix(in srgb, var(--fashion-primary) 22%, transparent);
             }
 
-            div[data-testid="stRadio"] label p {
-                font-size: .76rem;
+            div[data-testid="stRadio"] [role="radiogroup"] {
+                display: flex;
+                align-items: center;
+                gap: .72rem;
+                flex-wrap: nowrap;
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"] {
+                position: relative;
+                width: 48px;
+                min-width: 48px;
+                height: 36px;
+                min-height: 36px;
+                padding: 0 !important;
+                overflow: visible;
+                border: 2px solid rgba(255,255,255,.72);
+                border-radius: 38% 24% 42% 28% / 32% 44% 26% 40%;
+                box-shadow: 0 7px 15px rgba(45,55,50,.12), inset 0 0 0 1px rgba(35,45,40,.06);
+                transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]:nth-child(1) { background: #78a6cd; }
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]:nth-child(2) { background: #78a985; }
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]:nth-child(3) { background: #dea0b4; }
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]:nth-child(4) { background: #c9ad87; }
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]:nth-child(5) {
+                background: #fbfbf8;
+                border-color: #c9cbc7;
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"] > div {
+                width: 100%;
+                height: 100%;
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]
+            > div > div > div:first-child {
+                display: none;
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"] p {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                clip-path: inset(50%);
+                white-space: nowrap;
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]::after {
+                content: "✦";
+                position: absolute;
+                top: -8px;
+                right: -6px;
+                display: grid;
+                width: 18px;
+                height: 18px;
+                place-items: center;
+                border-radius: 7px 10px 7px 9px;
+                background: var(--fashion-strong);
+                color: white;
+                font-size: .62rem;
+                opacity: 0;
+                transform: scale(.6) rotate(-12deg);
+                transition: opacity .18s ease, transform .18s ease;
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]:hover {
+                transform: translateY(-2px) rotate(-1deg);
+                filter: saturate(1.08);
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]:has(input:checked) {
+                transform: translateY(-2px) rotate(-2deg);
+                box-shadow:
+                    0 0 0 3px rgba(255,255,255,.9),
+                    0 0 0 5px var(--fashion-strong),
+                    0 10px 20px rgba(45,55,50,.16);
+            }
+
+            div[data-testid="stRadio"] label[data-testid="stRadioOption"]:has(input:checked)::after {
+                opacity: 1;
+                transform: scale(1) rotate(7deg);
             }
 
             .home-wordmark {
@@ -3405,14 +3488,8 @@ if st.session_state.image_mode is None:
             }
 
             .home-dock-marker {
-                display: flex;
-                justify-content: flex-end;
-                min-height: 1rem;
-                color: var(--fashion-muted);
-                font-size: .64rem;
-                font-weight: 700;
-                letter-spacing: .12em;
-                text-transform: uppercase;
+                height: 0;
+                overflow: hidden;
             }
 
             div[data-testid="stLayoutWrapper"]:has(.home-dock-marker) {
@@ -3549,7 +3626,7 @@ if st.session_state.image_mode is None:
 
     with st.container(border=False):
         st.markdown(
-            '<div class="home-dock-marker">↔ drag anywhere on the page</div>',
+            '<div class="home-dock-marker"></div>',
             unsafe_allow_html=True,
         )
 
@@ -3559,7 +3636,6 @@ if st.session_state.image_mode is None:
                 <div class="city-panel-icon">⌖</div>
                 <div>
                     <div class="city-panel-title">Where are you dressing for?</div>
-                    <div class="city-panel-copy">Set the forecast, then keep favourites close.</div>
                 </div>
             </div>
             """,
