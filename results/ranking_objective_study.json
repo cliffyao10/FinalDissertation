@@ -1,0 +1,469 @@
+{
+  "protocol": "The proposed architecture is unchanged. Training adds a matched-pair margin loss to BCE and retains validation-AUC model selection.",
+  "configuration": {
+    "seeds": [
+      42,
+      7,
+      123
+    ],
+    "epochs": 20,
+    "patience": 6,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "margin": 0.2,
+    "ranking_weight": 0.5
+  },
+  "runs": [
+    {
+      "seed": 42,
+      "best_epoch": 17,
+      "best_validation_auc": 0.746608573526126,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.713862015394393,
+        "average_precision": 0.7121745720792363,
+        "accuracy": 0.6624649859943977,
+        "balanced_accuracy": 0.6624649859943977,
+        "precision": 0.7013888888888888,
+        "recall": 0.5658263305322129,
+        "f1": 0.6263565891472869,
+        "specificity": 0.7591036414565826,
+        "matthews_correlation_coefficient": 0.33117454308330696,
+        "brier_score": 0.3064510894967385,
+        "confusion_matrix": [
+          [
+            271,
+            86
+          ],
+          [
+            155,
+            202
+          ]
+        ],
+        "matched_pairs": 357,
+        "pair_ranking_accuracy": 0.7899159663865546,
+        "fitb4_examples": 357,
+        "fitb4_accuracy": 0.5434173669467787,
+        "fitb4_mean_reciprocal_rank": 0.7350606909430438,
+        "fitb4_ndcg": 0.8024504682872491,
+        "fitb4_protocol": "One true completion and three same-slot replacements. One replacement is the matched negative; two are sampled deterministically from other test pairs. This is a project-specific diagnostic, not the official Polyvore FITB."
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.7813667319004163,
+          "classification_loss": 0.689112051207113,
+          "ranking_loss": 0.1845093639994971,
+          "validation_auc": 0.6312362347984295
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.7114768326743599,
+          "classification_loss": 0.6459737371513068,
+          "ranking_loss": 0.13100619390107357,
+          "validation_auc": 0.7230042452679626
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6240653008637569,
+          "classification_loss": 0.5790514660717717,
+          "ranking_loss": 0.09002767634290343,
+          "validation_auc": 0.7337929713683806
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.5185161318405195,
+          "classification_loss": 0.4927237034458792,
+          "ranking_loss": 0.051584857511667935,
+          "validation_auc": 0.7313671039611862
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.41282329834755577,
+          "classification_loss": 0.4034594256063907,
+          "ranking_loss": 0.01872774512161678,
+          "validation_auc": 0.7322927638928788
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.28429926964903446,
+          "classification_loss": 0.28069327140727446,
+          "ranking_loss": 0.007211995451812464,
+          "validation_auc": 0.7294838647898114
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.19479457845756723,
+          "classification_loss": 0.1929869569104132,
+          "ranking_loss": 0.0036152424756677693,
+          "validation_auc": 0.7389958185706534
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.14063228609145087,
+          "classification_loss": 0.13996863013970107,
+          "ranking_loss": 0.0013273116191556123,
+          "validation_auc": 0.7231478821539148
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.10714901987196183,
+          "classification_loss": 0.10682685317038383,
+          "ranking_loss": 0.0006443337566647227,
+          "validation_auc": 0.7286858820900763
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.08922053566140081,
+          "classification_loss": 0.08916940157747932,
+          "ranking_loss": 0.00010226826006263234,
+          "validation_auc": 0.7393469309585368
+        },
+        {
+          "epoch": 11,
+          "train_loss": 0.06087921023783824,
+          "classification_loss": 0.06083204744017696,
+          "ranking_loss": 9.432556458267125e-05,
+          "validation_auc": 0.7419962335216573
+        },
+        {
+          "epoch": 12,
+          "train_loss": 0.03965343264291325,
+          "classification_loss": 0.03965343264291325,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.7420281528296466
+        },
+        {
+          "epoch": 13,
+          "train_loss": 0.030616177546168768,
+          "classification_loss": 0.030616177546168768,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.7365061125474799
+        },
+        {
+          "epoch": 14,
+          "train_loss": 0.03183166735746493,
+          "classification_loss": 0.03183166735746493,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.7402566312362348
+        },
+        {
+          "epoch": 15,
+          "train_loss": 0.02811324114941518,
+          "classification_loss": 0.02811324114941518,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.7388681413386957
+        },
+        {
+          "epoch": 16,
+          "train_loss": 0.03352601175658047,
+          "classification_loss": 0.03352601175658047,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.7404481470841712
+        },
+        {
+          "epoch": 17,
+          "train_loss": 0.04294010246765251,
+          "classification_loss": 0.04294010246765251,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.746608573526126
+        },
+        {
+          "epoch": 18,
+          "train_loss": 0.042160558141095546,
+          "classification_loss": 0.042160558141095546,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.7386766254907594
+        },
+        {
+          "epoch": 19,
+          "train_loss": 0.03685535508236315,
+          "classification_loss": 0.03685535508236315,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.7413738070158639
+        },
+        {
+          "epoch": 20,
+          "train_loss": 0.03082216667446542,
+          "classification_loss": 0.03082216667446542,
+          "ranking_loss": 0.0,
+          "validation_auc": 0.7409748156659963
+        }
+      ],
+      "checkpoint": "models\\ranking_objective\\hybrid_seed42.pt"
+    },
+    {
+      "seed": 7,
+      "best_epoch": 3,
+      "best_validation_auc": 0.7626480257908008,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.7270829900587686,
+        "average_precision": 0.7280480205311873,
+        "accuracy": 0.6386554621848739,
+        "balanced_accuracy": 0.6386554621848739,
+        "precision": 0.6073752711496746,
+        "recall": 0.7843137254901961,
+        "f1": 0.684596577017115,
+        "specificity": 0.49299719887955185,
+        "matthews_correlation_coefficient": 0.28988415082536917,
+        "brier_score": 0.21413559076185526,
+        "confusion_matrix": [
+          [
+            176,
+            181
+          ],
+          [
+            77,
+            280
+          ]
+        ],
+        "matched_pairs": 357,
+        "pair_ranking_accuracy": 0.7787114845938375,
+        "fitb4_examples": 357,
+        "fitb4_accuracy": 0.5574229691876751,
+        "fitb4_mean_reciprocal_rank": 0.7436974789915967,
+        "fitb4_ndcg": 0.8089788025327086,
+        "fitb4_protocol": "One true completion and three same-slot replacements. One replacement is the matched negative; two are sampled deterministically from other test pairs. This is a project-specific diagnostic, not the official Polyvore FITB."
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.7786353488691447,
+          "classification_loss": 0.687618495540068,
+          "ranking_loss": 0.18203371182245467,
+          "validation_auc": 0.6557502633342909
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.7046256800052,
+          "classification_loss": 0.6417725331516473,
+          "ranking_loss": 0.12570628992609906,
+          "validation_auc": 0.747294838647898
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.616770664400019,
+          "classification_loss": 0.5714040500654148,
+          "ranking_loss": 0.09073322905729947,
+          "validation_auc": 0.7626480257908008
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.5223293573724787,
+          "classification_loss": 0.4982373886283001,
+          "ranking_loss": 0.04818393791871565,
+          "validation_auc": 0.756168406268952
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.42410452126718906,
+          "classification_loss": 0.4120844155934252,
+          "ranking_loss": 0.024040214267817276,
+          "validation_auc": 0.7509655590666795
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.30051571330561844,
+          "classification_loss": 0.29479712650541057,
+          "ranking_loss": 0.01143717429974818,
+          "validation_auc": 0.7380063200229818
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.2469789288657544,
+          "classification_loss": 0.2445846798187559,
+          "ranking_loss": 0.004788499461922097,
+          "validation_auc": 0.7312394267292286
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.1499993389970928,
+          "classification_loss": 0.14928572022035724,
+          "ranking_loss": 0.0014272383065983584,
+          "validation_auc": 0.7388681413386957
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.11497094328099763,
+          "classification_loss": 0.11486508838290588,
+          "ranking_loss": 0.0002117097692860962,
+          "validation_auc": 0.739761881962399
+        }
+      ],
+      "checkpoint": "models\\ranking_objective\\hybrid_seed7.pt"
+    },
+    {
+      "seed": 123,
+      "best_epoch": 3,
+      "best_validation_auc": 0.7406556225861023,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.7162080518481901,
+        "average_precision": 0.7125227869956259,
+        "accuracy": 0.6470588235294118,
+        "balanced_accuracy": 0.6470588235294117,
+        "precision": 0.6223776223776224,
+        "recall": 0.7478991596638656,
+        "f1": 0.6793893129770993,
+        "specificity": 0.5462184873949579,
+        "matthews_correlation_coefficient": 0.30028816978000816,
+        "brier_score": 0.21651853804829746,
+        "confusion_matrix": [
+          [
+            195,
+            162
+          ],
+          [
+            90,
+            267
+          ]
+        ],
+        "matched_pairs": 357,
+        "pair_ranking_accuracy": 0.7843137254901961,
+        "fitb4_examples": 357,
+        "fitb4_accuracy": 0.5742296918767507,
+        "fitb4_mean_reciprocal_rank": 0.7481325863678804,
+        "fitb4_ndcg": 0.81198863059217,
+        "fitb4_protocol": "One true completion and three same-slot replacements. One replacement is the matched negative; two are sampled deterministically from other test pairs. This is a project-specific diagnostic, not the official Polyvore FITB."
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.7815963568424306,
+          "classification_loss": 0.689223187033696,
+          "ranking_loss": 0.18474634261460818,
+          "validation_auc": 0.647195888793131
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.7083579338721974,
+          "classification_loss": 0.6449385016710872,
+          "ranking_loss": 0.126838867768238,
+          "validation_auc": 0.7203230233968528
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6199473488447652,
+          "classification_loss": 0.575973957331295,
+          "ranking_loss": 0.08794678835262645,
+          "validation_auc": 0.7406556225861023
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.5124215274326822,
+          "classification_loss": 0.48720110692333596,
+          "ranking_loss": 0.0504408365037713,
+          "validation_auc": 0.7279836573143095
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.4003034485806627,
+          "classification_loss": 0.3882568510861173,
+          "ranking_loss": 0.02409319722733896,
+          "validation_auc": 0.7181205911455839
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.2960718721996699,
+          "classification_loss": 0.29083036085328473,
+          "ranking_loss": 0.010483023369047923,
+          "validation_auc": 0.7127900667113538
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.21629114480532588,
+          "classification_loss": 0.215039722448529,
+          "ranking_loss": 0.002502845581995574,
+          "validation_auc": 0.7160777554342622
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.16482769456980706,
+          "classification_loss": 0.16428905375812888,
+          "ranking_loss": 0.0010772813774372512,
+          "validation_auc": 0.7188547352293402
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.09851320499055714,
+          "classification_loss": 0.09815816861750724,
+          "ranking_loss": 0.0007100724233309592,
+          "validation_auc": 0.720737974400715
+        }
+      ],
+      "checkpoint": "models\\ranking_objective\\hybrid_seed123.pt"
+    }
+  ],
+  "summary": {
+    "auc": {
+      "values": [
+        0.713862015394393,
+        0.7270829900587686,
+        0.7162080518481901
+      ],
+      "mean": 0.7190510191004506,
+      "sample_standard_deviation": 0.007054104469532952
+    },
+    "average_precision": {
+      "values": [
+        0.7121745720792363,
+        0.7280480205311873,
+        0.7125227869956259
+      ],
+      "mean": 0.7175817932020165,
+      "sample_standard_deviation": 0.009065690778225942
+    },
+    "balanced_accuracy": {
+      "values": [
+        0.6624649859943977,
+        0.6386554621848739,
+        0.6470588235294117
+      ],
+      "mean": 0.6493930905695611,
+      "sample_standard_deviation": 0.012075179417719498
+    },
+    "pair_ranking_accuracy": {
+      "values": [
+        0.7899159663865546,
+        0.7787114845938375,
+        0.7843137254901961
+      ],
+      "mean": 0.7843137254901961,
+      "sample_standard_deviation": 0.0056022408963585235
+    },
+    "fitb4_accuracy": {
+      "values": [
+        0.5434173669467787,
+        0.5574229691876751,
+        0.5742296918767507
+      ],
+      "mean": 0.5583566760037348,
+      "sample_standard_deviation": 0.015427368479793003
+    },
+    "fitb4_mean_reciprocal_rank": {
+      "values": [
+        0.7350606909430438,
+        0.7436974789915967,
+        0.7481325863678804
+      ],
+      "mean": 0.742296918767507,
+      "sample_standard_deviation": 0.006647540086787169
+    },
+    "fitb4_ndcg": {
+      "values": [
+        0.8024504682872491,
+        0.8089788025327086,
+        0.81198863059217
+      ],
+      "mean": 0.807805967137376,
+      "sample_standard_deviation": 0.004876042676921762
+    }
+  }
+}

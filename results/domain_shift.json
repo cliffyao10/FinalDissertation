@@ -1,0 +1,61 @@
+{
+  "protocol": "Frozen SigLIP feature-distribution diagnostic using real positive Polyvore test items and the 300-item product catalogue.",
+  "encoder": "google/siglip-base-patch16-224",
+  "overall": {
+    "polyvore_items": 1162,
+    "catalogue_items": 300,
+    "centroid_cosine_similarity": 0.7468692462286403,
+    "catalogue_to_polyvore_nearest_cosine_mean": 0.6111301344347811,
+    "catalogue_to_polyvore_nearest_cosine_min": 0.47962270624728665,
+    "domain_classifier_cross_validated_auc": 1.0,
+    "rbf_mmd_squared": 0.1935748405555282,
+    "rbf_bandwidth_median_heuristic": 0.9851538188527392,
+    "interpretation": "Domain-classifier AUC near 0.5 indicates overlapping feature distributions; values near 1.0 indicate separable domains."
+  },
+  "by_slot": {
+    "inner_top": {
+      "polyvore_items": 333,
+      "catalogue_items": 75,
+      "centroid_cosine_similarity": 0.7160793404378044,
+      "catalogue_to_polyvore_nearest_cosine_mean": 0.5869101033522334,
+      "catalogue_to_polyvore_nearest_cosine_min": 0.500187381215687,
+      "domain_classifier_cross_validated_auc": 1.0,
+      "rbf_mmd_squared": 0.23724690274603022,
+      "rbf_bandwidth_median_heuristic": 0.9355119380692243,
+      "interpretation": "Domain-classifier AUC near 0.5 indicates overlapping feature distributions; values near 1.0 indicate separable domains."
+    },
+    "outer_top": {
+      "polyvore_items": 197,
+      "catalogue_items": 75,
+      "centroid_cosine_similarity": 0.7511409951120506,
+      "catalogue_to_polyvore_nearest_cosine_mean": 0.6133254457406969,
+      "catalogue_to_polyvore_nearest_cosine_min": 0.48148537348966125,
+      "domain_classifier_cross_validated_auc": 1.0,
+      "rbf_mmd_squared": 0.2234957982552115,
+      "rbf_bandwidth_median_heuristic": 0.8678030723318354,
+      "interpretation": "Domain-classifier AUC near 0.5 indicates overlapping feature distributions; values near 1.0 indicate separable domains."
+    },
+    "bottom": {
+      "polyvore_items": 282,
+      "catalogue_items": 75,
+      "centroid_cosine_similarity": 0.7271051021758962,
+      "catalogue_to_polyvore_nearest_cosine_mean": 0.5953280602943457,
+      "catalogue_to_polyvore_nearest_cosine_min": 0.4528864771864253,
+      "domain_classifier_cross_validated_auc": 1.0,
+      "rbf_mmd_squared": 0.23356433477493388,
+      "rbf_bandwidth_median_heuristic": 0.9169709002676549,
+      "interpretation": "Domain-classifier AUC near 0.5 indicates overlapping feature distributions; values near 1.0 indicate separable domains."
+    },
+    "shoes": {
+      "polyvore_items": 350,
+      "catalogue_items": 75,
+      "centroid_cosine_similarity": 0.7358507494111297,
+      "catalogue_to_polyvore_nearest_cosine_mean": 0.5695409438963321,
+      "catalogue_to_polyvore_nearest_cosine_min": 0.45690894095657786,
+      "domain_classifier_cross_validated_auc": 1.0,
+      "rbf_mmd_squared": 0.1857968013256599,
+      "rbf_bandwidth_median_heuristic": 1.0159781035907751,
+      "interpretation": "Domain-classifier AUC near 0.5 indicates overlapping feature distributions; values near 1.0 indicate separable domains."
+    }
+  }
+}

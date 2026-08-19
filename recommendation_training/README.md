@@ -100,6 +100,93 @@ warm end-to-end catalogue-ranking latency with:
 .\.venv\Scripts\python.exe -m recommendation_training.benchmark_runtime
 ```
 
+## Controlled comparison with fashion-model families
+
+The dissertation comparison uses representative architecture families from
+fashion compatibility research, adapted to the same cached tensors:
+
+- a slot-ordered Bi-LSTM, motivated by Han et al. (2017);
+- slot-pair-specific projections, motivated by the type-aware compatibility
+  spaces of Vasileva et al. (2018);
+- a small outfit-token Transformer, motivated by Sarkar et al. (2023); and
+- the proposed lightweight pooled/pair-difference model.
+
+Run all four under the same split, frozen SigLIP features, optimiser, training
+budget, early-stopping rule and completion candidates:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.fashion_model_comparison
+```
+
+The output `results/fashion_model_comparison.json` contains three-seed results,
+per-run predictions, compatibility AUC, matched-pair ranking accuracy, a fixed
+four-choice completion diagnostic, trainable parameter counts and paired
+bootstrap AUC-difference intervals. The comparison models preserve the central
+architectural idea of each research family but are not exact reproductions of
+the published systems. Published benchmark scores must therefore be presented
+separately and must not be compared numerically with this processed split.
+
+Primary methodological sources:
+
+- Han et al., *Learning Fashion Compatibility with Bidirectional LSTMs*, ACM
+  Multimedia 2017: https://arxiv.org/abs/1707.05691
+- Vasileva et al., *Learning Type-Aware Embeddings for Fashion Compatibility*,
+  ECCV 2018: https://arxiv.org/abs/1803.09196
+- Sarkar et al., *OutfitTransformer: Learning Outfit Representations for
+  Fashion Recommendation*, WACV 2023: https://arxiv.org/abs/2204.04812
+
+The four-choice metric is deliberately called a project-specific FITB-4
+diagnostic. It uses one true completion, the matched same-slot corruption and
+two deterministic replacements from other test pairs. It is reproducible and
+fair across the four local models, but it is not the official Polyvore FITB
+protocol and may contain plausible false negatives.
+
+## Official FITB availability and diagnostics
+
+The official `fill_in_blank_test.json` can be parsed without downloading or
+scraping any additional source. Extend a separate cache with locally available
+secondary-data images, then evaluate all comparison checkpoints:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.prepare_official_fitb_cache
+.\.venv\Scripts\python.exe -m recommendation_training.evaluate_official_fitb
+```
+
+The current image archive does not contain all four answer images for any
+question that can be mapped into the product's four slots. The evaluator writes
+an explicit `unavailable_with_current_image_archive` result with exclusion
+counts rather than silently reporting a selected or incomplete score.
+
+Generate structural error slices and a frozen-feature domain-shift diagnostic:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.error_analysis
+.\.venv\Scripts\python.exe -m recommendation_training.domain_shift
+```
+
+`error_analysis` reports calibration, three-versus-four-slot performance,
+matched ranking by replaced slot and the highest-confidence errors.
+`domain_shift` compares real positive Polyvore test items with the 300-product
+candidate catalogue using centroid similarity, nearest-neighbour similarity,
+RBF MMD and a cross-validated domain classifier.
+
+An explicit matched-pair margin-ranking objective was also tested without
+changing the architecture:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.ranking_objective_study
+```
+
+It did not improve held-out AUC, matched-pair accuracy or FITB-4 over the
+standard BCE-trained model, so the production checkpoint remains unchanged.
+
+Capture the exact Python/package versions, Git revision and SHA-256 hashes of
+the datasets and trained artifacts used for a result:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.reproducibility_manifest
+```
+
 ## Published Maryland hard negatives
 
 `prepare_hardneg.py` converts the published same-type replacement benchmark

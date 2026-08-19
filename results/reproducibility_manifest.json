@@ -1,0 +1,47 @@
+{
+  "generated_utc": "2026-08-19T19:49:15.873097+00:00",
+  "git_revision": "7703ad26e33641a152aec078bbe4ac91c298ac56",
+  "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "Pillow": "12.3.0",
+    "scikit-learn": "1.9.0",
+    "torch": "2.13.0",
+    "transformers": "5.15.0",
+    "streamlit": "1.61.1"
+  },
+  "artifacts": {
+    "data/processed/train.pt": {
+      "exists": true,
+      "bytes": 95369935,
+      "sha256": "97b5e3de854add9c6785951a62e9a95db299019301ebb2dbcf1b66b5ba8c5b1e"
+    },
+    "data/processed/validation.pt": {
+      "exists": true,
+      "bytes": 4355132,
+      "sha256": "80fa0cd4a2abf2a0b0b3bfc0442b23cf0adf9c461504f1a0bf90b8bc929e8f42"
+    },
+    "data/processed/test.pt": {
+      "exists": true,
+      "bytes": 8781510,
+      "sha256": "d7449d6220e7d0fcf3fd8177b0315bd38a16fc8160720d09a3cbc35b6bf28d1d"
+    },
+    "models/compatibility_ranker.pt": {
+      "exists": true,
+      "bytes": 1522655,
+      "sha256": "2572befd404dc8562167cabe72b1b6d3dcaae9dbd4b9dea3e45b3d6a3e65e811"
+    },
+    "models/catalogue_embeddings.pt": {
+      "exists": true,
+      "bytes": 1081988,
+      "sha256": "a29d66223ed6b975fa37b3cb41d5e1609461001f0d385046f390ed9446f278b0"
+    },
+    "data/catalogue.csv": {
+      "exists": true,
+      "bytes": 91993,
+      "sha256": "1c0bb593598134dea01116348f9b7c3b3fc572956ef33b1ff17506d1cc987ea6"
+    }
+  }
+}

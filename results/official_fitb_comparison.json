@@ -1,0 +1,16 @@
+{
+  "status": "unavailable_with_current_image_archive",
+  "protocol": "Official questions were parsed, but no question had four supported answer images available in the local secondary-data archive. No model score is reported.",
+  "coverage": {
+    "total_questions": 3076,
+    "retained_questions": 0,
+    "retained_fraction": 0.0,
+    "skipped": {
+      "missing_answer_embedding": 92,
+      "unsupported_answer_slot": 2984
+    },
+    "selection_bias_warning": "This filtered result is not numerically interchangeable with a full-dataset published FITB score."
+  },
+  "runs": {},
+  "summary": {}
+}

@@ -1,0 +1,575 @@
+{
+  "checkpoint": "models/compatibility_ranker.pt",
+  "test_dataset": "data/processed/test.pt",
+  "checkpoint_metadata": {
+    "checkpoint_version": 1,
+    "best_epoch": 4,
+    "best_validation_metrics": {
+      "accuracy": 0.6779661016949152,
+      "auc": 0.7584027578282103
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 7756,
+    "validation_examples": 354,
+    "train_positive_rate": 0.5,
+    "validation_positive_rate": 0.5,
+    "seed": 42,
+    "training_config": {
+      "batch_size": 128,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 6
+    }
+  },
+  "dataset_metadata": {
+    "positive_examples": 357,
+    "negative_examples": 357,
+    "source_outfits": 357,
+    "siglip_model": "google/siglip-base-patch16-224",
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "seed": 44
+  },
+  "analysis": {
+    "overall": {
+      "examples": 714,
+      "positive_rate": 0.5,
+      "threshold": 0.5,
+      "auc": 0.7293270249276183,
+      "average_precision": 0.7392407980686931,
+      "accuracy": 0.6708683473389355,
+      "balanced_accuracy": 0.6708683473389356,
+      "precision": 0.6703910614525139,
+      "recall": 0.6722689075630253,
+      "f1": 0.6713286713286714,
+      "specificity": 0.6694677871148459,
+      "matthews_correlation_coefficient": 0.34173803536593345,
+      "brier_score": 0.20963754461734715,
+      "confusion_matrix": [
+        [
+          239,
+          118
+        ],
+        [
+          117,
+          240
+        ]
+      ]
+    },
+    "calibration": {
+      "bins": 10,
+      "ece": 0.04199720969220169,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "examples": 8,
+          "mean_probability": 0.07435301039367914,
+          "positive_rate": 0.0
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "examples": 41,
+          "mean_probability": 0.15692145668151902,
+          "positive_rate": 0.17073170731707318
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.30000000000000004,
+          "examples": 72,
+          "mean_probability": 0.25448888209131026,
+          "positive_rate": 0.25
+        },
+        {
+          "lower": 0.30000000000000004,
+          "upper": 0.4,
+          "examples": 94,
+          "mean_probability": 0.3529164451867976,
+          "positive_rate": 0.40425531914893614
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "examples": 141,
+          "mean_probability": 0.44967363320343884,
+          "positive_rate": 0.3829787234042553
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6000000000000001,
+          "examples": 128,
+          "mean_probability": 0.55336525849998,
+          "positive_rate": 0.5390625
+        },
+        {
+          "lower": 0.6000000000000001,
+          "upper": 0.7000000000000001,
+          "examples": 115,
+          "mean_probability": 0.6466921915178714,
+          "positive_rate": 0.6260869565217392
+        },
+        {
+          "lower": 0.7000000000000001,
+          "upper": 0.8,
+          "examples": 81,
+          "mean_probability": 0.7438371144695046,
+          "positive_rate": 0.8271604938271605
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "examples": 34,
+          "mean_probability": 0.8434594536528868,
+          "positive_rate": 0.9411764705882353
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "examples": 0,
+          "mean_probability": null,
+          "positive_rate": null
+        }
+      ]
+    },
+    "by_present_slot_count": {
+      "3": {
+        "examples": 532,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.7428769291650177,
+        "average_precision": 0.748506900118433,
+        "accuracy": 0.6823308270676691,
+        "balanced_accuracy": 0.6823308270676691,
+        "precision": 0.6802973977695167,
+        "recall": 0.6879699248120301,
+        "f1": 0.6841121495327103,
+        "specificity": 0.6766917293233082,
+        "matthews_correlation_coefficient": 0.36468484840870896,
+        "brier_score": 0.20482498338552102,
+        "confusion_matrix": [
+          [
+            180,
+            86
+          ],
+          [
+            83,
+            183
+          ]
+        ]
+      },
+      "4": {
+        "examples": 182,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.6865112909068952,
+        "average_precision": 0.7155828959790532,
+        "accuracy": 0.6373626373626373,
+        "balanced_accuracy": 0.6373626373626373,
+        "precision": 0.6404494382022472,
+        "recall": 0.6263736263736264,
+        "f1": 0.6333333333333333,
+        "specificity": 0.6483516483516484,
+        "matthews_correlation_coefficient": 0.27479164952081325,
+        "brier_score": 0.22370503129499283,
+        "confusion_matrix": [
+          [
+            59,
+            32
+          ],
+          [
+            34,
+            57
+          ]
+        ]
+      }
+    },
+    "by_replaced_slot": {
+      "inner_top": {
+        "matched_pairs": 100,
+        "pair_ranking_accuracy": 0.73,
+        "classification": {
+          "examples": 200,
+          "positive_rate": 0.5,
+          "threshold": 0.5,
+          "auc": 0.7363999999999999,
+          "average_precision": 0.7474289123486311,
+          "accuracy": 0.68,
+          "balanced_accuracy": 0.68,
+          "precision": 0.68,
+          "recall": 0.68,
+          "f1": 0.68,
+          "specificity": 0.68,
+          "matthews_correlation_coefficient": 0.36,
+          "brier_score": 0.20765012279855155,
+          "confusion_matrix": [
+            [
+              68,
+              32
+            ],
+            [
+              32,
+              68
+            ]
+          ]
+        }
+      },
+      "outer_top": {
+        "matched_pairs": 50,
+        "pair_ranking_accuracy": 0.64,
+        "classification": {
+          "examples": 100,
+          "positive_rate": 0.5,
+          "threshold": 0.5,
+          "auc": 0.6204,
+          "average_precision": 0.6763260563633484,
+          "accuracy": 0.58,
+          "balanced_accuracy": 0.5800000000000001,
+          "precision": 0.5869565217391305,
+          "recall": 0.54,
+          "f1": 0.5625,
+          "specificity": 0.62,
+          "matthews_correlation_coefficient": 0.1605144707810256,
+          "brier_score": 0.2372235475034402,
+          "confusion_matrix": [
+            [
+              31,
+              19
+            ],
+            [
+              23,
+              27
+            ]
+          ]
+        }
+      },
+      "bottom": {
+        "matched_pairs": 88,
+        "pair_ranking_accuracy": 0.7613636363636364,
+        "classification": {
+          "examples": 176,
+          "positive_rate": 0.5,
+          "threshold": 0.5,
+          "auc": 0.7306301652892562,
+          "average_precision": 0.7588879860981685,
+          "accuracy": 0.6477272727272727,
+          "balanced_accuracy": 0.6477272727272727,
+          "precision": 0.6413043478260869,
+          "recall": 0.6704545454545454,
+          "f1": 0.6555555555555556,
+          "specificity": 0.625,
+          "matthews_correlation_coefficient": 0.29576024087563857,
+          "brier_score": 0.20941508202731487,
+          "confusion_matrix": [
+            [
+              55,
+              33
+            ],
+            [
+              29,
+              59
+            ]
+          ]
+        }
+      },
+      "shoes": {
+        "matched_pairs": 119,
+        "pair_ranking_accuracy": 0.8067226890756303,
+        "classification": {
+          "examples": 238,
+          "positive_rate": 0.5,
+          "threshold": 0.5,
+          "auc": 0.760327660475955,
+          "average_precision": 0.7520839095957751,
+          "accuracy": 0.7184873949579832,
+          "balanced_accuracy": 0.7184873949579832,
+          "precision": 0.7166666666666667,
+          "recall": 0.7226890756302521,
+          "f1": 0.7196652719665272,
+          "specificity": 0.7142857142857143,
+          "matthews_correlation_coefficient": 0.4369902195443293,
+          "brier_score": 0.19988139962152993,
+          "confusion_matrix": [
+            [
+              85,
+              34
+            ],
+            [
+              33,
+              86
+            ]
+          ]
+        }
+      }
+    },
+    "highest_confidence_mistakes": [
+      {
+        "example_index": 480,
+        "label": 1,
+        "probability": 0.10252255946397781,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 273,
+        "label": 0,
+        "probability": 0.8834510445594788,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 236,
+        "label": 1,
+        "probability": 0.14231035113334656,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 172,
+        "label": 1,
+        "probability": 0.15653975307941437,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 52,
+        "label": 1,
+        "probability": 0.1579541712999344,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 428,
+        "label": 1,
+        "probability": 0.18522489070892334,
+        "present_slots": [
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 460,
+        "label": 1,
+        "probability": 0.18644574284553528,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "bottom"
+        ]
+      },
+      {
+        "example_index": 337,
+        "label": 0,
+        "probability": 0.8040891885757446,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 228,
+        "label": 1,
+        "probability": 0.19602271914482117,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 579,
+        "label": 0,
+        "probability": 0.7974655628204346,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 65,
+        "label": 0,
+        "probability": 0.7947050929069519,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 616,
+        "label": 1,
+        "probability": 0.20782683789730072,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 692,
+        "label": 1,
+        "probability": 0.21518176794052124,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 471,
+        "label": 0,
+        "probability": 0.7732442021369934,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 362,
+        "label": 1,
+        "probability": 0.2269774228334427,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 492,
+        "label": 1,
+        "probability": 0.23449377715587616,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 590,
+        "label": 1,
+        "probability": 0.2373940646648407,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 465,
+        "label": 0,
+        "probability": 0.7616921067237854,
+        "present_slots": [
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 663,
+        "label": 0,
+        "probability": 0.7496936321258545,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 553,
+        "label": 0,
+        "probability": 0.7481868267059326,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 226,
+        "label": 1,
+        "probability": 0.2547398805618286,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 124,
+        "label": 1,
+        "probability": 0.2564795911312103,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 304,
+        "label": 1,
+        "probability": 0.25773128867149353,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 689,
+        "label": 0,
+        "probability": 0.7397153973579407,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 559,
+        "label": 0,
+        "probability": 0.7379141449928284,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      }
+    ]
+  }
+}
