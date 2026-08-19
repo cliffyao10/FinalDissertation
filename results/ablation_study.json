@@ -1,0 +1,304 @@
+{
+  "purpose": "Controlled comparison on identical frozen SigLIP embeddings; production checkpoint remains unchanged.",
+  "datasets": {
+    "train": "data/processed/train.pt",
+    "validation": "data/processed/validation.pt",
+    "test": "data/processed/test.pt"
+  },
+  "device": "cpu",
+  "seed": 42,
+  "training_configuration": {
+    "epochs": 10,
+    "batch_size": 128,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "patience": 6
+  },
+  "variants": {
+    "mean_pool_logistic": {
+      "kind": "mean_pooled_frozen_siglip_logistic_regression",
+      "trainable_parameters": 769,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.5114202543762603,
+        "accuracy": 0.49299719887955185,
+        "precision": 0.4901185770750988,
+        "recall": 0.3473389355742297,
+        "f1": 0.4065573770491803,
+        "brier_score": 0.2503424882888794,
+        "confusion_matrix": [
+          [
+            228,
+            129
+          ],
+          [
+            233,
+            124
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.47060974769236524,
+          0.5517670744768496
+        ]
+      },
+      "configuration": {
+        "C": 1.0,
+        "max_iter": 2000
+      }
+    },
+    "no_slot": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 362753,
+      "best_epoch": 5,
+      "best_validation_auc": 0.7615627693191612,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.735541275333663,
+        "accuracy": 0.6596638655462185,
+        "precision": 0.6647398843930635,
+        "recall": 0.6442577030812325,
+        "f1": 0.6543385490753911,
+        "brier_score": 0.2076345970186596,
+        "confusion_matrix": [
+          [
+            241,
+            116
+          ],
+          [
+            127,
+            230
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.7009429994025306,
+          0.7707557001492251
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6938837143549789,
+          "validation_auc": 0.5702065179226914
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.684775795685747,
+          "validation_auc": 0.6758594273676147
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6525024800893263,
+          "validation_auc": 0.7350697436879567
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.6153344080090338,
+          "validation_auc": 0.7529445561620224
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.5683623617183553,
+          "validation_auc": 0.7615627693191612
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.5119389776042468,
+          "validation_auc": 0.7594880142998499
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.446758976159113,
+          "validation_auc": 0.757189824124613
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.3554907640026303,
+          "validation_auc": 0.7430814899932969
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.26891290266960166,
+          "validation_auc": 0.7351974209199145
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.197183129366616,
+          "validation_auc": 0.7419962335216572
+        }
+      ],
+      "checkpoint": "models\\ablations\\no_slot.pt"
+    },
+    "no_pairwise": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 305537,
+      "best_epoch": 9,
+      "best_validation_auc": 0.6623256407801078,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.6602248742634309,
+        "accuracy": 0.5980392156862745,
+        "precision": 0.6151315789473685,
+        "recall": 0.5238095238095238,
+        "f1": 0.5658093797276853,
+        "brier_score": 0.2301301892967661,
+        "confusion_matrix": [
+          [
+            240,
+            117
+          ],
+          [
+            170,
+            187
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.621187560148679,
+          0.6997229903102139
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6942368407357655,
+          "validation_auc": 0.5119857001500208
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.6928835854879539,
+          "validation_auc": 0.5201251236873184
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6918327437349666,
+          "validation_auc": 0.5444795556832327
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.6849813581496677,
+          "validation_auc": 0.6021577452200837
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.6735957286725529,
+          "validation_auc": 0.6203836700820327
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.6623626800466285,
+          "validation_auc": 0.6375881770883208
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.6543351655586778,
+          "validation_auc": 0.6300233010948322
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.6443803963924327,
+          "validation_auc": 0.6276931916116059
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.6352411132918737,
+          "validation_auc": 0.6623256407801078
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.6252939464075778,
+          "validation_auc": 0.6464298254013853
+        }
+      ],
+      "checkpoint": "models\\ablations\\no_pairwise.pt"
+    },
+    "full_retrained": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 379265,
+      "best_epoch": 5,
+      "best_validation_auc": 0.7625203485588432,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.733210931431396,
+        "accuracy": 0.6582633053221288,
+        "precision": 0.6686567164179105,
+        "recall": 0.6274509803921569,
+        "f1": 0.6473988439306358,
+        "brier_score": 0.2086324058402806,
+        "confusion_matrix": [
+          [
+            246,
+            111
+          ],
+          [
+            133,
+            224
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.7004277406859671,
+          0.7694193546402519
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6939917116696347,
+          "validation_auc": 0.5881451690127358
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.6874211624210922,
+          "validation_auc": 0.6646238309553448
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6507525136631872,
+          "validation_auc": 0.7474863544958346
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.6113887806723203,
+          "validation_auc": 0.7604775128475214
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.5623485976546742,
+          "validation_auc": 0.7625203485588432
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.5036919979688862,
+          "validation_auc": 0.748156659963612
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.435428902868022,
+          "validation_auc": 0.7534233457818634
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.35352574025250516,
+          "validation_auc": 0.7401449136582718
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.25790570706298144,
+          "validation_auc": 0.7428899741453605
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.20320848246835568,
+          "validation_auc": 0.7435283603051486
+        }
+      ],
+      "checkpoint": "models\\ablations\\full_retrained.pt"
+    }
+  }
+}

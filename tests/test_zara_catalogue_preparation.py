@@ -1,9 +1,28 @@
 import unittest
 
-from recommendation_training.prepare_zara_catalogue import infer_slot
+from recommendation_training.prepare_zara_catalogue import (
+    has_precipitation_protection,
+    infer_slot,
+)
 
 
 class ZaraCataloguePreparationTests(unittest.TestCase):
+    def test_detects_published_wet_weather_claims(self):
+        self.assertTrue(
+            has_precipitation_protection(
+                {
+                    "name": "Technical boots",
+                    "description": "Water-repellent finish",
+                    "terms": "shoes",
+                }
+            )
+        )
+        self.assertFalse(
+            has_precipitation_protection(
+                {"name": "Leather loafers", "description": "", "terms": "shoes"}
+            )
+        )
+
     def test_infers_each_supported_slot_from_product_name(self):
         self.assertEqual(infer_slot("Linen Shirt", ""), "inner_top")
         self.assertEqual(infer_slot("Water-Resistant Puffer Jacket", ""), "outer_top")

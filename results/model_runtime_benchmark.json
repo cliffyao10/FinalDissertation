@@ -1,0 +1,54 @@
+{
+  "device": "cpu",
+  "torch_threads": 8,
+  "trainable_parameters": 379265,
+  "checkpoint_size_bytes": 1522655,
+  "catalogue_embedding_size_bytes": 1081988,
+  "single_outfit_head_latency": {
+    "iterations": 300,
+    "mean_ms": 1.1281400018682082,
+    "median_ms": 0.9711500024423003,
+    "p95_ms": 2.5599150685593517,
+    "minimum_ms": 0.33599999733269215,
+    "maximum_ms": 5.2399999694898725
+  },
+  "warm_end_to_end_catalogue_ranking_latency": {
+    "iterations": 10,
+    "mean_ms": 74.06415999867022,
+    "median_ms": 70.45695005217567,
+    "p95_ms": 98.19118006853387,
+    "minimum_ms": 54.69060002360493,
+    "maximum_ms": 99.41860008984804
+  },
+  "notes": {
+    "warm_runtime": "One-time artifact loading is excluded from ranking latency.",
+    "input": "One held-out inner_top embedding with a Casual style filter."
+  },
+  "checkpoint_metadata": {
+    "checkpoint_version": 1,
+    "best_epoch": 4,
+    "best_validation_metrics": {
+      "accuracy": 0.6779661016949152,
+      "auc": 0.7584027578282103
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 7756,
+    "validation_examples": 354,
+    "train_positive_rate": 0.5,
+    "validation_positive_rate": 0.5,
+    "seed": 42,
+    "training_config": {
+      "batch_size": 128,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 6
+    }
+  }
+}

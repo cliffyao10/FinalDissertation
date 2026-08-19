@@ -1,8 +1,13 @@
 """Train and evaluate the lightweight compatibility model."""
 
 import argparse
+import json
 import random
+import sys
 from pathlib import Path
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
 import torch
@@ -47,6 +52,13 @@ def main():
     parser.add_argument("--epochs", type=int, default=12)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
+    parser.add_argument("--weight-decay", type=float, default=1e-4)
+    parser.add_argument(
+        "--patience",
+        type=int,
+        default=4,
+        help="Stop after this many epochs without a validation AUC improvement; 0 disables.",
+    )
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -59,9 +71,16 @@ def main():
     model = CompatibilityRanker(
         ModelConfig(embedding_dim=train_data.embeddings.shape[-1])
     ).to(device)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
+    optimizer = torch.optim.AdamW(
+        model.parameters(),
+        lr=args.learning_rate,
+        weight_decay=args.weight_decay,
+    )
     loss_function = nn.BCEWithLogitsLoss()
     best_auc = -1.0
+    best_epoch = 0
+    epochs_without_improvement = 0
+    history = []
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -77,18 +96,67 @@ def main():
             total_loss += loss.item() * len(batch["label"])
         metrics = evaluate(model, validation_loader, device)
         mean_loss = total_loss / len(train_data)
+        epoch_record = {
+            "epoch": epoch,
+            "train_loss": mean_loss,
+            "validation_accuracy": float(metrics["accuracy"]),
+            "validation_auc": float(metrics["auc"]),
+        }
+        history.append(epoch_record)
         print(
             f"epoch={epoch:02d} loss={mean_loss:.4f} "
             f"val_accuracy={metrics['accuracy']:.4f} val_auc={metrics['auc']:.4f}"
         )
         if metrics["auc"] > best_auc:
             best_auc = metrics["auc"]
+            best_epoch = epoch
+            epochs_without_improvement = 0
             save_checkpoint(
                 output_path,
                 model,
-                extra={"best_validation_metrics": metrics, "slots": 4},
+                extra={
+                    "checkpoint_version": 1,
+                    "best_epoch": epoch,
+                    "best_validation_metrics": {
+                        key: float(value) for key, value in metrics.items()
+                    },
+                    "slots": 4,
+                    "slot_names": list(train_data.metadata.get("slot_names", [])),
+                    "siglip_model": train_data.metadata.get("siglip_model"),
+                    "train_examples": len(train_data),
+                    "validation_examples": len(validation_data),
+                    "train_positive_rate": train_data.positive_rate,
+                    "validation_positive_rate": validation_data.positive_rate,
+                    "seed": args.seed,
+                    "training_config": {
+                        "batch_size": args.batch_size,
+                        "learning_rate": args.learning_rate,
+                        "weight_decay": args.weight_decay,
+                        "patience": args.patience,
+                    },
+                },
             )
+        else:
+            epochs_without_improvement += 1
+            if args.patience and epochs_without_improvement >= args.patience:
+                print(f"Early stopping after epoch {epoch}.")
+                break
+
+    metrics_path = output_path.with_suffix(".training.json")
+    metrics_path.write_text(
+        json.dumps(
+            {
+                "best_epoch": best_epoch,
+                "best_validation_auc": float(best_auc),
+                "epochs_completed": len(history),
+                "history": history,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
     print(f"Saved best model to {output_path} (AUC={best_auc:.4f})")
+    print(f"Saved training history to {metrics_path}")
 
 
 if __name__ == "__main__":

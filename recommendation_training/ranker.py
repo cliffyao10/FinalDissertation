@@ -17,6 +17,8 @@ class OutfitCandidateRanker:
 
     @torch.no_grad()
     def rank(self, fixed_items, candidates_by_slot, limit=1000):
+        if limit <= 0:
+            raise ValueError("Ranking limit must be positive.")
         choices = []
         for slot in SLOTS:
             choices.append(
@@ -32,9 +34,16 @@ class OutfitCandidateRanker:
             if index >= limit:
                 break
             combinations.append(outfit)
+        if not combinations:
+            raise ValueError("No complete outfit combinations were generated.")
         embeddings = torch.stack(
             [torch.stack([item["embedding"] for item in outfit]) for outfit in combinations]
         ).to(self.device)
+        if embeddings.shape[-1] != self.model.config.embedding_dim:
+            raise ValueError(
+                "Catalogue embedding dimension does not match the trained checkpoint "
+                f"({embeddings.shape[-1]} != {self.model.config.embedding_dim})."
+            )
         mask = torch.ones(embeddings.shape[:2], dtype=torch.bool, device=self.device)
         probabilities = self.model.probability(embeddings, mask).cpu().tolist()
         ranked = sorted(

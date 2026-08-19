@@ -1,0 +1,81 @@
+{
+  "checkpoint": "models\\compatibility_ranker.pt",
+  "test_dataset": "data\\processed\\hardneg\\test.pt",
+  "device": "cpu",
+  "metrics": {
+    "examples": 408,
+    "positive_rate": 0.875,
+    "threshold": 0.5,
+    "auc": 0.869995056846268,
+    "average_precision": 0.9762733522726986,
+    "accuracy": 0.6985294117647058,
+    "balanced_accuracy": 0.7773109243697479,
+    "precision": 0.975609756097561,
+    "recall": 0.6722689075630253,
+    "f1": 0.7960199004975125,
+    "specificity": 0.8823529411764706,
+    "matthews_correlation_coefficient": 0.3748789971250483,
+    "brier_score": 0.19877351434411059,
+    "confusion_matrix": [
+      [
+        45,
+        6
+      ],
+      [
+        117,
+        240
+      ]
+    ],
+    "auc_95_percent_ci": [
+      0.8148554653489336,
+      0.9209299599284525
+    ]
+  },
+  "checkpoint_metadata": {
+    "checkpoint_version": 1,
+    "best_epoch": 4,
+    "best_validation_metrics": {
+      "accuracy": 0.6779661016949152,
+      "auc": 0.7584027578282103
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 7756,
+    "validation_examples": 354,
+    "train_positive_rate": 0.5,
+    "validation_positive_rate": 0.5,
+    "seed": 42,
+    "training_config": {
+      "batch_size": 128,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 6
+    }
+  },
+  "dataset_metadata": {
+    "positive_examples": 357,
+    "negative_examples": 51,
+    "minimum_slots": 3,
+    "skipped_rows": {
+      "fewer_than_minimum_slots": 5673,
+      "missing_embedding": 4652,
+      "duplicate_slot": 219
+    },
+    "negative_strategy": "published_same-type_hard_negatives",
+    "source_rows": 6081,
+    "siglip_model": "google/siglip-base-patch16-224",
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "source": "Maryland Polyvore hard-negative compatibility split"
+  }
+}

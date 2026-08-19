@@ -13,6 +13,11 @@ class OutfitDataset(Dataset):
         self.embeddings = payload["embeddings"].float()
         self.masks = payload["masks"].bool()
         self.labels = payload["labels"].float()
+        self.metadata = {
+            key: value
+            for key, value in payload.items()
+            if key not in {"embeddings", "masks", "labels"}
+        }
         if self.embeddings.ndim != 3 or self.embeddings.shape[1] != len(SLOTS):
             raise ValueError("Expected embeddings shaped [examples, 4, dimension].")
         if self.masks.shape != self.embeddings.shape[:2]:
@@ -21,6 +26,10 @@ class OutfitDataset(Dataset):
             raise ValueError("Labels and embeddings have different lengths.")
         if not bool(self.masks.any(dim=1).all()):
             raise ValueError("Every example needs at least one present item.")
+
+    @property
+    def positive_rate(self):
+        return float(self.labels.mean()) if len(self.labels) else 0.0
 
     def __len__(self):
         return len(self.labels)

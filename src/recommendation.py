@@ -353,6 +353,49 @@ def _build_outfit(category, colour, style, weather, ranked_candidate):
             }
         )
 
+    alternative_colours = tuple(
+        dict.fromkeys(
+            COLOUR_PALETTES.get(colour, [])
+            + ALTERNATIVE_COLOUR_PALETTES.get(colour, [])
+            + ["Black", "White", "Grey", "Navy", "Beige", "Cream"]
+        )
+    )
+    alternatives_by_slot = {}
+    for item_index, item in enumerate(items):
+        if item.get("colour") is None:
+            alternatives_by_slot[item["slot"]] = []
+            continue
+        ranked_replacements = []
+        for candidate_colour in alternative_colours:
+            if candidate_colour == item["colour"]:
+                continue
+            candidate_palette = list(palette)
+            candidate_palette[item_index] = candidate_colour
+            candidate_score, candidate_components = RANKER.score(
+                colour,
+                style,
+                recommendation_slots,
+                tuple(candidate_palette),
+                weather,
+            )
+            ranked_replacements.append(
+                {
+                    **item,
+                    "colour": candidate_colour,
+                    "label": f'{candidate_colour} {item["type"]}',
+                    "compatibility_score": candidate_score,
+                    "score_components": candidate_components,
+                    "selection_source": "model_ranked_slot_replacement",
+                }
+            )
+        ranked_replacements.sort(
+            key=lambda candidate: (
+                -candidate["compatibility_score"],
+                candidate["colour"],
+            )
+        )
+        alternatives_by_slot[item["slot"]] = ranked_replacements[:3]
+
     return {
         "style": style,
         "input_slot": input_slot,
@@ -360,6 +403,7 @@ def _build_outfit(category, colour, style, weather, ranked_candidate):
         "constraints_applied": list(dict.fromkeys(constraints)),
         "model_score": outfit_score,
         "score_components": score_components,
+        "alternatives_by_slot": alternatives_by_slot,
     }
 
 

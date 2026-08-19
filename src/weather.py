@@ -43,17 +43,26 @@ def geocode_city(city):
         },
     )
 
+    if not isinstance(payload, dict):
+        raise WeatherServiceError("Weather location data was invalid.")
     results = payload.get("results", [])
     if not results:
         raise WeatherServiceError(f"No weather location was found for '{city}'.")
 
     location = results[0]
 
+    try:
+        name = str(location["name"])
+        latitude = float(location["latitude"])
+        longitude = float(location["longitude"])
+    except (KeyError, TypeError, ValueError) as error:
+        raise WeatherServiceError("Weather location data was incomplete.") from error
+
     return {
-        "name": location["name"],
+        "name": name,
         "country": location.get("country", ""),
-        "latitude": float(location["latitude"]),
-        "longitude": float(location["longitude"]),
+        "latitude": latitude,
+        "longitude": longitude,
         "timezone": location.get("timezone", "auto"),
     }
 
@@ -101,29 +110,39 @@ def get_city_weather(city):
         },
     )
 
-    current = payload.get("current", {})
-    daily = payload.get("daily", {})
+    if not isinstance(payload, dict):
+        raise WeatherServiceError("Weather forecast data was invalid.")
+    current = payload.get("current") or {}
+    daily = payload.get("daily") or {}
+    if not isinstance(current, dict) or not isinstance(daily, dict):
+        raise WeatherServiceError("Weather forecast data was invalid.")
+
+    def safe_float(value, default=0.0):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return float(default)
 
     def first_daily_value(name, default=0.0):
-        values = daily.get(name, [])
-        return float(values[0]) if values else float(default)
+        values = daily.get(name) or []
+        return safe_float(values[0], default) if values else float(default)
 
-    weather_code = int(current.get("weather_code", -1))
+    weather_code = int(safe_float(current.get("weather_code"), -1))
 
     return {
         "city": location["name"],
         "country": location["country"],
         "latitude": location["latitude"],
         "longitude": location["longitude"],
-        "temperature": float(current.get("temperature_2m", 20.0)),
-        "feels_like": float(current.get("apparent_temperature", 20.0)),
-        "precipitation": float(current.get("precipitation", 0.0)),
-        "rain": float(current.get("rain", 0.0)),
-        "showers": float(current.get("showers", 0.0)),
-        "snowfall": float(current.get("snowfall", 0.0)),
+        "temperature": safe_float(current.get("temperature_2m"), 20.0),
+        "feels_like": safe_float(current.get("apparent_temperature"), 20.0),
+        "precipitation": safe_float(current.get("precipitation"), 0.0),
+        "rain": safe_float(current.get("rain"), 0.0),
+        "showers": safe_float(current.get("showers"), 0.0),
+        "snowfall": safe_float(current.get("snowfall"), 0.0),
         "weather_code": weather_code,
         "condition": describe_weather_code(weather_code),
-        "wind_speed": float(current.get("wind_speed_10m", 0.0)),
+        "wind_speed": safe_float(current.get("wind_speed_10m"), 0.0),
         "temperature_max": first_daily_value("temperature_2m_max", 20.0),
         "temperature_min": first_daily_value("temperature_2m_min", 10.0),
         "rain_probability": first_daily_value(

@@ -1,0 +1,35 @@
+{
+  "seeds": [42, 7, 123],
+  "metric": "test ROC AUC",
+  "dataset": "data/processed/test.pt",
+  "examples": 714,
+  "positive_rate": 0.5,
+  "variants": {
+    "mean_pool_logistic": {
+      "values": [0.5114202543762603, 0.5114202543762603, 0.5114202543762603],
+      "mean": 0.5114202543762603,
+      "sample_standard_deviation": 0.0
+    },
+    "no_slot": {
+      "values": [0.735541275333663, 0.7340897143170994, 0.7258903561424569],
+      "mean": 0.7318404485977398,
+      "sample_standard_deviation": 0.005203792608858678
+    },
+    "no_pairwise": {
+      "values": [0.6602248742634309, 0.659926715784353, 0.669397170632959],
+      "mean": 0.6631829202269143,
+      "sample_standard_deviation": 0.0053837631542845085
+    },
+    "full_retrained": {
+      "values": [0.733210931431396, 0.7433953973746361, 0.7412455178149691],
+      "mean": 0.7392839488736671,
+      "sample_standard_deviation": 0.005368114303073723
+    }
+  },
+  "interpretation": {
+    "mean_pool_logistic": "Mean pooling discards the cross-item relationships needed for compatibility discrimination.",
+    "pairwise_summary": "Removing pairwise differences reduces mean AUC by approximately 0.076, providing evidence that cross-item relations are the main useful structural component.",
+    "slot_embedding": "Removing slot embeddings reduces mean AUC by approximately 0.007. The direction favours the full model, but the effect is small and should not be overstated.",
+    "production_decision": "Retain the current production checkpoint until ranking and external-robustness evaluation provide a reason to change it."
+  }
+}

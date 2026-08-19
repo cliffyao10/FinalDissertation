@@ -11,9 +11,13 @@ import ast
 import csv
 import re
 import shutil
+import sys
 from collections import defaultdict, deque
 from pathlib import Path
 from zipfile import ZipFile
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pandas as pd
 import torch
@@ -137,6 +141,25 @@ def _round_robin_candidates(frame, slot, limit):
     return selected
 
 
+def has_precipitation_protection(row):
+    """Return whether published product text claims wet-weather protection."""
+
+    text = f'{row.get("name", "")} {row.get("description", "")} {row.get("terms", "")}'.casefold()
+    return any(
+        phrase in text
+        for phrase in (
+            "waterproof",
+            "water-resistant",
+            "water resistant",
+            "water-repellent",
+            "water repellent",
+            "raincoat",
+            "rain jacket",
+            "rain boot",
+        )
+    )
+
+
 def select_products(frame, archive, per_slot):
     available_entries = set(archive.namelist())
     selected = []
@@ -156,7 +179,8 @@ def select_products(frame, archive, per_slot):
             for section in ("WOMAN", "MAN"):
                 if by_section[section]:
                     candidates.append(by_section[section].popleft())
-        slot_products = []
+        usable_candidates = []
+        seen_skus, seen_images = set(), set()
         for row in candidates:
             image_id = next(
                 (
@@ -168,9 +192,29 @@ def select_products(frame, archive, per_slot):
             )
             if image_id is None:
                 continue
-            slot_products.append((row, image_id))
-            if len(slot_products) == per_slot:
-                break
+            sku = str(row["sku"])
+            if sku in seen_skus or image_id in seen_images:
+                continue
+            seen_skus.add(sku)
+            seen_images.add(image_id)
+            usable_candidates.append((row, image_id))
+
+        protected_required = (
+            max(2, round(per_slot * 0.15))
+            if slot in {"outer_top", "shoes"}
+            else 0
+        )
+        protected = [
+            candidate
+            for candidate in usable_candidates
+            if has_precipitation_protection(candidate[0])
+        ][:protected_required]
+        protected_skus = {str(row["sku"]) for row, _ in protected}
+        slot_products = protected + [
+            candidate
+            for candidate in usable_candidates
+            if str(candidate[0]["sku"]) not in protected_skus
+        ][: per_slot - len(protected)]
         if len(slot_products) < per_slot:
             raise RuntimeError(
                 f"Only {len(slot_products)} usable products were found for {slot}."
@@ -237,7 +281,19 @@ def weather_metadata(name, description, terms):
     elif any(word in text for word in ("linen", "shorts", "sandal", "tank")):
         minimum, maximum = 18, 40
         tags.append("warm")
-    if any(word in text for word in ("waterproof", "water-resistant", "rain")):
+    if any(
+        word in text
+        for word in (
+            "waterproof",
+            "water-resistant",
+            "water resistant",
+            "water-repellent",
+            "water repellent",
+            "raincoat",
+            "rain jacket",
+            "rain boot",
+        )
+    ):
         tags.extend(("rain", "waterproof"))
     return minimum, maximum, ";".join(dict.fromkeys(tags))
 

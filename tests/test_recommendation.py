@@ -18,6 +18,10 @@ class RecommendationModelTests(unittest.TestCase):
             set(result["primary"]["score_components"]),
             set(result["model"]["feature_weights"]),
         )
+        self.assertEqual(
+            set(result["primary"]["alternatives_by_slot"]),
+            {"outer_top", "bottom", "shoes"},
+        )
 
     def test_alternative_changes_at_least_two_colours(self):
         result = recommend_outfit("Jacket", "Red", selected_style="Streetwear")
@@ -66,6 +70,28 @@ class RecommendationModelTests(unittest.TestCase):
         self.assertEqual(outer_layer["type"], "TOO HOT - No Outer Layer Needed")
         self.assertIsNone(outer_layer["colour"])
         self.assertEqual(outer_layer["label"], outer_layer["type"])
+
+    def test_slot_colour_changes_are_model_ranked_and_limited(self):
+        result = recommend_outfit("T-Shirt", "Red", selected_style="Casual")
+
+        for outfit_name in ("primary", "alternative"):
+            outfit = result[outfit_name]
+            current_by_slot = {
+                item["slot"]: item.get("colour") for item in outfit["items"]
+            }
+            for slot, candidates in outfit["alternatives_by_slot"].items():
+                self.assertLessEqual(len(candidates), 3)
+                self.assertEqual(
+                    len({candidate["colour"] for candidate in candidates}),
+                    len(candidates),
+                )
+                for candidate in candidates:
+                    self.assertNotEqual(candidate["colour"], current_by_slot[slot])
+                    self.assertEqual(
+                        candidate["selection_source"],
+                        "model_ranked_slot_replacement",
+                    )
+                    self.assertIn("compatibility_score", candidate)
 
     def test_model_is_deterministic(self):
         arguments = ("Dress", "Purple")

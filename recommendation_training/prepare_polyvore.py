@@ -8,8 +8,13 @@ SigLIP stays frozen; its normalised image vectors are cached for repeatability.
 import argparse
 import json
 import random
+import re
+import sys
 from collections import defaultdict
 from pathlib import Path
+
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import torch
 
@@ -50,14 +55,23 @@ CATEGORY_TO_SLOT = {
 }
 
 
-def image_path(images_root, set_id, index):
+def image_identifier(item):
+    """Read the stable Polyvore item ID embedded as ``tid`` in its image URL."""
+
+    match = re.search(r"[?&]tid=(\d+)", str(item.get("image", "")))
+    return match.group(1) if match else None
+
+
+def image_path(images_root, set_id, index, item_id=None):
     candidates = (
+        images_root / "images" / f"{item_id}.jpg" if item_id else None,
+        images_root / f"{item_id}.jpg" if item_id else None,
         images_root / str(set_id) / f"{index}.jpg",
         images_root / str(set_id) / f"{index}.png",
         images_root / f"{set_id}_{index}.jpg",
         images_root / "images" / str(set_id) / f"{index}.jpg",
     )
-    return next((path for path in candidates if path.is_file()), None)
+    return next((path for path in candidates if path is not None and path.is_file()), None)
 
 
 def load_split(path, images_root, minimum_slots=3, maximum_outfits=None):
@@ -71,10 +85,16 @@ def load_split(path, images_root, minimum_slots=3, maximum_outfits=None):
             if slot is None or slot in selected:
                 continue
             index = str(item["index"])
-            path_value = image_path(images_root, set_id, index)
+            stable_item_id = image_identifier(item)
+            path_value = image_path(
+                images_root,
+                set_id,
+                index,
+                item_id=stable_item_id,
+            )
             if path_value is None:
                 continue
-            item_id = f"{set_id}_{index}"
+            item_id = stable_item_id or f"{set_id}_{index}"
             record = {
                 "item_id": item_id,
                 "set_id": set_id,
@@ -90,13 +110,65 @@ def load_split(path, images_root, minimum_slots=3, maximum_outfits=None):
     return outfits, items
 
 
-def create_embedding_cache(items, output_path, model_name, batch_size):
+def _save_embedding_cache(path, item_ids, embeddings, model_name):
+    """Atomically replace the resumable image-vector cache."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = path.with_suffix(path.suffix + ".tmp")
+    torch.save(
+        {
+            "item_ids": item_ids,
+            "embeddings": embeddings,
+            "model_name": model_name,
+        },
+        temporary_path,
+    )
+    temporary_path.replace(path)
+
+
+def create_embedding_cache(
+    items,
+    output_path,
+    model_name,
+    batch_size,
+    save_every_batches=10,
+):
+    """Embed missing items and resume from a compatible partial cache."""
+
+    cached_ids = []
+    cached_embeddings = None
+    if output_path.exists():
+        candidate = torch.load(output_path, map_location="cpu", weights_only=False)
+        candidate_ids = candidate.get("item_ids", [])
+        candidate_embeddings = candidate.get("embeddings")
+        compatible = (
+            candidate.get("model_name") == model_name
+            and isinstance(candidate_ids, list)
+            and isinstance(candidate_embeddings, torch.Tensor)
+            and len(candidate_ids) == len(candidate_embeddings)
+        )
+        if compatible:
+            cached_ids = list(candidate_ids)
+            cached_embeddings = candidate_embeddings.float()
+            print(f"resumed_cached_items={len(cached_ids)}")
+
+    cached_id_set = set(cached_ids)
+    missing_ids = [item_id for item_id in sorted(items) if item_id not in cached_id_set]
+    if not missing_ids:
+        return {
+            "item_ids": cached_ids,
+            "embeddings": cached_embeddings,
+            "model_name": model_name,
+        }
+
     processor, model, device = load_encoder(model_name)
-    item_ids = sorted(items)
-    batches = []
-    for start in range(0, len(item_ids), batch_size):
-        batch_ids = item_ids[start : start + batch_size]
-        batches.append(
+    pending_ids, pending_batches = [], []
+    completed = 0
+    total_required = len(missing_ids)
+    for batch_number, start in enumerate(range(0, total_required, batch_size), start=1):
+        batch_ids = missing_ids[start : start + batch_size]
+        pending_ids.extend(batch_ids)
+        pending_batches.append(
             embed_paths(
                 [items[item_id]["path"] for item_id in batch_ids],
                 processor,
@@ -104,15 +176,36 @@ def create_embedding_cache(items, output_path, model_name, batch_size):
                 device,
             )
         )
-        print(f"embedded={min(start + batch_size, len(item_ids))}/{len(item_ids)}")
-    payload = {
-        "item_ids": item_ids,
-        "embeddings": torch.cat(batches),
+        completed += len(batch_ids)
+        print(f"embedded_missing={completed}/{total_required}")
+
+        should_save = (
+            batch_number % max(1, save_every_batches) == 0
+            or completed == total_required
+        )
+        if should_save:
+            new_embeddings = torch.cat(pending_batches)
+            cached_embeddings = (
+                new_embeddings
+                if cached_embeddings is None
+                else torch.cat((cached_embeddings, new_embeddings))
+            )
+            cached_ids.extend(pending_ids)
+            _save_embedding_cache(
+                output_path,
+                cached_ids,
+                cached_embeddings,
+                model_name,
+            )
+            pending_ids.clear()
+            pending_batches.clear()
+            print(f"cache_saved_items={len(cached_ids)}")
+
+    return {
+        "item_ids": cached_ids,
+        "embeddings": cached_embeddings,
         "model_name": model_name,
     }
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    torch.save(payload, output_path)
-    return payload
 
 
 def build_examples(outfits, items, embedding_by_id, seed):
@@ -177,6 +270,12 @@ def main():
     parser.add_argument("--output-dir", default="data/processed")
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument(
+        "--cache-save-every",
+        type=int,
+        default=10,
+        help="Persist the resumable embedding cache after this many batches.",
+    )
     parser.add_argument("--minimum-slots", type=int, default=3)
     parser.add_argument("--maximum-outfits", type=int)
     parser.add_argument("--seed", type=int, default=42)
@@ -202,14 +301,13 @@ def main():
         raise RuntimeError("No images matched the Polyvore metadata paths.")
 
     cache_path = output_dir / "polyvore_item_embeddings.pt"
-    cache = None
-    if cache_path.exists():
-        candidate_cache = torch.load(cache_path, map_location="cpu", weights_only=False)
-        cache_ids = set(candidate_cache.get("item_ids", []))
-        if candidate_cache.get("model_name") == args.model and set(all_items) <= cache_ids:
-            cache = candidate_cache
-    if cache is None:
-        cache = create_embedding_cache(all_items, cache_path, args.model, args.batch_size)
+    cache = create_embedding_cache(
+        all_items,
+        cache_path,
+        args.model,
+        args.batch_size,
+        save_every_batches=args.cache_save_every,
+    )
     embedding_by_id = dict(zip(cache["item_ids"], cache["embeddings"]))
     for offset, (split, outfits) in enumerate(split_outfits.items()):
         payload = build_examples(
@@ -220,6 +318,8 @@ def main():
         )
         payload["source_outfits"] = len(outfits)
         payload["siglip_model"] = cache["model_name"]
+        payload["slot_names"] = list(SLOTS)
+        payload["seed"] = args.seed + offset
         output_dir.mkdir(parents=True, exist_ok=True)
         torch.save(payload, output_dir / f"{split}.pt")
         print(

@@ -1,0 +1,74 @@
+{
+  "checkpoint": "models\\compatibility_ranker.pt",
+  "test_dataset": "data\\processed\\test.pt",
+  "device": "cpu",
+  "metrics": {
+    "examples": 714,
+    "positive_rate": 0.5,
+    "threshold": 0.5,
+    "auc": 0.7293270249276183,
+    "average_precision": 0.7392407980686931,
+    "accuracy": 0.6708683473389355,
+    "balanced_accuracy": 0.6708683473389356,
+    "precision": 0.6703910614525139,
+    "recall": 0.6722689075630253,
+    "f1": 0.6713286713286714,
+    "specificity": 0.6694677871148459,
+    "matthews_correlation_coefficient": 0.34173803536593345,
+    "brier_score": 0.20963754461734715,
+    "confusion_matrix": [
+      [
+        239,
+        118
+      ],
+      [
+        117,
+        240
+      ]
+    ],
+    "auc_95_percent_ci": [
+      0.693961546730154,
+      0.7657784484472607
+    ]
+  },
+  "checkpoint_metadata": {
+    "checkpoint_version": 1,
+    "best_epoch": 4,
+    "best_validation_metrics": {
+      "accuracy": 0.6779661016949152,
+      "auc": 0.7584027578282103
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 7756,
+    "validation_examples": 354,
+    "train_positive_rate": 0.5,
+    "validation_positive_rate": 0.5,
+    "seed": 42,
+    "training_config": {
+      "batch_size": 128,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 6
+    }
+  },
+  "dataset_metadata": {
+    "positive_examples": 357,
+    "negative_examples": 357,
+    "source_outfits": 357,
+    "siglip_model": "google/siglip-base-patch16-224",
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "seed": 44
+  }
+}

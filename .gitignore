@@ -3,16 +3,25 @@
 __pycache__/
 *.pyc
 
-results/
+results/*
+!results/*.json
 data/recognition_test/
 batch_test_recognition.py
 recognition_test_labels_example.csv
 
 # Downloaded datasets, cached embeddings and trained artifacts.
 data/polyvore/
+data/polyvore_hardneg/
+data/polyvore_images/
+data/polyvore_nondisjoint/
 data/polyvore_source/
 data/processed/
 data/incoming/
 data/zara_products/
 data/user_preferences.json
+data/wardrobe.json
+data/wardrobe_images/
 models/*.pt
+models/*.training.json
+models/training_smoke/
+models/ablations/

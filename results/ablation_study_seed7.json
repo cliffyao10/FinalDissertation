@@ -1,0 +1,304 @@
+{
+  "purpose": "Controlled comparison on identical frozen SigLIP embeddings; production checkpoint remains unchanged.",
+  "datasets": {
+    "train": "data/processed/train.pt",
+    "validation": "data/processed/validation.pt",
+    "test": "data/processed/test.pt"
+  },
+  "device": "cpu",
+  "seed": 7,
+  "training_configuration": {
+    "epochs": 10,
+    "batch_size": 128,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "patience": 6
+  },
+  "variants": {
+    "mean_pool_logistic": {
+      "kind": "mean_pooled_frozen_siglip_logistic_regression",
+      "trainable_parameters": 769,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.5114202543762603,
+        "accuracy": 0.49299719887955185,
+        "precision": 0.4901185770750988,
+        "recall": 0.3473389355742297,
+        "f1": 0.4065573770491803,
+        "brier_score": 0.2503424882888794,
+        "confusion_matrix": [
+          [
+            228,
+            129
+          ],
+          [
+            233,
+            124
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.4748702871011682,
+          0.552271235354266
+        ]
+      },
+      "configuration": {
+        "C": 1.0,
+        "max_iter": 2000
+      }
+    },
+    "no_slot": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 362753,
+      "best_epoch": 5,
+      "best_validation_auc": 0.7651058125059849,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.7340897143170994,
+        "accuracy": 0.6568627450980392,
+        "precision": 0.6627906976744186,
+        "recall": 0.6386554621848739,
+        "f1": 0.6504992867332382,
+        "brier_score": 0.208125914773706,
+        "confusion_matrix": [
+          [
+            241,
+            116
+          ],
+          [
+            129,
+            228
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.6967717660412905,
+          0.7728257749880918
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6937812057397241,
+          "validation_auc": 0.5791758434677136
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.6858744423004571,
+          "validation_auc": 0.6676880845223275
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6597050823705476,
+          "validation_auc": 0.7068849947333142
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.6223067519528279,
+          "validation_auc": 0.7529764754700118
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.5680585910881716,
+          "validation_auc": 0.7651058125059849
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.5083898794042382,
+          "validation_auc": 0.7563599221168884
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.430177615437697,
+          "validation_auc": 0.7497845446710715
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.3446262529241848,
+          "validation_auc": 0.7403364295062083
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.2737276343078328,
+          "validation_auc": 0.7428899741453605
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.18482996939137278,
+          "validation_auc": 0.7295796227137795
+        }
+      ],
+      "checkpoint": "models\\ablations\\seed7\\no_slot.pt"
+    },
+    "no_pairwise": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 305537,
+      "best_epoch": 10,
+      "best_validation_auc": 0.6594209837530723,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.659926715784353,
+        "accuracy": 0.6008403361344538,
+        "precision": 0.5891089108910891,
+        "recall": 0.6666666666666666,
+        "f1": 0.6254927726675427,
+        "brier_score": 0.2293602664973516,
+        "confusion_matrix": [
+          [
+            191,
+            166
+          ],
+          [
+            119,
+            238
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.6201659230672325,
+          0.6978594524171122
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6939983682081587,
+          "validation_auc": 0.5187845127517635
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.6932751828705668,
+          "validation_auc": 0.5187206741357847
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6928579294232746,
+          "validation_auc": 0.5222956366305977
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.6904308809454506,
+          "validation_auc": 0.5400427718727058
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.6837750472562593,
+          "validation_auc": 0.607903220658176
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.6731006353709303,
+          "validation_auc": 0.6288742060072138
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.6609406833060935,
+          "validation_auc": 0.6378435315522359
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.6508169260880823,
+          "validation_auc": 0.6208943790098631
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.6459976009574977,
+          "validation_auc": 0.6413227361230808
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.6325438135428918,
+          "validation_auc": 0.6594209837530723
+        }
+      ],
+      "checkpoint": "models\\ablations\\seed7\\no_pairwise.pt"
+    },
+    "full_retrained": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 379265,
+      "best_epoch": 5,
+      "best_validation_auc": 0.7740432187430177,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.7433953973746361,
+        "accuracy": 0.6750700280112045,
+        "precision": 0.6649076517150396,
+        "recall": 0.7058823529411765,
+        "f1": 0.6847826086956522,
+        "brier_score": 0.20508087395987454,
+        "confusion_matrix": [
+          [
+            230,
+            127
+          ],
+          [
+            105,
+            252
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.7106509394866589,
+          0.7793486475859357
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6940926768965423,
+          "validation_auc": 0.5854001085256473
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.689032511375441,
+          "validation_auc": 0.6714226435570877
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6604876553292985,
+          "validation_auc": 0.7271537553065849
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.6190375962043435,
+          "validation_auc": 0.7626480257908008
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.563760543097043,
+          "validation_auc": 0.7740432187430177
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.50489405908801,
+          "validation_auc": 0.7618819623990551
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.43046816674749405,
+          "validation_auc": 0.7464010980241947
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.3387915867391845,
+          "validation_auc": 0.7396022854224521
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.2624717871512009,
+          "validation_auc": 0.7401129943502825
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.18004802390433514,
+          "validation_auc": 0.739123495802611
+        }
+      ],
+      "checkpoint": "models\\ablations\\seed7\\full_retrained.pt"
+    }
+  }
+}

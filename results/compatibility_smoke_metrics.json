@@ -1,0 +1,70 @@
+{
+  "checkpoint": "models\\compatibility_ranker_smoke.pt",
+  "test_dataset": "data\\processed\\test.pt",
+  "device": "cpu",
+  "metrics": {
+    "examples": 200,
+    "positive_rate": 0.5,
+    "threshold": 0.5,
+    "auc": 0.5926,
+    "accuracy": 0.525,
+    "precision": 0.5510204081632653,
+    "recall": 0.27,
+    "f1": 0.3624161073825503,
+    "brier_score": 0.2883511091887733,
+    "confusion_matrix": [
+      [
+        78,
+        22
+      ],
+      [
+        73,
+        27
+      ]
+    ],
+    "auc_95_percent_ci": [
+      0.5209660622765838,
+      0.672812315785713
+    ]
+  },
+  "checkpoint_metadata": {
+    "checkpoint_version": 1,
+    "best_epoch": 13,
+    "best_validation_metrics": {
+      "accuracy": 0.535,
+      "auc": 0.5856
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 200,
+    "validation_examples": 200,
+    "train_positive_rate": 0.5,
+    "validation_positive_rate": 0.5,
+    "seed": 42,
+    "training_config": {
+      "batch_size": 32,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 5
+    }
+  },
+  "dataset_metadata": {
+    "positive_examples": 100,
+    "negative_examples": 100,
+    "source_outfits": 100,
+    "siglip_model": "google/siglip-base-patch16-224",
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "seed": 44
+  }
+}

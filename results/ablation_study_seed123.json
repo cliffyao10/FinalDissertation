@@ -1,0 +1,304 @@
+{
+  "purpose": "Controlled comparison on identical frozen SigLIP embeddings; production checkpoint remains unchanged.",
+  "datasets": {
+    "train": "data/processed/train.pt",
+    "validation": "data/processed/validation.pt",
+    "test": "data/processed/test.pt"
+  },
+  "device": "cpu",
+  "seed": 123,
+  "training_configuration": {
+    "epochs": 10,
+    "batch_size": 128,
+    "learning_rate": 0.0003,
+    "weight_decay": 0.0001,
+    "patience": 6
+  },
+  "variants": {
+    "mean_pool_logistic": {
+      "kind": "mean_pooled_frozen_siglip_logistic_regression",
+      "trainable_parameters": 769,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.5114202543762603,
+        "accuracy": 0.49299719887955185,
+        "precision": 0.4901185770750988,
+        "recall": 0.3473389355742297,
+        "f1": 0.4065573770491803,
+        "brier_score": 0.2503424882888794,
+        "confusion_matrix": [
+          [
+            228,
+            129
+          ],
+          [
+            233,
+            124
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.46682481056323855,
+          0.5538044114297996
+        ]
+      },
+      "configuration": {
+        "C": 1.0,
+        "max_iter": 2000
+      }
+    },
+    "no_slot": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 362753,
+      "best_epoch": 5,
+      "best_validation_auc": 0.7773947460819051,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.7258903561424569,
+        "accuracy": 0.6582633053221288,
+        "precision": 0.6816720257234726,
+        "recall": 0.5938375350140056,
+        "f1": 0.6347305389221557,
+        "brier_score": 0.21434248810357517,
+        "confusion_matrix": [
+          [
+            258,
+            99
+          ],
+          [
+            145,
+            212
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.6882334626926726,
+          0.7609863844630165
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6935452270470924,
+          "validation_auc": 0.6035621947716173
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.6841289659269449,
+          "validation_auc": 0.691499888282422
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6498029688819897,
+          "validation_auc": 0.7557534552650899
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.6145963067551014,
+          "validation_auc": 0.7690318873886813
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.5693229950845333,
+          "validation_auc": 0.7773947460819051
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.5047703599610115,
+          "validation_auc": 0.7757987806824348
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.43541431858897395,
+          "validation_auc": 0.758690031600115
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.347461663090488,
+          "validation_auc": 0.7548597146413866
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.24687935452660437,
+          "validation_auc": 0.7584985157521785
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.1741424270239363,
+          "validation_auc": 0.7319735708129846
+        }
+      ],
+      "checkpoint": "models\\ablations\\seed123\\no_slot.pt"
+    },
+    "no_pairwise": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 305537,
+      "best_epoch": 9,
+      "best_validation_auc": 0.6594209837530722,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.669397170632959,
+        "accuracy": 0.5882352941176471,
+        "precision": 0.6206896551724138,
+        "recall": 0.453781512605042,
+        "f1": 0.5242718446601942,
+        "brier_score": 0.22968768249925015,
+        "confusion_matrix": [
+          [
+            258,
+            99
+          ],
+          [
+            195,
+            162
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.6272527202308438,
+          0.7096010598417821
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6937881350332834,
+          "validation_auc": 0.5259344377413897
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.692915311881474,
+          "validation_auc": 0.5258386798174215
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6921721943387548,
+          "validation_auc": 0.5364358900699032
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.68312218215061,
+          "validation_auc": 0.6045516933192888
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.6718206311575589,
+          "validation_auc": 0.6267675316799132
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.661678145662173,
+          "validation_auc": 0.6374604998563631
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.6515562023742719,
+          "validation_auc": 0.6388011107919179
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.6388350514913109,
+          "validation_auc": 0.6543138944747677
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.6253645374886826,
+          "validation_auc": 0.6594209837530722
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.6141760022201262,
+          "validation_auc": 0.6521114622234989
+        }
+      ],
+      "checkpoint": "models\\ablations\\seed123\\no_pairwise.pt"
+    },
+    "full_retrained": {
+      "kind": "neural_ablation",
+      "trainable_parameters": 379265,
+      "best_epoch": 6,
+      "best_validation_auc": 0.7765967633821699,
+      "test_metrics": {
+        "examples": 714,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.7412455178149691,
+        "accuracy": 0.634453781512605,
+        "precision": 0.7307692307692307,
+        "recall": 0.4257703081232493,
+        "f1": 0.5380530973451327,
+        "brier_score": 0.22563557297860515,
+        "confusion_matrix": [
+          [
+            301,
+            56
+          ],
+          [
+            205,
+            152
+          ]
+        ],
+        "auc_95_percent_ci": [
+          0.7059651651764344,
+          0.7752220070518441
+        ]
+      },
+      "history": [
+        {
+          "epoch": 1,
+          "train_loss": 0.6941190651238979,
+          "validation_auc": 0.607855341696192
+        },
+        {
+          "epoch": 2,
+          "train_loss": 0.687507765172621,
+          "validation_auc": 0.6868077500079797
+        },
+        {
+          "epoch": 3,
+          "train_loss": 0.6555692434249434,
+          "validation_auc": 0.7420281528296467
+        },
+        {
+          "epoch": 4,
+          "train_loss": 0.6172757409109536,
+          "validation_auc": 0.7633183312585783
+        },
+        {
+          "epoch": 5,
+          "train_loss": 0.5703249297970776,
+          "validation_auc": 0.7648504580420696
+        },
+        {
+          "epoch": 6,
+          "train_loss": 0.5104363840563264,
+          "validation_auc": 0.7765967633821699
+        },
+        {
+          "epoch": 7,
+          "train_loss": 0.45138612358824626,
+          "validation_auc": 0.7454754380925022
+        },
+        {
+          "epoch": 8,
+          "train_loss": 0.3710871090927095,
+          "validation_auc": 0.7406237032781129
+        },
+        {
+          "epoch": 9,
+          "train_loss": 0.27389589986461776,
+          "validation_auc": 0.7477736282677392
+        },
+        {
+          "epoch": 10,
+          "train_loss": 0.20064386696991324,
+          "validation_auc": 0.72207858533627
+        }
+      ],
+      "checkpoint": "models\\ablations\\seed123\\full_retrained.pt"
+    }
+  }
+}
