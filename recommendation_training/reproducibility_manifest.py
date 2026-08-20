@@ -48,6 +48,19 @@ def git_revision():
         return None
 
 
+def git_worktree_dirty():
+    try:
+        return bool(
+            subprocess.check_output(
+                ["git", "status", "--porcelain"],
+                text=True,
+                stderr=subprocess.DEVNULL,
+            ).strip()
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--artifacts", nargs="+", default=list(DEFAULT_ARTIFACTS))
@@ -63,7 +76,8 @@ def main():
         }
     report = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
-        "git_revision": git_revision(),
+        "git_revision_at_generation": git_revision(),
+        "git_worktree_dirty_at_generation": git_worktree_dirty(),
         "python": sys.version,
         "platform": platform.platform(),
         "packages": package_versions(

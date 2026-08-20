@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "failures": 0,
+  "warnings": 0,
+  "checks": [
+    {
+      "name": "required:app.py",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:requirements.txt",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:requirements-reproducible.txt",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:data/catalogue.csv",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:recommendation_training/MODEL_CARD.md",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/compatibility_test_metrics.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/bias_audit.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/reproducibility_manifest.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "trained_artifacts",
+      "status": "pass",
+      "detail": "checkpoint_dim=768, catalogue_items=300, catalogue_dims=[768]"
+    },
+    {
+      "name": "catalogue_schema",
+      "status": "pass",
+      "detail": "slot_counts={'bottom': 75, 'inner_top': 75, 'outer_top': 75, 'shoes': 75}"
+    },
+    {
+      "name": "model_evidence",
+      "status": "pass",
+      "detail": "auc=0.7447214179789564, calibrated=True"
+    },
+    {
+      "name": "local_privacy:data/user_preferences.json",
+      "status": "pass",
+      "detail": "Git-ignored"
+    },
+    {
+      "name": "local_privacy:data/wardrobe.json",
+      "status": "pass",
+      "detail": "Git-ignored"
+    },
+    {
+      "name": "local_privacy:data/wardrobe_images",
+      "status": "pass",
+      "detail": "Git-ignored"
+    }
+  ]
+}

@@ -21,6 +21,7 @@ class CompatibilityRanker(nn.Module):
     def __init__(self, config: ModelConfig):
         super().__init__()
         self.config = config
+        self.calibration_temperature = 1.0
         self.image_projection = nn.Sequential(
             nn.LayerNorm(config.embedding_dim),
             nn.Linear(config.embedding_dim, config.hidden_dim),
@@ -62,7 +63,8 @@ class CompatibilityRanker(nn.Module):
         return self.scorer(torch.cat((pooled, pair_summary), dim=-1)).squeeze(-1)
 
     def probability(self, embeddings, mask):
-        return torch.sigmoid(self.forward(embeddings, mask))
+        temperature = max(float(self.calibration_temperature), 1e-6)
+        return torch.sigmoid(self.forward(embeddings, mask) / temperature)
 
 
 def save_checkpoint(path, model, extra=None):
@@ -80,5 +82,9 @@ def load_checkpoint(path, device="cpu"):
     checkpoint = torch.load(path, map_location=device, weights_only=False)
     model = CompatibilityRanker(ModelConfig(**checkpoint["config"]))
     model.load_state_dict(checkpoint["model_state"])
+    extra = checkpoint.get("extra", {})
+    model.calibration_temperature = float(
+        extra.get("calibration", {}).get("temperature", 1.0)
+    )
     model.to(device).eval()
-    return model, checkpoint.get("extra", {})
+    return model, extra

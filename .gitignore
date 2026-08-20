@@ -27,4 +27,5 @@ models/training_smoke/
 models/ablations/
 models/fashion_model_comparison/
 models/ranking_objective/
+models/imbalance_mitigation/
 tmp/

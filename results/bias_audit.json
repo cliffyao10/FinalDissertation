@@ -1,0 +1,212 @@
+{
+  "scope": "Operational data and performance slices. No demographic attributes are collected, so demographic fairness is neither measured nor claimed.",
+  "datasets": {
+    "train": {
+      "examples": 7756,
+      "positive_rate": 0.5,
+      "pairs_by_changed_slot_and_outfit_length": {
+        "bottom|3": 817,
+        "bottom|4": 213,
+        "inner_top|3": 876,
+        "inner_top|4": 210,
+        "outer_top|3": 380,
+        "outer_top|4": 191,
+        "shoes|3": 965,
+        "shoes|4": 226
+      }
+    },
+    "validation": {
+      "examples": 354,
+      "positive_rate": 0.5,
+      "pairs_by_changed_slot_and_outfit_length": {
+        "bottom|3": 41,
+        "bottom|4": 8,
+        "inner_top|3": 49,
+        "inner_top|4": 11,
+        "outer_top|3": 13,
+        "outer_top|4": 7,
+        "shoes|3": 36,
+        "shoes|4": 12
+      }
+    },
+    "test": {
+      "examples": 714,
+      "positive_rate": 0.5,
+      "pairs_by_changed_slot_and_outfit_length": {
+        "bottom|3": 66,
+        "bottom|4": 22,
+        "inner_top|3": 75,
+        "inner_top|4": 25,
+        "outer_top|3": 31,
+        "outer_top|4": 19,
+        "shoes|3": 94,
+        "shoes|4": 25
+      }
+    }
+  },
+  "catalogue": {
+    "products": 300,
+    "by_slot": {
+      "bottom": 75,
+      "inner_top": 75,
+      "outer_top": 75,
+      "shoes": 75
+    },
+    "by_slot_and_published_section": {
+      "bottom|MAN": 37,
+      "bottom|WOMAN": 38,
+      "inner_top|MAN": 37,
+      "inner_top|WOMAN": 38,
+      "outer_top|MAN": 36,
+      "outer_top|WOMAN": 39,
+      "shoes|MAN": 37,
+      "shoes|WOMAN": 38
+    },
+    "by_inferred_colour": {
+      "Black": 77,
+      "Beige": 63,
+      "Grey": 34,
+      "Blue": 32,
+      "White": 31,
+      "Brown": 30,
+      "Green": 19,
+      "Yellow": 4,
+      "Red": 4,
+      "Pink": 2,
+      "Orange": 2,
+      "Purple": 2
+    },
+    "largest_colour_share": 0.25666666666666665,
+    "slot_count_gap": 0,
+    "section_balance_note": "Published MAN/WOMAN sections are catalogue-source metadata, not user identity labels and are not used by the compatibility model."
+  },
+  "mitigation_result": {
+    "chosen_configuration": "slot_length_sqrt",
+    "deployment_gate": {
+      "passed": true,
+      "checks": {
+        "overall_auc_loss_at_most_0_01": true,
+        "macro_slot_auc_loss_at_most_0_002": true,
+        "worst_slot_auc_improves": true,
+        "slot_auc_gap_reduces": true
+      }
+    },
+    "summary": {
+      "auc": {
+        "values": [
+          0.7351881929242285,
+          0.7447214179789564,
+          0.735392196094124
+        ],
+        "mean": 0.7384339356657698,
+        "sample_standard_deviation": 0.005446074705906002
+      },
+      "pair_ranking_accuracy": {
+        "values": [
+          0.7899159663865546,
+          0.7983193277310925,
+          0.7815126050420168
+        ],
+        "mean": 0.7899159663865546,
+        "sample_standard_deviation": 0.00840336134453784
+      },
+      "fitb4_accuracy": {
+        "values": [
+          0.5686274509803921,
+          0.5854341736694678,
+          0.5630252100840336
+        ],
+        "mean": 0.5723622782446312,
+        "sample_standard_deviation": 0.011661994394768272
+      },
+      "macro_slot_auc": {
+        "values": [
+          0.7236320687609025,
+          0.7319462619843757,
+          0.7261576215829064
+        ],
+        "mean": 0.7272453174427284,
+        "sample_standard_deviation": 0.004262483308110108
+      },
+      "worst_slot_auc": {
+        "values": [
+          0.6644,
+          0.6584000000000001,
+          0.6704
+        ],
+        "mean": 0.6644,
+        "sample_standard_deviation": 0.00599999999999995
+      },
+      "slot_auc_gap": {
+        "values": [
+          0.08646505190311427,
+          0.1108253371937008,
+          0.08088875079443547
+        ],
+        "mean": 0.09272637996375017,
+        "sample_standard_deviation": 0.015920206440946348
+      },
+      "macro_length_auc": {
+        "values": [
+          0.7169273870934398,
+          0.7334748369343969,
+          0.7179108067361089
+        ],
+        "mean": 0.7227710102546485,
+        "sample_standard_deviation": 0.00928281787718396
+      },
+      "length_auc_gap": {
+        "values": [
+          0.06880224429918502,
+          0.04658981394849404,
+          0.06714633270902493
+        ],
+        "mean": 0.06084613031890133,
+        "sample_standard_deviation": 0.012374062717574361
+      }
+    }
+  },
+  "unresolved_domain_shift": {
+    "polyvore_items": 1162,
+    "catalogue_items": 300,
+    "centroid_cosine_similarity": 0.7468692462286403,
+    "catalogue_to_polyvore_nearest_cosine_mean": 0.6111301344347811,
+    "catalogue_to_polyvore_nearest_cosine_min": 0.47962270624728665,
+    "domain_classifier_cross_validated_auc": 1.0,
+    "rbf_mmd_squared": 0.1935748405555282,
+    "rbf_bandwidth_median_heuristic": 0.9851538188527392,
+    "interpretation": "Domain-classifier AUC near 0.5 indicates overlapping feature distributions; values near 1.0 indicate separable domains."
+  },
+  "risk_register": [
+    {
+      "risk": "changed-slot and outfit-length imbalance",
+      "status": "mitigated_not_eliminated",
+      "control": "capped square-root inverse-frequency weighted BCE"
+    },
+    {
+      "risk": "candidate slot and published-section imbalance",
+      "status": "controlled",
+      "control": "75 products per slot and near-even MAN/WOMAN source sections"
+    },
+    {
+      "risk": "candidate colour concentration",
+      "status": "mitigated_not_eliminated",
+      "control": "colour-diverse shortlist and distinct-colour alternatives"
+    },
+    {
+      "risk": "Polyvore-to-catalogue domain shift",
+      "status": "unresolved_measured_limitation",
+      "control": "no cross-domain accuracy claim; rules fallback and user alternatives"
+    },
+    {
+      "risk": "SigLIP and Polyvore cultural/demographic representation",
+      "status": "unresolved_unmeasurable_without_attributes",
+      "control": "no objective-taste claim, no protected-attribute inference, user control"
+    },
+    {
+      "risk": "false negatives from random item replacement",
+      "status": "unresolved_label_noise",
+      "control": "ranking metrics, error analysis, explicit limitation"
+    }
+  ]
+}

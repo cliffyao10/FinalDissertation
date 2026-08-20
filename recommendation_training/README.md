@@ -238,3 +238,25 @@ interpretable baseline and record the fallback reason in `result["model"]`.
 After weather/style filtering, the runtime compares the uploaded garment with
 all remaining products, creates an input-dependent colour-diverse shortlist,
 and exhaustively scores complete outfits from that shortlist.
+
+## Imbalance mitigation and model card
+
+Run the controlled group-weighting study with:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.imbalance_mitigation_study
+```
+
+The study balances joint changed-slot/outfit-length groups with capped,
+smoothed inverse-frequency weights. It selects configurations on validation
+data only and reports overall, macro-slot, worst-slot and disparity metrics.
+Deployment is guarded by explicit performance/fairness equivalence margins.
+Intended use, evaluation boundaries and unresolved biases are documented in
+`recommendation_training/MODEL_CARD.md`.
+
+Generate the machine-readable operational bias register and catalogue/data
+distribution audit with:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.bias_audit
+```

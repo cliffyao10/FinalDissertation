@@ -36,6 +36,7 @@ class OutfitDataset(Dataset):
 
     def __getitem__(self, index):
         return {
+            "index": index,
             "embeddings": self.embeddings[index],
             "mask": self.masks[index],
             "label": self.labels[index],

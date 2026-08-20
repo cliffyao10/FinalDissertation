@@ -21,6 +21,7 @@ from recommendation_training.compatibility_model import (
     save_checkpoint,
 )
 from recommendation_training.dataset import OutfitDataset
+from recommendation_training.balance import example_weights, group_diagnostics
 
 
 def seed_everything(seed):
@@ -30,7 +31,7 @@ def seed_everything(seed):
 
 
 @torch.no_grad()
-def evaluate(model, loader, device):
+def evaluate(model, loader, device, dataset=None):
     model.eval()
     labels, probabilities = [], []
     for batch in loader:
@@ -38,10 +39,13 @@ def evaluate(model, loader, device):
         probabilities.extend(torch.sigmoid(logits).cpu().tolist())
         labels.extend(batch["label"].cpu().tolist())
     predictions = [value >= 0.5 for value in probabilities]
-    return {
+    metrics = {
         "accuracy": accuracy_score(labels, predictions),
         "auc": roc_auc_score(labels, probabilities) if len(set(labels)) > 1 else 0.0,
     }
+    if dataset is not None:
+        metrics["groups"] = group_diagnostics(dataset, labels, probabilities)
+    return metrics
 
 
 def main():
@@ -60,6 +64,14 @@ def main():
         help="Stop after this many epochs without a validation AUC improvement; 0 disables.",
     )
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--balance",
+        choices=("none", "slot", "slot_length"),
+        default="none",
+        help="Apply smoothed inverse-frequency loss weights to paired groups.",
+    )
+    parser.add_argument("--balance-exponent", type=float, default=0.5)
+    parser.add_argument("--maximum-sample-weight", type=float, default=3.0)
     args = parser.parse_args()
 
     seed_everything(args.seed)
@@ -76,7 +88,13 @@ def main():
         lr=args.learning_rate,
         weight_decay=args.weight_decay,
     )
-    loss_function = nn.BCEWithLogitsLoss()
+    loss_function = nn.BCEWithLogitsLoss(reduction="none")
+    training_weights = example_weights(
+        train_data,
+        strategy=args.balance,
+        exponent=args.balance_exponent,
+        maximum=args.maximum_sample_weight,
+    )
     best_auc = -1.0
     best_epoch = 0
     epochs_without_improvement = 0
@@ -90,11 +108,13 @@ def main():
         for batch in train_loader:
             optimizer.zero_grad(set_to_none=True)
             logits = model(batch["embeddings"].to(device), batch["mask"].to(device))
-            loss = loss_function(logits, batch["label"].to(device))
+            losses = loss_function(logits, batch["label"].to(device))
+            batch_weights = training_weights[batch["index"]].to(device)
+            loss = (losses * batch_weights).sum() / batch_weights.sum()
             loss.backward()
             optimizer.step()
             total_loss += loss.item() * len(batch["label"])
-        metrics = evaluate(model, validation_loader, device)
+        metrics = evaluate(model, validation_loader, device, validation_data)
         mean_loss = total_loss / len(train_data)
         epoch_record = {
             "epoch": epoch,
@@ -133,6 +153,9 @@ def main():
                         "learning_rate": args.learning_rate,
                         "weight_decay": args.weight_decay,
                         "patience": args.patience,
+                        "balance": args.balance,
+                        "balance_exponent": args.balance_exponent,
+                        "maximum_sample_weight": args.maximum_sample_weight,
                     },
                 },
             )

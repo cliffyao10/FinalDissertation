@@ -1,6 +1,7 @@
 {
-  "generated_utc": "2026-08-19T19:49:15.873097+00:00",
-  "git_revision": "7703ad26e33641a152aec078bbe4ac91c298ac56",
+  "generated_utc": "2026-08-20T15:10:02.096071+00:00",
+  "git_revision_at_generation": "7508261887b39377b0b8d79bb605d8fa23c88101",
+  "git_worktree_dirty_at_generation": true,
   "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
   "platform": "Windows-11-10.0.26200-SP0",
   "packages": {
@@ -30,8 +31,8 @@
     },
     "models/compatibility_ranker.pt": {
       "exists": true,
-      "bytes": 1522655,
-      "sha256": "2572befd404dc8562167cabe72b1b6d3dcaae9dbd4b9dea3e45b3d6a3e65e811"
+      "bytes": 1523807,
+      "sha256": "8aa315b3029bb2d70007a54a239b8c3c9a394ac3d6ab4ea5eb72ffef832867a7"
     },
     "models/catalogue_embeddings.pt": {
       "exists": true,
