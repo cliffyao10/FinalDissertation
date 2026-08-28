@@ -24,7 +24,11 @@ def pooled_image_features(output):
 def load_encoder(model_name=DEFAULT_MODEL, device=None):
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")
     processor = AutoProcessor.from_pretrained(model_name)
-    model = AutoModel.from_pretrained(model_name).to(device).eval()
+    model = AutoModel.from_pretrained(model_name).to(device)
+    # Feature extraction is deliberately separate from compatibility training.
+    # Make the frozen state explicit as well as disabling autograd in embed_paths.
+    model.requires_grad_(False)
+    model.eval()
     return processor, model, device
 
 

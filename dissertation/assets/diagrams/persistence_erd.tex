@@ -1,0 +1,29 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{0.96\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\scriptsize,
+    entity/.style={draw=wmgdarkblue!65, rounded corners=1pt, align=left,
+      text width=34mm, fill=wmgblue!6, inner sep=2.5mm},
+    store/.style={entity, fill=green!7, draw=green!45!black},
+    rel/.style={thick, draw=wmgdarkblue!70}
+  ]
+    \node[store] (wardrobe) at (7.0,6.0) {\textbf{WardrobeStore}\\\hrulefill\\version\\pieces[]\\outfits[]\\outfit\_groups[]};
+    \node[entity] (piece) at (0,2.7) {\textbf{Piece}\\\hrulefill\\id\\slot\\type and colour\\image\_path\\display\_mode\\source and created\_at};
+    \node[entity] (outfit) at (5.0,2.7) {\textbf{Outfit}\\\hrulefill\\id and title\\mood and style\\group\\slots\\created\_at};
+    \node[entity] (group) at (10.0,2.7) {\textbf{OutfitGroup}\\\hrulefill\\name\\default\_or\_custom};
+    \node[store] (preferences) at (15.0,2.7) {\textbf{UserPreferences}\\\hrulefill\\saved\_cities[0..6]};
+    \node[entity] (image) at (0,-0.8) {\textbf{ImageFile}\\\hrulefill\\relative path\\PNG content};
+    \node[entity] (slot) at (5.0,-0.8) {\textbf{SlotEntry}\\\hrulefill\\position: one of four slots\\value: embedded Piece or null};
+
+    \draw[rel] (wardrobe) -- node[pos=0.15,left,font=\scriptsize]{1} node[pos=0.85,above,font=\scriptsize]{0..*} (piece);
+    \draw[rel] (wardrobe) -- node[pos=0.15,left,font=\scriptsize]{1} node[pos=0.85,right,font=\scriptsize]{0..*} (outfit);
+    \draw[rel] (wardrobe) -- node[pos=0.15,right,font=\scriptsize]{1} node[pos=0.85,above,font=\scriptsize]{4..*} (group);
+    \draw[rel] (outfit) -- node[pos=0.15,left,font=\scriptsize]{1} node[pos=0.85,right,font=\scriptsize]{4} (slot);
+    \draw[rel] (slot) -- node[above,font=\scriptsize]{0..1 snapshot} (piece);
+    \draw[rel] (piece) -- node[right,font=\scriptsize]{0..1} (image);
+    \draw[rel] (group) -- node[pos=0.15,above,font=\scriptsize]{1} node[pos=0.85,above,font=\scriptsize]{0..*} (outfit);
+  \end{tikzpicture}}
+  \caption{Entity-relationship view of the logical file schema; these entities are serialised to JSON rather than relational tables}
+  \label{fig:persistence-erd}
+\end{figure}

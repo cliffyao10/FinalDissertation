@@ -1,0 +1,31 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small,
+    flowbox/.style={draw=wmgdarkblue!55, rounded corners=2pt, align=center,
+      text width=32mm, minimum height=11mm, fill=wmgblue!7},
+    decision/.style={diamond, draw=wmgblue!75, align=center, aspect=2.1,
+      text width=21mm, inner sep=1.5pt, fill=wmgblue!12},
+    output/.style={flowbox, fill=green!7, draw=green!45!black},
+    arrow/.style={-{Latex[length=2.2mm]}, thick, draw=wmgdarkblue!70}
+  ]
+    \node[flowbox] (image) at (0,2.4) {Selected garment\\or local wardrobe piece};
+    \node[flowbox] (analyse) at (4.3,2.4) {Type, colour, style\\and SigLIP embedding};
+    \node[decision] (available) at (8.6,2.4) {Model artefacts\\available?};
+    \node[flowbox] (filter) at (12.9,2.4) {Fix selected item; filter by\\weather, style and range};
+    \node[flowbox] (search) at (12.9,-0.4) {Exact enumeration and\\batched compatibility scoring};
+    \node[flowbox] (fallback) at (8.6,-0.4) {Deterministic content\\ranker fallback};
+    \node[output] (results) at (4.3,-1.2) {Primary outfit, diverse\\alternative and replacements};
+
+    \draw[arrow] (image) -- (analyse);
+    \draw[arrow] (analyse) -- (available);
+    \draw[arrow] (available) -- node[above,font=\scriptsize]{yes} (filter);
+    \draw[arrow] (filter) -- (search);
+    \draw[arrow] (search.south) -- ++(0,-1.8) -| (results.south);
+    \draw[arrow] (available) -- node[right,font=\scriptsize]{no} (fallback);
+    \draw[arrow] (fallback) -- (results);
+  \end{tikzpicture}}
+  \caption{Runtime recommendation and fallback flow}
+  \label{fig:runtime-flow}
+\end{figure}

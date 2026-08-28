@@ -1,0 +1,365 @@
+\chapter{Methodology}
+
+\section{Research approach}
+
+This project used a quantitative secondary-data approach combined with
+software-system evaluation. The investigation examined whether a lightweight
+model could learn outfit compatibility from published fashion data and whether
+its scores could support a practical recommendation application. The research
+therefore covered both model performance and the behaviour of the complete
+recommendation process.
+
+The project did not conduct interviews, questionnaires or other participant
+research. It consequently does not claim that the recommendations improve user
+satisfaction or represent universally accepted fashion choices. The available
+evidence is limited to offline model evaluation, controlled comparisons and
+functional system testing.
+
+The complete technical route is shown in Figure~\ref{fig:technical-route}.
+It separates secondary-data preparation and frozen feature extraction from
+compatibility learning, controlled evaluation and application deployment.
+
+\input{assets/diagrams/technical_route}
+
+\section{Data and ethical scope}
+
+The main model was trained and evaluated using the published Polyvore Outfits
+disjoint dataset described by \textcite{vasileva2018typeaware}. The disjoint
+version was selected because the same product does not appear across its main
+training, validation and test divisions. This provides a more demanding
+evaluation of the model's ability to work with previously unseen garments.
+
+The application supports four clothing positions: an inner top, an optional
+outer layer, a bottom and shoes. After unsupported or incomplete examples were
+removed, the processed data contained 18,243 training, 3,274 validation and
+16,062 test examples. Positive examples came from outfits retained in the
+published dataset, while negative examples were constructed by replacing a
+garment with another item from the same broad category.
+
+Polyvore was used to learn compatibility relationships. The separately
+obtained Zara dataset was not added to these compatibility labels. It was used
+only to examine garment recognition and differences between data sources.
+User-uploaded photographs remain on the local device and were not used as
+research data.
+
+\section{Recommendation-model development}
+
+SigLIP was used to convert each garment image into a numerical visual
+representation \parencite{zhai2023siglip}. SigLIP itself was not retrained. Its
+existing parameters were frozen, and its image representations were calculated
+before the compatibility model was trained. This substantially reduced the
+amount of computation required and allowed every comparison model to use the
+same visual information.
+
+A small neural model was then trained to assign one compatibility score to a
+complete outfit. The model combines two forms of information: an overall
+summary of the garments and the visual differences between garment pairs.
+Clothing-position information is also supplied so that, for example, the
+relationship between a top and shoes can be distinguished from the relationship
+between two other positions.
+
+The compatibility head contains approximately 379,000 trainable parameters. It
+was trained to distinguish positive outfits from constructed negative outfits.
+Although its output is later used to rank recommendations, the model is trained
+as a compatibility classifier rather than as a direct user-preference
+predictor.
+
+Figure~\ref{fig:model-architecture} shows the implemented compatibility head.
+The trainable component receives frozen item embeddings and a position mask,
+then combines a masked outfit summary with explicit pairwise differences before
+producing one compatibility logit.
+
+\input{assets/diagrams/model_architecture}
+
+Training was limited to 12 epochs and used validation performance to select the
+saved checkpoint. Three predefined random seeds were used to examine whether
+results depended heavily on one training run. The test set was kept separate
+from model selection.
+
+The processed labels were already balanced, so the final model did not apply
+additional positive-class weighting. Alternative weighting by outfit length
+was tested but did not satisfy the complete acceptance criteria. The unweighted
+model was therefore retained. Detailed settings and the rejected weighting
+experiment are reserved for the appendices.
+
+\section{Comparative experiments}
+
+The proposed model was first compared with random ranking and a non-learned
+SigLIP similarity baseline. These controls test whether the model performs
+above chance and whether learning garment relationships adds value beyond the
+frozen visual representation.
+
+Three further models represented established directions in outfit-recommendation
+research: a bidirectional LSTM based on \textcite{han2017bilstm}, a type-aware
+pairwise model based on \textcite{vasileva2018typeaware}, and a
+Transformer-based set model informed by \textcite{sarkar2023outfittransformer}.
+They used the same processed data, frozen image representations and training
+conditions as the proposed model. They are controlled implementations of the
+main architectural ideas rather than exact reproductions of the published
+systems.
+
+Two ablation experiments were also conducted. One removed clothing-position
+information, and the other removed the module that explicitly compares garment
+pairs. The purpose was to determine whether these components made a measurable
+contribution when the rest of the experimental conditions remained unchanged.
+
+\section{Model and system evaluation}
+
+Compatibility classification was evaluated using several complementary
+measures. ROC--AUC measured how reliably positive outfits received higher
+scores than negative outfits \parencite{fawcett2006roc}. Accuracy, balanced
+accuracy, precision, recall, F1 and the confusion matrix were used to examine
+classification behaviour at the selected threshold. Calibration measures were
+reported separately because a model can rank examples correctly while still
+producing overconfident scores \parencite{guo2017calibration}.
+
+Recommendation performance was examined through the official fill-in-the-blank
+task. One garment is removed from an outfit and the model must select the
+correct replacement from four candidates. The correct answer was matched
+through the outfit identifier because the answers in the disjoint data are
+shuffled. Only questions compatible with the project's four clothing positions
+were retained, and the retained proportion is reported with the result.
+
+Confidence intervals were estimated by repeatedly resampling the evaluation
+questions \parencite{efron1993bootstrap}. The same questions and random seeds
+were used when comparing the complete model with an ablation, allowing their
+differences to be assessed directly. Training, validation and test behaviour
+were also compared to identify evidence of overfitting.
+
+The complete application was tested separately from the classifier. Candidate
+availability was checked under different weather and style conditions. Search
+experiments examined whether the previous quota-based method could miss
+higher-scoring combinations and measured the time required to search the
+complete filtered candidate space.
+
+Figure~\ref{fig:evaluation-framework} groups the evidence used to assess the
+model and the surrounding recommendation process. No single metric is treated
+as sufficient for deployment or for a claim about recommendation quality.
+
+\input{assets/diagrams/evaluation_framework}
+
+\section{Experimental controls and decision rules}
+
+The experiments were designed so that each comparison changed a defined part
+of the pipeline. Architecture comparisons used the same processed examples,
+frozen SigLIP features, epoch limit, optimiser settings and predefined random
+seeds. This does not make the models identical in their learning behaviour,
+but it reduces the risk that a reported difference is caused by one model
+receiving different visual inputs or a more favourable data split. Parameter
+counts and recorded training times were reported to place performance in the
+context of model size and implementation cost. Training time was not treated
+as a hardware-independent benchmark.
+
+Model selection was separated from final reporting. Validation AUC selected
+the saved checkpoint, and the test data were then used to estimate performance
+on unseen examples. The three-seed architecture experiment examined variation
+from initialisation and training order. Multiple runs cannot remove every
+source of benchmark uncertainty, but they provide more reliable evidence than
+one favourable run \parencite{bouthillier2021variance}. Paired bootstrap
+comparisons reused the same resampled test examples for the two models being
+compared. This preserves the relationship between their predictions and is
+more informative than treating the scores as unrelated observations
+\parencite{dietterich1998tests,efron1993bootstrap}.
+
+Decisions about model changes used more than overall AUC. The length-weighting
+experiment had to retain overall discrimination, avoid reducing macro-level
+performance and improve the weakest length group. It was rejected when the
+weakest group deteriorated, despite a small improvement in overall mean AUC.
+The ranking-loss experiment was also not adopted because it did not improve
+the retained completion result. These decision rules reduce the temptation to
+select a configuration from one favourable number after seeing the results.
+They remain specific to the tested alternatives and do not imply that all
+weighting or ranking losses are unsuitable.
+
+The search comparison also kept the scoring objective and candidate artefact
+fixed. Exact enumeration and quota-limited retrieval received the same held-out
+inputs and feasible candidate states. The exact path supplied the reference
+top results for the bounded space. Top-one recovery, top-ten recall, score loss
+and runtime then described what the quota path gained and lost. Human
+preference was not included in this comparison, so a higher model score was
+interpreted only as better optimisation of the deployed compatibility
+objective.
+
+\section{Application integration, bias and reproducibility}
+
+The recommendation interface presents broad clothing concepts such as a black
+casual jacket or white trainers rather than claiming that the model has
+selected a particular commercial product. These concepts are derived from
+garments in the Polyvore training split and are displayed as coloured icons.
+Photographs are used only for garments uploaded or saved by the user.
+
+Weather, clothing position and the selected menswear or womenswear range are
+treated as explicit constraints. The application does not infer gender from a
+photograph. Because pure menswear training examples are limited, the same
+compatibility model is used for both ranges and no claim is made that their
+reliability is equal.
+
+Reproducibility records include random seeds, model settings, training
+histories, software versions, file hashes and evaluation outputs. Automated
+tests cover data shapes, missing clothing positions, corrected fill-in-the-blank
+labels, clothing-range filtering, recommendation determinism and search safety
+limits. These records allow the reported experiments to be checked without
+relying only on the running user interface.
+
+The software was organised so that training, evaluation and application
+inference could be run independently. Processed tensors and frozen embeddings
+were stored as explicit artefacts, rather than being recreated silently during
+each training run. Model checkpoints include the configuration required to
+reconstruct the compatibility head, while evaluation scripts write structured
+result files used by the tables in Chapter 4. This separation reduces the risk
+that interface state or later UI changes alter a reported experiment.
+
+Integration used a guarded loading path. The application first checks whether
+the candidate artefact, model checkpoint and required metadata are present and
+compatible. If they are available, the learned score participates in ranking;
+otherwise the existing rule procedure is used and the fallback reason is
+recorded. The model was not allowed to replace category, weather or
+clothing-range validation. This design made it possible to test learned
+recommendation without making the whole application dependent on one model
+file. It also distinguishes reproducibility of an experimental checkpoint from
+availability of a user-facing feature.
+
+The runtime sequence is shown in Figure~\ref{fig:runtime-flow}. The selected
+garment remains fixed, contextual constraints define the feasible candidate
+space, and the learned model ranks complete combinations. A deterministic
+content-based path is retained only as an operational fallback when the
+required model artefacts cannot be loaded.
+
+\input{assets/diagrams/runtime_flow}
+
+Table~\ref{tab:application-functions} records the responsibility of each core
+application module. This division prevents the compatibility score from being
+described as if it also performs recognition, weather validation or storage.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Core functions of the Cove prototype}
+  \label{tab:application-functions}
+  \small
+  \begin{tabularx}{\textwidth}{@{}p{0.19\textwidth}p{0.25\textwidth}X@{}}
+    \toprule
+    \textbf{Module} & \textbf{Main input and output} & \textbf{Responsibility} \\
+    \midrule
+    Garment analysis & Selected crop $\rightarrow$ type, colour, style and embedding & Interprets the item supplied by the user and prepares its model representation. \\
+    Candidate control & Context and fixed item $\rightarrow$ feasible states & Applies position, weather, style and clothing-range constraints. \\
+    Compatibility ranking & Complete candidates $\rightarrow$ ordered scores & Scores relational coherence using the trained lightweight head. \\
+    Wardrobe management & Piece and outfit edits $\rightarrow$ local records and images & Saves, reuses, renames, groups and removes local wardrobe content. \\
+    Fallback & Recognised item and context $\rightarrow$ rule-ranked outfit & Preserves basic operation when learned artefacts are absent or incompatible. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The prototype does not use a relational database. Its persistent state is held
+in JSON documents and local image files, while model and research outputs are
+separate artefacts. Figure~\ref{fig:local-data-relationships} presents these
+logical relationships without implying tables, foreign keys or a database
+engine that are not present in the implementation.
+
+\input{assets/diagrams/local_data_relationships}
+
+\begin{table}[htbp]
+  \centering
+  \caption{Local persistence and research artefacts}
+  \label{tab:local-persistence}
+  \small
+  \begin{tabularx}{\textwidth}{@{}p{0.27\textwidth}p{0.27\textwidth}X@{}}
+    \toprule
+    \textbf{File or artefact} & \textbf{Principal contents} & \textbf{Role and relationship} \\
+    \midrule
+    \texttt{wardrobe.json} & Pieces, outfits and outfit groups & Local user store; each outfit contains values for the four supported positions. \\
+    \texttt{wardrobe\_images/} & User garment PNG files & Image paths are referenced by saved piece records. \\
+    \texttt{user\_preferences.json} & Saved cities & Read by the application to restore local location choices. \\
+    Compatibility checkpoint & Model configuration, state and metadata & Reconstructs the selected compatibility scorer at runtime. \\
+    Abstract prototype artefact & Candidate states and frozen embeddings & Supplies the product-independent candidate space for constrained search. \\
+    Evaluation JSON and manifests & Metrics, histories, hashes and settings & Preserve the evidence chain; they are not user-profile records. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Supplementary software-design views are provided in
+Appendix~\ref{app:software-design}. They include the implemented use cases,
+overall component structure, recommendation-module dependencies, a logical
+entity-relationship view and traceable user stories. The diagrams describe the
+current prototype rather than an assumed enterprise architecture.
+
+Result artefacts and checkpoints are larger than ordinary source files and may
+not always be suitable for repository distribution. File hashes and documented
+generation commands therefore provide an additional check that a locally held
+artefact corresponds to the evaluated version. This approach does not replace
+archival storage or full environment preservation, but it provides a practical
+chain from processed data to training history, evaluation output and deployed
+configuration.
+
+\section{Research risks and mitigation}
+
+The investigation involved data, methodological, ethical and operational
+risks. These were considered during development rather than being listed only
+after the experiments. The first concerned data provenance and permitted use.
+The project therefore used documented secondary datasets and kept their roles
+separate. Polyvore supplied compatibility labels, whereas Zara was limited to
+recognition and feature-domain diagnostics. User photographs remained local
+and were not incorporated into the research dataset. This boundary reduces
+privacy exposure, but it does not establish equal provenance or representation
+quality for every image. Any later public release would require a separate
+check before third-party images or large derived artefacts could be
+redistributed.
+
+A second risk was data leakage. Product overlap between training and test data
+could allow a model to recognise garments seen during training instead of
+learning relationships that transfer to unseen items. The published disjoint
+split was used to reduce this risk, and candidate concepts were derived from
+the training division rather than the test division. Model selection and
+temperature scaling used validation data, while the test set was reserved for
+final evaluation. Repeatedly changing the model after inspecting test results
+could still weaken test independence. The current test results are therefore
+treated as final evidence for the selected model rather than as a further
+tuning target.
+
+The labels create a further interpretive risk. Positive examples are observed
+Polyvore outfits, whereas negatives are constructed by replacing an item
+within a broad category. A constructed negative is not proof that an outfit is
+inherently unacceptable; it is a reproducible device for learning distinctions
+within this dataset. Similarly, official FITB evaluation was restricted to
+questions represented by the four supported positions and available
+embeddings. Coverage is reported with accuracy so that performance on the
+retained subset is not presented as a complete benchmark result. This follows
+the principle that recommender metrics must be interpreted in relation to the
+task and sampling protocol \parencite{herlocker2004evaluation}.
+
+Overfitting and unstable model selection were addressed by recording training,
+validation and test behaviour separately, using three random seeds for the
+controlled architecture comparison and selecting checkpoints from validation
+AUC. Confidence intervals were estimated for the principal test and paired
+comparisons. Early stopping limits continued fitting after validation
+performance stops improving, but does not remove a generalisation gap
+\parencite{prechelt1998early}. The results therefore report both the close
+validation--test result and the larger train--test difference.
+
+Representation across clothing ranges was unequal. The retained FITB questions
+and pure training examples were concentrated in womenswear, so the small
+menswear subgroup could not support a reliable fairness comparison. The
+interface asks users to choose a clothing range and does not infer gender from
+an image. Menswear evidence is reported as sparse coverage rather than proof of
+equal reliability. This does not resolve representational bias, but it avoids
+automated gender classification and makes the evidential boundary explicit
+\parencite{keyes2018misgendering,mehrabi2021bias}.
+
+Finally, the deployed process could fail if model files, embeddings or
+candidate records were unavailable, or if constraints removed every candidate
+for a position. Release checks, deterministic seeds and recorded artefact paths
+support reproducibility. Slot, weather and clothing-range constraints reject
+infeasible combinations, while a deterministic rule-based fallback allows the
+application to continue when learned artefacts cannot be loaded. The fallback
+improves operational resilience; it is not evidence that its recommendations
+are stylistically correct. These mitigations make failure conditions more
+visible and bounded, without implying that technical testing removes all
+social or external-validity risks.
+
+\section{Summary}
+
+The methodology combines a frozen visual encoder, a lightweight compatibility
+model and a constrained recommendation process. Controlled baselines, repeated
+training runs, fill-in-the-blank evaluation, ablation experiments and system
+tests were used to examine different aspects of performance. The following
+chapter reports the corresponding results without extending them to unsupported
+claims about universal fashion quality or user satisfaction.

@@ -4,11 +4,12 @@ from functools import lru_cache
 from pathlib import Path
 
 from src.garment_taxonomy import broad_garment_category
+from src.audience import item_matches_audience, normalise_audience
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CHECKPOINT = PROJECT_ROOT / "models" / "compatibility_ranker.pt"
-DEFAULT_CATALOGUE = PROJECT_ROOT / "models" / "catalogue_embeddings.pt"
+DEFAULT_CATALOGUE = PROJECT_ROOT / "models" / "polyvore_abstract_prototypes.pt"
 
 
 def artifacts_available(checkpoint=DEFAULT_CHECKPOINT, catalogue=DEFAULT_CATALOGUE):
@@ -82,6 +83,12 @@ def _style_filter(items, style):
     return retained
 
 
+def _audience_filter(items, audience):
+    """Keep only the user-selected clothing range or neutral concepts."""
+
+    return [item for item in items if item_matches_audience(item, audience)]
+
+
 def _shortlist_candidates(items, input_embedding, limit=10, diverse_colours=4):
     """Choose an input-dependent, colour-diverse shortlist from a full slot."""
 
@@ -131,6 +138,8 @@ def recommend_with_trained_model(
     style,
     weather,
     slot_labels,
+    input_occupied_slots=None,
+    audience="womenswear",
     checkpoint=DEFAULT_CHECKPOINT,
     catalogue=DEFAULT_CATALOGUE,
 ):
@@ -146,20 +155,55 @@ def recommend_with_trained_model(
     ranker, catalogue_items, embedding_model = _load_runtime(
         str(Path(checkpoint).resolve()), str(Path(catalogue).resolve())
     )
-    candidates, constraints = _weather_filter(catalogue_items, weather)
+    catalogue_is_abstract = bool(catalogue_items) and all(
+        item.get("abstract") for item in catalogue_items
+    )
+    audience = normalise_audience(audience)
+    audience_candidates = _audience_filter(catalogue_items, audience)
+    candidates, constraints = _weather_filter(audience_candidates, weather)
     candidates = _style_filter(candidates, style)
     all_candidates_by_slot = {slot: [] for slot in slot_labels}
     for item in candidates:
         all_candidates_by_slot.setdefault(item["slot"], []).append(item)
+    # The abstract catalogue has one latent medoid for every visible
+    # slot/type/colour/style state.  It is deliberately not similarity- or
+    # quota-shortlisted before compatibility scoring: all feasible abstract
+    # states reach the model.
+    is_abstract_catalogue = catalogue_is_abstract
+    input_occupied_slots = set(input_occupied_slots or {input_slot})
+    if (
+        is_abstract_catalogue
+        and weather
+        and float(weather.get("feels_like", 20.0)) >= 28
+        and "outer_top" not in input_occupied_slots
+    ):
+        all_candidates_by_slot["outer_top"] = [
+            {
+                "item_id": "abstract-no-outer-layer",
+                "slot": "outer_top",
+                "occupies_slots": "outer_top",
+                "type": "No Outer Layer",
+                "colour": None,
+                "style": style,
+                "embedding": torch.zeros_like(
+                    torch.as_tensor(input_embedding).float().cpu()
+                ),
+                "image_path": "",
+                "abstract": True,
+                "masked_from_model": True,
+                "source": "weather_constrained_absence_state",
+                "audience": audience,
+            }
+        ]
     candidates_by_slot = {}
     for slot, slot_items in all_candidates_by_slot.items():
-        candidates_by_slot[slot] = _shortlist_candidates(
-            slot_items,
-            input_embedding,
-            limit=10,
+        candidates_by_slot[slot] = (
+            slot_items
+            if is_abstract_catalogue
+            else _shortlist_candidates(slot_items, input_embedding, limit=10)
         )
 
-    required_candidate_slots = set(slot_labels) - {input_slot}
+    required_candidate_slots = set(slot_labels) - input_occupied_slots
     missing_slots = sorted(
         slot for slot in required_candidate_slots if not candidates_by_slot.get(slot)
     )
@@ -175,8 +219,23 @@ def recommend_with_trained_model(
         "type": input_category,
         "colour": input_colour,
         "embedding": torch.as_tensor(input_embedding).float().cpu(),
+        "occupies_slots": sorted(input_occupied_slots),
     }
-    ranked = ranker.rank({input_slot: fixed_item}, candidates_by_slot, limit=1000)
+    if is_abstract_catalogue:
+        ranked = ranker.rank_exact(
+            {input_slot: fixed_item},
+            candidates_by_slot,
+            top_k=256,
+            batch_size=4096,
+            maximum_combinations=5_000_000,
+        )
+        primary_search_stats = dict(ranker.last_search_stats)
+    else:
+        ranked = ranker.rank({input_slot: fixed_item}, candidates_by_slot, limit=1000)
+        primary_search_stats = {
+            "method": "legacy_prefix_enumeration",
+            "exact": False,
+        }
     primary, alternative = choose_diverse_pair(ranked)
     if primary is None or alternative is None:
         raise ValueError("The filtered catalogue cannot form two complete outfits.")
@@ -191,7 +250,11 @@ def recommend_with_trained_model(
             "slot_label": slot_labels[item["slot"]],
             "type": broad_category,
             "colour": item["colour"],
-            "label": f'{item["colour"]} {broad_category}',
+            "label": (
+                f'{item["colour"]} {broad_category}'
+                if item.get("colour")
+                else broad_category
+            ),
             "image_path": str(item.get("image_path", "")),
         }
 
@@ -209,19 +272,26 @@ def recommend_with_trained_model(
                 for fixed_slot, fixed_item in fixed_by_slot.items()
                 if fixed_slot != slot
             }
-            rescored = ranker.rank(
-                fixed_items,
-                {
-                    slot: [
-                        item
-                        for item in all_candidates_by_slot.get(slot, [])
-                        if broad_garment_category(
-                            slot, item.get("type", "")
-                        ) == current_category
-                    ]
-                },
-                limit=max(1, len(all_candidates_by_slot.get(slot, []))),
-            )
+            replacement_pool = [
+                item
+                for item in all_candidates_by_slot.get(slot, [])
+                if broad_garment_category(slot, item.get("type", ""))
+                == current_category
+            ]
+            if is_abstract_catalogue:
+                rescored = ranker.rank_exact(
+                    fixed_items,
+                    {slot: replacement_pool},
+                    top_k=max(1, len(replacement_pool)),
+                    batch_size=4096,
+                    maximum_combinations=50_000,
+                )
+            else:
+                rescored = ranker.rank(
+                    fixed_items,
+                    {slot: replacement_pool},
+                    limit=max(1, len(replacement_pool)),
+                )
             replacements = []
             seen_colours = set()
             for scored_outfit in rescored:
@@ -275,7 +345,12 @@ def recommend_with_trained_model(
         "items": [item["label"] for item in primary_outfit["items"]],
         "primary": primary_outfit,
         "alternative": alternative_outfit,
-        "method": "trained_siglip_compatibility_ranker_v1",
+        "method": (
+            "cove_v3_abstract_exact_search"
+            if is_abstract_catalogue
+            else "trained_siglip_compatibility_ranker_v1"
+        ),
+        "system_version": "3.0" if is_abstract_catalogue else "2.x",
         "model": {
             "type": "trained_neural_compatibility_ranker",
             "checkpoint": str(checkpoint),
@@ -284,9 +359,15 @@ def recommend_with_trained_model(
             "training_metadata": ranker.metadata,
             "catalogue_items_considered": len(candidates),
             "candidates_scored": len(ranked),
+            "abstract_recommendations": is_abstract_catalogue,
+            "search": primary_search_stats,
+            "audience": audience,
         },
         "explanation": (
             "A compatibility network trained on frozen SigLIP item embeddings "
+            "ranked complete abstract outfits after hard weather filtering."
+            if is_abstract_catalogue
+            else "A compatibility network trained on frozen SigLIP item embeddings "
             "ranked complete catalogue outfits after hard weather filtering."
         ),
     }

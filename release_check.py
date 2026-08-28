@@ -18,10 +18,19 @@ REQUIRED_FILES = (
     "results/compatibility_test_metrics.json",
     "results/bias_audit.json",
     "results/reproducibility_manifest.json",
+    "results/abstract_prototype_build.json",
+    "results/abstract_search_benchmark.json",
+    "results/v3_system_comparison.json",
+    "results/v3_release_check.json",
+    "results/d2_evaluation.json",
+    "results/d2_official_fitb_ablation.json",
+    "results/d2_overfitting_audit.json",
+    "results/d2_promotion.json",
+    "results/research_readiness_check.json",
 )
 TRAINED_ARTIFACTS = (
     "models/compatibility_ranker.pt",
-    "models/catalogue_embeddings.pt",
+    "models/polyvore_abstract_prototypes.pt",
 )
 LOCAL_PRIVATE_PATHS = (
     "data/user_preferences.json",
@@ -68,18 +77,37 @@ def run_checks(root, strict_artifacts=False):
             root / TRAINED_ARTIFACTS[1], map_location="cpu", weights_only=False
         )
         expected_dimension = int(checkpoint["config"]["embedding_dim"])
+        model_version = checkpoint.get("extra", {}).get("model_version")
         items = catalogue.get("items", [])
         dimensions = {
             int(item["embedding"].shape[-1])
             for item in items
             if isinstance(item.get("embedding"), torch.Tensor)
         }
-        compatible = bool(items) and dimensions == {expected_dimension}
+        compatible = (
+            bool(items)
+            and dimensions == {expected_dimension}
+            and model_version == "D2"
+        )
+        forbidden_fields = {"brand", "price", "source_url", "title"}
+        abstract_safe = (
+            catalogue.get("schema") in {
+                "abstract_garment_prototypes_v1",
+                "abstract_garment_prototypes_v2",
+            }
+            and catalogue.get("source_policy")
+            == "training_split_only_no_product_media_or_brand_output"
+            and all(item.get("abstract") for item in items)
+            and all(not item.get("image_path") for item in items)
+            and all(not (forbidden_fields & set(item)) for item in items)
+            and all(item.get("audience") in {"menswear", "womenswear"} for item in items)
+        )
         record(
             checks,
             "trained_artifacts",
-            "pass" if compatible else "fail",
-            f"checkpoint_dim={expected_dimension}, catalogue_items={len(items)}, catalogue_dims={sorted(dimensions)}",
+            "pass" if compatible and abstract_safe else "fail",
+            f"model_version={model_version}, checkpoint_dim={expected_dimension}, abstract_prototypes={len(items)}, "
+            f"catalogue_dims={sorted(dimensions)}, abstract_safe={abstract_safe}",
         )
     elif any(artifact_presence):
         record(
@@ -130,6 +158,24 @@ def run_checks(root, strict_artifacts=False):
             "pass" if valid else "fail",
             f"auc={auc}, calibrated={calibrated}",
         )
+
+    readiness_path = root / "results/research_readiness_check.json"
+    if readiness_path.is_file():
+        try:
+            readiness = json.loads(readiness_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            readiness = {}
+            readiness_detail = f"invalid readiness artifact: {error}"
+        else:
+            readiness_detail = readiness.get("decision")
+        ready = readiness.get("ready_for_report_rewrite") is True
+        if ready or strict_artifacts:
+            record(
+                checks,
+                "research_readiness",
+                "pass" if ready else "fail",
+                readiness_detail,
+            )
 
     for relative in LOCAL_PRIVATE_PATHS:
         ignored = git_ignored(root, relative)

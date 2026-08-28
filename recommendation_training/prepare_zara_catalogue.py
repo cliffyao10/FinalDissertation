@@ -107,7 +107,9 @@ def infer_slot(name, description):
 
     Descriptions often mention styling partners (for example shoes for a pair
     of ski pants), so using them for category inference creates false matches.
-    One-piece garments and accessories are deliberately outside this model.
+    One-piece garments use the ``inner_top`` anchor slot.  Their additional
+    bottom-slot occupancy is recorded separately by :func:`occupied_slots`.
+    Accessories remain outside this model.
     """
 
     del description
@@ -119,12 +121,24 @@ def infer_slot(name, description):
         if re.search(rf"\b{re.escape(keyword)}\b", text):
             return "shoes"
     if any(re.search(rf"\b{re.escape(keyword)}\b", text) for keyword in ONE_PIECE_KEYWORDS):
-        return None
+        return "inner_top"
     for slot in ("outer_top", "bottom", "inner_top"):
         for keyword in SLOT_KEYWORDS[slot]:
             if re.search(rf"\b{re.escape(keyword)}\b", text):
                 return slot
     return None
+
+
+def occupied_slots(name, inferred_slot):
+    """Return the logical slots occupied by a catalogue garment."""
+
+    text = str(name).casefold()
+    if inferred_slot == "inner_top" and any(
+        re.search(rf"\b{re.escape(keyword)}\b", text)
+        for keyword in ONE_PIECE_KEYWORDS
+    ):
+        return "inner_top;bottom"
+    return str(inferred_slot or "")
 
 
 def _round_robin_candidates(frame, slot, limit):
@@ -311,6 +325,7 @@ def build_records(selected, paths, classifications, project_root):
             {
                 "item_id": str(row["sku"]),
                 "slot": slot,
+                "occupies_slots": occupied_slots(row["name"], slot),
                 "type": str(row["name"]).title(),
                 "colour": colour,
                 "style": style,

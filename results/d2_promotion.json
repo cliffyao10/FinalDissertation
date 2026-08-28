@@ -1,0 +1,10 @@
+{
+  "promoted": true,
+  "model_version": "D2",
+  "candidate": "models\\d2\\compatibility_ranker.pt",
+  "production": "models\\compatibility_ranker.pt",
+  "legacy_backup": "models\\legacy\\compatibility_ranker_p1.pt",
+  "candidate_sha256": "bd90bd98c77c39e33c8b17630fb9227a565190bc4bf3409e14305f5684728459",
+  "production_sha256": "01d1c683143a51cd456240154a2b3184ee37b007bda3463a787196c032c0a548",
+  "model_state_identical": true
+}

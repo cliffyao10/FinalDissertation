@@ -1,0 +1,98 @@
+\chapter{Evidence of Required Ethics Training}
+
+[Insert the student's evidence of completing all required ethics training.]
+
+\chapter{Confirmation of Ethical Approval Waiver}
+
+[Insert the confirmation email showing that ethical approval was waived.]
+
+\chapter{Supplementary Experimental Results}
+
+\section{Clothing-range coverage in the retained FITB subset}
+
+The retained official FITB subset contained 46 menswear-labelled questions and
+4,422 womenswear-labelled questions. Descriptive accuracy was 0.4348 for the
+menswear subset and 0.6043 for the womenswear subset. The menswear result is not
+treated as a reliable group comparison because its sample is substantially
+smaller.
+
+\chapter{Supplementary Software-Design Artefacts}
+\label{app:software-design}
+
+This appendix documents the implemented prototype at a level below the
+methodology diagrams. Cove does not contain accounts, administrator roles,
+repository interfaces or relational database tables. The views therefore use
+UML conventions where they match the code and identify the persistent entities
+as a logical file schema.
+
+\section{Use cases}
+
+Figure~\ref{fig:use-case} records the actions available to the single local
+wardrobe user and the external weather dependency. Saving and wardrobe
+management remain local actions; the weather service receives a city query but
+does not receive wardrobe images.
+
+\input{assets/diagrams/use_case}
+
+\section{Overall software structure}
+
+The application is predominantly function-oriented, so an overall class
+diagram would invent classes that do not exist. Figure~\ref{fig:overall-architecture}
+uses a UML-style component view to show the real source modules, external
+service and stored artefacts.
+
+\input{assets/diagrams/overall_architecture}
+
+\section{Recommendation-module classes and dependencies}
+
+Figure~\ref{fig:recommendation-classes} focuses on the classes that are present
+in the recommendation path and includes the function-based adapter and facade
+on which they depend.
+
+\input{assets/diagrams/recommendation_classes}
+
+\section{Logical entity relationships}
+
+Figure~\ref{fig:persistence-erd} expresses the multiplicities in the local
+wardrobe schema. It is an entity-relationship view of serialised application
+state, not evidence of a relational database implementation.
+
+\input{assets/diagrams/persistence_erd}
+
+\section{User stories and acceptance criteria}
+
+Table~\ref{tab:user-stories} converts the implemented interaction paths into
+testable user stories. Priorities distinguish the core recommendation journey
+from supporting convenience features.
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.18}
+\begin{longtable}{@{}p{0.06\textwidth}p{0.13\textwidth}p{0.29\textwidth}p{0.38\textwidth}p{0.07\textwidth}@{}}
+  \caption{Implemented user stories and acceptance criteria}\label{tab:user-stories}\\
+  \toprule
+  \textbf{ID} & \textbf{Feature} & \textbf{User story} & \textbf{Acceptance criteria} & \textbf{Priority} \\
+  \midrule
+  \endfirsthead
+  \multicolumn{5}{l}{\textit{Table~\thetable\ continued}}\\
+  \toprule
+  \textbf{ID} & \textbf{Feature} & \textbf{User story} & \textbf{Acceptance criteria} & \textbf{Priority} \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  US-01 & Location & As a user, city weather should inform the outfit context. & A valid city returns current conditions; an invalid or unavailable request produces a bounded error rather than stopping the application. & Must \\
+  US-02 & Saved cities & As a user, frequently used cities should be available without retyping. & A city can be saved or removed; no more than six are retained; selecting one refreshes the forecast. & Should \\
+  US-03 & Image selection & As a user, a garment should be selectable from a photograph. & The user can upload an image, draw a region and repeat the selection before analysis. & Must \\
+  US-04 & Recognition & As a user, the selected garment should be interpreted before recommendation. & The application returns a supported broad category, colour, style cues and an image embedding, with an editable fallback when recognition is uncertain. & Must \\
+  US-05 & Context control & As a user, clothing range and style should remain under explicit control. & Menswear or womenswear and an available style can be selected; changing either regenerates the recommendation without inferring gender from the image. & Must \\
+  US-06 & Outfit completion & As a user, the selected garment should remain fixed while the outfit is completed. & The result covers all feasible supported positions, respects occupied slots and weather constraints, and uses product-independent types and colours. & Must \\
+  US-07 & Alternatives & As a user, more than one acceptable solution should be inspectable. & The interface provides a primary outfit, a materially different alternative and model-ranked position replacements where feasible. & Must \\
+  US-08 & Operational fallback & As a user, recommendation should remain available if model artefacts cannot load. & The system records the loading reason and returns a deterministic rule-ranked result without presenting it as a learned score. & Must \\
+  US-09 & Save result & As a user, either the supplied garment or a complete recommendation should be saved. & Saving preserves the user image where available and represents abstract recommended garments as coloured icons. & Should \\
+  US-10 & Outfit editing & As a user, saved outfits should be completed and revised later. & Each of four equal positions supports add, replace or confirmed removal; an outfit can be renamed and assigned to a group. & Should \\
+  US-11 & Piece library & As a user, individual garments should be reusable across outfits. & Pieces can be filtered by four positions, renamed, reused in multiple outfits and deleted with confirmation. & Should \\
+  US-12 & Local persistence & As a user, wardrobe information should remain private on the device. & Wardrobe JSON, preferences and images are stored locally and are not incorporated into model training. & Must \\
+\end{longtable}
+\endgroup

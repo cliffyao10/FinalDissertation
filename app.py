@@ -1417,6 +1417,7 @@ def initialise_state():
         "weather_data": None,
         "weather_error": None,
         "theme": "Green",
+        "outfit_audience": "womenswear",
         "saved_cities": load_saved_cities(),
         "weather_refresh_requested": False,
         "wardrobe_store": load_store(),
@@ -1547,6 +1548,30 @@ def render_theme_css():
                 background: var(--fashion-strong) !important;
                 color: white !important;
                 box-shadow: 0 8px 22px color-mix(in srgb, var(--fashion-strong) 25%, transparent) !important;
+            }}
+            div[data-testid="stSegmentedControl"] {{
+                width:100% !important;
+                padding:3px !important;
+                border:1px solid color-mix(in srgb,var(--fashion-primary) 28%,#ddd4c8) !important;
+                border-radius:999px !important;
+                background:color-mix(in srgb,var(--fashion-soft) 62%,rgba(255,255,255,.74)) !important;
+            }}
+            div[data-testid="stSegmentedControl"] > div {{ width:100% !important; gap:0 !important; }}
+            div[data-testid="stSegmentedControl"] button {{
+                flex:1 1 50% !important;
+                min-height:2.65rem !important;
+                justify-content:center !important;
+                border:0 !important;
+                border-radius:999px !important;
+                background:transparent !important;
+                color:var(--fashion-muted) !important;
+                box-shadow:none !important;
+                transition:background-color .18s ease,color .18s ease,box-shadow .18s ease !important;
+            }}
+            div[data-testid="stSegmentedControl"] button[aria-pressed="true"] {{
+                background:var(--fashion-strong) !important;
+                color:white !important;
+                box-shadow:0 5px 14px color-mix(in srgb,var(--fashion-strong) 24%,transparent) !important;
             }}
             .stButton > button[kind="primary"]:hover,
             .stFormSubmitButton > button[kind="primary"]:hover {{
@@ -2906,6 +2931,7 @@ def analyse_clothing(
         styles=recognised_styles,
         weather=weather_data,
         input_embedding=input_embedding,
+        audience=st.session_state.get("outfit_audience", "womenswear"),
     )
 
     if models_agree:
@@ -2930,6 +2956,7 @@ def analyse_clothing(
         "models_agree": models_agree,
         "colour": final_colour,
         "recommendation": recommendation,
+        "audience": st.session_state.get("outfit_audience", "womenswear"),
         "confirmation_source": confirmation_source,
         "siglip_margin": siglip_margin,
         "siglip_relative_margin": relative_siglip_margin,
@@ -3172,6 +3199,9 @@ def recommendation_inputs(result):
         ],
         "weather": result.get("weather"),
         "input_embedding": result.get("input_embedding"),
+        "audience": result.get(
+            "audience", st.session_state.get("outfit_audience", "womenswear")
+        ),
     }
 
 def prepare_score_rows(score_distribution, limit=6):
@@ -4312,6 +4342,9 @@ def render_recommendations_only(result):
             styles=recognised_styles,
             weather=result.get("weather"),
             input_embedding=result.get("input_embedding"),
+            audience=result.get(
+                "audience", st.session_state.get("outfit_audience", "womenswear")
+            ),
         )
         result["recommendation"] = recommendation
 
@@ -4331,6 +4364,43 @@ def render_recommendations_only(result):
         st.caption(
             "Recognised: " + ", ".join(recognised_styles)
         )
+
+        current_audience = result.get(
+            "audience", st.session_state.get("outfit_audience", "womenswear")
+        )
+        audience_labels = {
+            "Menswear": "menswear",
+            "Womenswear": "womenswear",
+        }
+        current_label = next(
+            label
+            for label, value in audience_labels.items()
+            if value == current_audience
+        )
+        if "recommendation_audience_choice" not in st.session_state:
+            st.session_state.recommendation_audience_choice = current_label
+        selected_audience_label = st.segmented_control(
+            "Clothing range",
+            list(audience_labels),
+            selection_mode="single",
+            key="recommendation_audience_choice",
+            label_visibility="collapsed",
+        ) or current_label
+        selected_audience = audience_labels[selected_audience_label]
+        if selected_audience != current_audience:
+            st.session_state.outfit_audience = selected_audience
+            result["audience"] = selected_audience
+            result["recommendation"] = recommend_outfit(
+                result["recommendation_category"],
+                result["colour"],
+                styles=recognised_styles,
+                weather=weather,
+                selected_style=st.session_state.get("recommendation_style_choice"),
+                input_embedding=result.get("input_embedding"),
+                audience=selected_audience,
+            )
+            st.session_state.analysis_result = result
+            recommendation = result["recommendation"]
 
         style_column, button_column = st.columns([1.35, 0.65])
         with style_column:
@@ -4356,6 +4426,7 @@ def render_recommendations_only(result):
                     weather=weather,
                     selected_style=selected_style,
                     input_embedding=result.get("input_embedding"),
+                    audience=selected_audience,
                 )
                 st.session_state.analysis_result = result
                 st.rerun()

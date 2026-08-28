@@ -30,10 +30,10 @@ def broad_garment_category(slot, item_type=""):
             return "Sweater"
         if "blouse" in name:
             return "Blouse"
-        if "shirt" in name:
-            return "Shirt"
         if any(word in name for word in ("t-shirt", "tee")):
             return "T-Shirt"
+        if "shirt" in name:
+            return "Shirt"
         return "Top"
 
     if slot == "bottom":

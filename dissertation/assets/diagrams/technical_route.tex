@@ -1,0 +1,38 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small,
+    data/.style={draw=wmgdarkblue!55, rounded corners=2pt, align=center,
+      minimum width=31mm, minimum height=11mm, fill=gray!7},
+    process/.style={data, fill=wmgblue!11, draw=wmgblue!70},
+    artefact/.style={data, fill=green!7, draw=green!45!black},
+    arrow/.style={-{Latex[length=2.2mm]}, thick, draw=wmgdarkblue!70}
+  ]
+    \node[data] (polyvore) {Polyvore disjoint\\images and metadata};
+    \node[process, right=7mm of polyvore] (mapping) {Four-position mapping\\and negative construction};
+    \node[process, right=7mm of mapping] (siglip) {Frozen SigLIP\\feature extraction};
+    \node[artefact, right=7mm of siglip] (tensors) {Processed embeddings\\and outfit tensors};
+
+    \node[process, below=13mm of mapping] (training) {Compatibility-head\\training};
+    \node[process, right=7mm of training] (selection) {Validation selection\\and calibration};
+    \node[artefact, right=7mm of selection] (checkpoint) {Selected checkpoint\\and abstract prototypes};
+
+    \node[process, below=13mm of training] (evaluation) {Baselines, FITB, ablation,\\bias and generalisation tests};
+    \node[process, right=7mm of evaluation] (runtime) {Constraint filtering and\\exact candidate search};
+    \node[artefact, right=7mm of runtime] (prototype) {Cove recommendation\\prototype};
+
+    \draw[arrow] (polyvore) -- (mapping);
+    \draw[arrow] (mapping) -- (siglip);
+    \draw[arrow] (siglip) -- (tensors);
+    \draw[arrow] (tensors.south) -- ++(0,-5mm) -| (training.north);
+    \draw[arrow] (training) -- (selection);
+    \draw[arrow] (selection) -- (checkpoint);
+    \draw[arrow] (checkpoint.south) -- ++(0,-5mm) -| (runtime.north);
+    \draw[arrow] (training) -- (evaluation);
+    \draw[arrow] (evaluation) -- (runtime);
+    \draw[arrow] (runtime) -- (prototype);
+  \end{tikzpicture}}
+  \caption{Technical route from secondary fashion data to the evaluated prototype}
+  \label{fig:technical-route}
+\end{figure}

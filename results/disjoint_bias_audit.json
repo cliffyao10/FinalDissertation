@@ -1,0 +1,181 @@
+{
+  "scope": "Operational data and performance slices. No demographic attributes are collected, so demographic fairness is neither measured nor claimed.",
+  "datasets": {
+    "train": {
+      "examples": 18243,
+      "positive_rate": 0.4999725818634033,
+      "examples_by_outfit_length": {
+        "3": 14810,
+        "4": 3433
+      },
+      "examples_by_label": {
+        "0": 9122,
+        "1": 9121
+      },
+      "changed_slot_diagnostics": "unavailable_for_unpaired_published_rows",
+      "unavailable_reason": "Expected an even number of paired examples."
+    },
+    "validation": {
+      "examples": 3274,
+      "positive_rate": 0.5,
+      "examples_by_outfit_length": {
+        "3": 2588,
+        "4": 686
+      },
+      "examples_by_label": {
+        "0": 1637,
+        "1": 1637
+      },
+      "changed_slot_diagnostics": "unavailable_for_unpaired_published_rows",
+      "unavailable_reason": "Expected each pair to end with a negative example."
+    },
+    "test": {
+      "examples": 16062,
+      "positive_rate": 0.5,
+      "examples_by_outfit_length": {
+        "3": 12000,
+        "4": 4062
+      },
+      "examples_by_label": {
+        "0": 8031,
+        "1": 8031
+      },
+      "changed_slot_diagnostics": "unavailable_for_unpaired_published_rows",
+      "unavailable_reason": "Expected each pair to end with a negative example."
+    }
+  },
+  "catalogue": {
+    "products": 300,
+    "by_slot": {
+      "bottom": 75,
+      "inner_top": 75,
+      "outer_top": 75,
+      "shoes": 75
+    },
+    "by_slot_and_published_section": {
+      "bottom|MAN": 37,
+      "bottom|WOMAN": 38,
+      "inner_top|MAN": 37,
+      "inner_top|WOMAN": 38,
+      "outer_top|MAN": 36,
+      "outer_top|WOMAN": 39,
+      "shoes|MAN": 37,
+      "shoes|WOMAN": 38
+    },
+    "by_inferred_colour": {
+      "Black": 80,
+      "Beige": 61,
+      "Blue": 35,
+      "Grey": 31,
+      "White": 30,
+      "Brown": 30,
+      "Green": 19,
+      "Yellow": 4,
+      "Red": 4,
+      "Pink": 2,
+      "Orange": 2,
+      "Purple": 2
+    },
+    "largest_colour_share": 0.26666666666666666,
+    "slot_count_gap": 0,
+    "section_balance_note": "Published MAN/WOMAN sections are catalogue-source metadata, not user identity labels and are not used by the compatibility model."
+  },
+  "mitigation_result": {
+    "chosen_configuration": "length_sqrt",
+    "deployed_configuration": "unweighted",
+    "deployment_gate": {
+      "passed": false,
+      "checks": {
+        "overall_auc_loss_at_most_0_01": true,
+        "macro_length_auc_loss_at_most_0_002": true,
+        "worst_length_auc_not_lower": false
+      }
+    },
+    "summary": {
+      "auc": {
+        "values": [
+          0.8586043224579217,
+          0.8602335697646281,
+          0.8600033108536695
+        ],
+        "mean": 0.8596137343587399,
+        "sample_standard_deviation": 0.000881725059558691
+      },
+      "macro_length_auc": {
+        "values": [
+          0.8691857095118748,
+          0.871353041481983,
+          0.8704099471421669
+        ],
+        "mean": 0.8703162327120082,
+        "sample_standard_deviation": 0.0010867008617730354
+      },
+      "worst_length_auc": {
+        "values": [
+          0.8499009583333333,
+          0.8507846805555555,
+          0.8513603333333334
+        ],
+        "mean": 0.8506819907407408,
+        "sample_standard_deviation": 0.0007350868970443503
+      },
+      "length_auc_gap": {
+        "values": [
+          0.0385695023570829,
+          0.04113672185285511,
+          0.03809922761766704
+        ],
+        "mean": 0.039268483942535015,
+        "sample_standard_deviation": 0.001634938607349233
+      }
+    }
+  },
+  "unresolved_domain_shift": {
+    "polyvore_items": 26124,
+    "catalogue_items": 300,
+    "centroid_cosine_similarity": 0.7451769996857649,
+    "catalogue_to_polyvore_nearest_cosine_mean": 0.6527517996043154,
+    "catalogue_to_polyvore_nearest_cosine_min": 0.4965381921160688,
+    "domain_classifier_cross_validated_auc": 1.0,
+    "rbf_mmd_squared": 0.19250703779476064,
+    "rbf_bandwidth_median_heuristic": 0.9850243831720229,
+    "interpretation": "Domain-classifier AUC near 0.5 indicates overlapping feature distributions; values near 1.0 indicate separable domains."
+  },
+  "risk_register": [
+    {
+      "risk": "outfit-length imbalance",
+      "status": "measured_no_safe_weighting_gain",
+      "control": "Three/four-item slices and a validation-only weighting study; unweighted BCE retained because the candidate reduced the worst-group AUC."
+    },
+    {
+      "risk": "changed-slot imbalance",
+      "status": "unavailable_in_published_rows",
+      "control": "No changed-slot fairness claim because official compatibility rows do not expose defensible adjacent replacement pairs."
+    },
+    {
+      "risk": "candidate slot and published-section imbalance",
+      "status": "controlled",
+      "control": "75 products per slot and near-even MAN/WOMAN source sections"
+    },
+    {
+      "risk": "candidate colour concentration",
+      "status": "mitigated_not_eliminated",
+      "control": "colour-diverse shortlist and distinct-colour alternatives"
+    },
+    {
+      "risk": "Polyvore-to-catalogue domain shift",
+      "status": "unresolved_measured_limitation",
+      "control": "no cross-domain accuracy claim; rules fallback and user alternatives"
+    },
+    {
+      "risk": "SigLIP and Polyvore cultural/demographic representation",
+      "status": "unresolved_unmeasurable_without_attributes",
+      "control": "no objective-taste claim, no protected-attribute inference, user control"
+    },
+    {
+      "risk": "plausible false negatives from item replacement",
+      "status": "unresolved_label_noise",
+      "control": "Published same-type hard negatives, error analysis and an explicit limitation; no claim that every negative is aesthetically invalid."
+    }
+  ]
+}

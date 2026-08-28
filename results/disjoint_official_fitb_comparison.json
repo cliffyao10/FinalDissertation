@@ -1,0 +1,259 @@
+{
+  "protocol": "Official Polyvore fill_in_blank_test.json questions, restricted to questions representable by the project's four-slot taxonomy with available frozen embeddings. The correct answer is identified by matching the answer set_id to the question outfit; disjoint answer order is shuffled.",
+  "coverage": {
+    "total_questions": 15145,
+    "retained_questions": 4468,
+    "retained_fraction": 0.2950148563882469,
+    "skipped": {
+      "answer_slot_already_present": 567,
+      "duplicate_question_slot": 502,
+      "fewer_than_minimum_supported_slots": 3010,
+      "unsupported_answer_slot": 6598
+    },
+    "selection_bias_warning": "This filtered result is not numerically interchangeable with a full-dataset published FITB score."
+  },
+  "device": "cpu",
+  "siglip_model": "google/siglip-base-patch16-224",
+  "minimum_slots": 3,
+  "seeds": [
+    42,
+    7,
+    123
+  ],
+  "runs": {
+    "bilstm": [
+      {
+        "questions": 4468,
+        "accuracy": 0.4897045658012534,
+        "mean_reciprocal_rank": 0.6981498060280512,
+        "ndcg": 0.7746588707922147,
+        "chance_accuracy": 0.25,
+        "seed": 42,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\bilstm_seed42.pt"
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.4735899731423456,
+        "mean_reciprocal_rank": 0.6887869292748433,
+        "ndcg": 0.7676771821688341,
+        "chance_accuracy": 0.25,
+        "seed": 7,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\bilstm_seed7.pt"
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.48321396598030436,
+        "mean_reciprocal_rank": 0.6930953446732319,
+        "ndcg": 0.7708257367429041,
+        "chance_accuracy": 0.25,
+        "seed": 123,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\bilstm_seed123.pt"
+      }
+    ],
+    "type_aware_pairwise": [
+      {
+        "questions": 4468,
+        "accuracy": 0.5302148612354521,
+        "mean_reciprocal_rank": 0.7204006266786034,
+        "ndcg": 0.7912062721058423,
+        "chance_accuracy": 0.25,
+        "seed": 42,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\type_aware_pairwise_seed42.pt"
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.5116383169203222,
+        "mean_reciprocal_rank": 0.7102917039689646,
+        "ndcg": 0.7836882648688328,
+        "chance_accuracy": 0.25,
+        "seed": 7,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\type_aware_pairwise_seed7.pt"
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.4973142345568487,
+        "mean_reciprocal_rank": 0.6997724559832886,
+        "ndcg": 0.7757228699002517,
+        "chance_accuracy": 0.25,
+        "seed": 123,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\type_aware_pairwise_seed123.pt"
+      }
+    ],
+    "set_transformer": [
+      {
+        "questions": 4468,
+        "accuracy": 0.4431512981199642,
+        "mean_reciprocal_rank": 0.6667412712623098,
+        "ndcg": 0.7510477453082226,
+        "chance_accuracy": 0.25,
+        "seed": 42,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\set_transformer_seed42.pt"
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.4650850492390331,
+        "mean_reciprocal_rank": 0.6838257236645777,
+        "ndcg": 0.7639953116138009,
+        "chance_accuracy": 0.25,
+        "seed": 7,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\set_transformer_seed7.pt"
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.45344673231871085,
+        "mean_reciprocal_rank": 0.676010892270964,
+        "ndcg": 0.7580985169247115,
+        "chance_accuracy": 0.25,
+        "seed": 123,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\set_transformer_seed123.pt"
+      }
+    ],
+    "lightweight_pairwise_proposed": [
+      {
+        "questions": 4468,
+        "accuracy": 0.600940017905103,
+        "mean_reciprocal_rank": 0.7685951954640406,
+        "ndcg": 0.827468810398806,
+        "chance_accuracy": 0.25,
+        "seed": 42,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\lightweight_pairwise_proposed_seed42.pt"
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.5966875559534467,
+        "mean_reciprocal_rank": 0.7658348254252462,
+        "ndcg": 0.8254029143910675,
+        "chance_accuracy": 0.25,
+        "seed": 7,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\lightweight_pairwise_proposed_seed7.pt"
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.6004923903312444,
+        "mean_reciprocal_rank": 0.7685019397194868,
+        "ndcg": 0.8274225763751534,
+        "chance_accuracy": 0.25,
+        "seed": 123,
+        "checkpoint": "models\\disjoint_fashion_model_comparison\\lightweight_pairwise_proposed_seed123.pt"
+      }
+    ]
+  },
+  "summary": {
+    "bilstm": {
+      "accuracy": {
+        "values": [
+          0.4897045658012534,
+          0.4735899731423456,
+          0.48321396598030436
+        ],
+        "mean": 0.48216950164130107,
+        "sample_standard_deviation": 0.008107909931493962
+      },
+      "mean_reciprocal_rank": {
+        "values": [
+          0.6981498060280512,
+          0.6887869292748433,
+          0.6930953446732319
+        ],
+        "mean": 0.6933440266587088,
+        "sample_standard_deviation": 0.004686389582756198
+      },
+      "ndcg": {
+        "values": [
+          0.7746588707922147,
+          0.7676771821688341,
+          0.7708257367429041
+        ],
+        "mean": 0.7710539299013176,
+        "sample_standard_deviation": 0.003496433625370402
+      }
+    },
+    "type_aware_pairwise": {
+      "accuracy": {
+        "values": [
+          0.5302148612354521,
+          0.5116383169203222,
+          0.4973142345568487
+        ],
+        "mean": 0.5130558042375409,
+        "sample_standard_deviation": 0.016496052912198883
+      },
+      "mean_reciprocal_rank": {
+        "values": [
+          0.7204006266786034,
+          0.7102917039689646,
+          0.6997724559832886
+        ],
+        "mean": 0.7101549288769523,
+        "sample_standard_deviation": 0.010314765490698603
+      },
+      "ndcg": {
+        "values": [
+          0.7912062721058423,
+          0.7836882648688328,
+          0.7757228699002517
+        ],
+        "mean": 0.7835391356249756,
+        "sample_standard_deviation": 0.007742778287769284
+      }
+    },
+    "set_transformer": {
+      "accuracy": {
+        "values": [
+          0.4431512981199642,
+          0.4650850492390331,
+          0.45344673231871085
+        ],
+        "mean": 0.4538943598925694,
+        "sample_standard_deviation": 0.010973724863143469
+      },
+      "mean_reciprocal_rank": {
+        "values": [
+          0.6667412712623098,
+          0.6838257236645777,
+          0.676010892270964
+        ],
+        "mean": 0.6755259623992839,
+        "sample_standard_deviation": 0.008552543259561788
+      },
+      "ndcg": {
+        "values": [
+          0.7510477453082226,
+          0.7639953116138009,
+          0.7580985169247115
+        ],
+        "mean": 0.7577138579489117,
+        "sample_standard_deviation": 0.006482348355733735
+      }
+    },
+    "lightweight_pairwise_proposed": {
+      "accuracy": {
+        "values": [
+          0.600940017905103,
+          0.5966875559534467,
+          0.6004923903312444
+        ],
+        "mean": 0.599373321396598,
+        "sample_standard_deviation": 0.002336684536461649
+      },
+      "mean_reciprocal_rank": {
+        "values": [
+          0.7685951954640406,
+          0.7658348254252462,
+          0.7685019397194868
+        ],
+        "mean": 0.7676439868695911,
+        "sample_standard_deviation": 0.00156747344706426
+      },
+      "ndcg": {
+        "values": [
+          0.827468810398806,
+          0.8254029143910675,
+          0.8274225763751534
+        ],
+        "mean": 0.826764767055009,
+        "sample_standard_deviation": 0.0011796255359007549
+      }
+    }
+  }
+}

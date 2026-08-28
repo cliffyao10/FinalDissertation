@@ -9,10 +9,26 @@ from recommendation_training.dataset import OutfitDataset
 from recommendation_training.evaluate import (
     bootstrap_auc_interval,
     classification_metrics,
+    predict,
 )
 
 
 class TrainingEvaluationTests(unittest.TestCase):
+    def test_predict_supports_uncalibrated_baseline_logits(self):
+        class Baseline(torch.nn.Module):
+            def forward(self, embeddings, mask):
+                return embeddings[:, 0, 0]
+
+        payload = {
+            "embeddings": torch.tensor([[[0.0]], [[2.0]]]),
+            "mask": torch.ones(2, 1, dtype=torch.bool),
+            "label": torch.tensor([0.0, 1.0]),
+        }
+        labels, probabilities = predict(Baseline(), [payload], "cpu")
+        self.assertEqual(labels.tolist(), [0, 1])
+        self.assertAlmostEqual(probabilities[0], 0.5)
+        self.assertGreater(probabilities[1], 0.5)
+
     def test_dataset_exposes_reproducibility_metadata(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "split.pt"

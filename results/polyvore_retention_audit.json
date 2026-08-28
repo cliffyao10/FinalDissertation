@@ -1,0 +1,397 @@
+{
+  "train": {
+    "raw_outfits": 17316,
+    "raw_items": 114806,
+    "supported_items": 50324,
+    "supported_item_image_matches": 27201,
+    "supported_item_image_missing": 23123,
+    "supported_item_image_match_rate": 0.5405174469438041,
+    "supported_items_without_stable_tid": 0,
+    "retained_outfits_minimum_3_slots": 3878,
+    "excluded_fewer_than_3_supported_slots": 5970,
+    "excluded_due_to_images_after_3_supported_slots": 7468,
+    "outfits_by_unique_supported_slot_count": {
+      "0": 553,
+      "1": 782,
+      "2": 4635,
+      "3": 8315,
+      "4": 3031
+    },
+    "outfits_by_unique_matched_slot_count": {
+      "0": 4080,
+      "1": 4947,
+      "2": 4411,
+      "3": 3038,
+      "4": 840
+    },
+    "top_unsupported_categories": [
+      {
+        "category_id": 64,
+        "name": "Earrings",
+        "items": 4216
+      },
+      {
+        "category_id": 37,
+        "name": "Shoulder Bags",
+        "items": 4119
+      },
+      {
+        "category_id": 62,
+        "name": "Necklaces",
+        "items": 3881
+      },
+      {
+        "category_id": 57,
+        "name": "Sunglasses",
+        "items": 3497
+      },
+      {
+        "category_id": 106,
+        "name": "Bracelets & Bangles",
+        "items": 2906
+      },
+      {
+        "category_id": 38,
+        "name": "Clutches",
+        "items": 2788
+      },
+      {
+        "category_id": 65,
+        "name": "Rings",
+        "items": 2674
+      },
+      {
+        "category_id": 1967,
+        "name": "Tech Accessories",
+        "items": 2398
+      },
+      {
+        "category_id": 200,
+        "name": "Lipstick",
+        "items": 2346
+      },
+      {
+        "category_id": 318,
+        "name": "Handbags",
+        "items": 2092
+      },
+      {
+        "category_id": 55,
+        "name": "Hats",
+        "items": 1804
+      },
+      {
+        "category_id": 36,
+        "name": "Tote Bags",
+        "items": 1617
+      },
+      {
+        "category_id": 259,
+        "name": "Backpacks",
+        "items": 1529
+      },
+      {
+        "category_id": 196,
+        "name": "Eyeshadow",
+        "items": 1486
+      },
+      {
+        "category_id": 61,
+        "name": "Watches",
+        "items": 1403
+      },
+      {
+        "category_id": 2,
+        "name": "Clothing",
+        "items": 1249
+      },
+      {
+        "category_id": 95,
+        "name": "Fragrance",
+        "items": 1182
+      },
+      {
+        "category_id": 222,
+        "name": "Nail Polish",
+        "items": 1015
+      },
+      {
+        "category_id": 197,
+        "name": "Mascara",
+        "items": 909
+      },
+      {
+        "category_id": 58,
+        "name": "Hair Accessories",
+        "items": 860
+      }
+    ]
+  },
+  "validation": {
+    "raw_outfits": 1497,
+    "raw_items": 9070,
+    "supported_items": 3700,
+    "supported_item_image_matches": 1255,
+    "supported_item_image_missing": 2445,
+    "supported_item_image_match_rate": 0.33918918918918917,
+    "supported_items_without_stable_tid": 0,
+    "retained_outfits_minimum_3_slots": 177,
+    "excluded_fewer_than_3_supported_slots": 754,
+    "excluded_due_to_images_after_3_supported_slots": 566,
+    "outfits_by_unique_supported_slot_count": {
+      "0": 212,
+      "1": 115,
+      "2": 427,
+      "3": 568,
+      "4": 175
+    },
+    "outfits_by_unique_matched_slot_count": {
+      "0": 850,
+      "1": 318,
+      "2": 152,
+      "3": 139,
+      "4": 38
+    },
+    "top_unsupported_categories": [
+      {
+        "category_id": 37,
+        "name": "Shoulder Bags",
+        "items": 332
+      },
+      {
+        "category_id": 64,
+        "name": "Earrings",
+        "items": 294
+      },
+      {
+        "category_id": 62,
+        "name": "Necklaces",
+        "items": 264
+      },
+      {
+        "category_id": 106,
+        "name": "Bracelets & Bangles",
+        "items": 210
+      },
+      {
+        "category_id": 318,
+        "name": "Handbags",
+        "items": 193
+      },
+      {
+        "category_id": 57,
+        "name": "Sunglasses",
+        "items": 190
+      },
+      {
+        "category_id": 38,
+        "name": "Clutches",
+        "items": 187
+      },
+      {
+        "category_id": 2,
+        "name": "Clothing",
+        "items": 174
+      },
+      {
+        "category_id": 36,
+        "name": "Tote Bags",
+        "items": 147
+      },
+      {
+        "category_id": 55,
+        "name": "Hats",
+        "items": 128
+      },
+      {
+        "category_id": 65,
+        "name": "Rings",
+        "items": 123
+      },
+      {
+        "category_id": 182,
+        "name": "Home Decor",
+        "items": 106
+      },
+      {
+        "category_id": 118,
+        "name": "Accent Tables",
+        "items": 90
+      },
+      {
+        "category_id": 222,
+        "name": "Nail Polish",
+        "items": 88
+      },
+      {
+        "category_id": 61,
+        "name": "Watches",
+        "items": 79
+      },
+      {
+        "category_id": 144,
+        "name": "Throw Pillows",
+        "items": 79
+      },
+      {
+        "category_id": 259,
+        "name": "Backpacks",
+        "items": 73
+      },
+      {
+        "category_id": 1967,
+        "name": "Tech Accessories",
+        "items": 70
+      },
+      {
+        "category_id": 4503,
+        "name": "Ceiling Lights",
+        "items": 66
+      },
+      {
+        "category_id": 105,
+        "name": "Scarves",
+        "items": 62
+      }
+    ]
+  },
+  "test": {
+    "raw_outfits": 3076,
+    "raw_items": 18604,
+    "supported_items": 7663,
+    "supported_item_image_matches": 2599,
+    "supported_item_image_missing": 5064,
+    "supported_item_image_match_rate": 0.3391622080125277,
+    "supported_items_without_stable_tid": 0,
+    "retained_outfits_minimum_3_slots": 357,
+    "excluded_fewer_than_3_supported_slots": 1555,
+    "excluded_due_to_images_after_3_supported_slots": 1164,
+    "outfits_by_unique_supported_slot_count": {
+      "0": 419,
+      "1": 228,
+      "2": 908,
+      "3": 1125,
+      "4": 396
+    },
+    "outfits_by_unique_matched_slot_count": {
+      "0": 1759,
+      "1": 613,
+      "2": 347,
+      "3": 266,
+      "4": 91
+    },
+    "top_unsupported_categories": [
+      {
+        "category_id": 37,
+        "name": "Shoulder Bags",
+        "items": 647
+      },
+      {
+        "category_id": 64,
+        "name": "Earrings",
+        "items": 608
+      },
+      {
+        "category_id": 62,
+        "name": "Necklaces",
+        "items": 574
+      },
+      {
+        "category_id": 38,
+        "name": "Clutches",
+        "items": 484
+      },
+      {
+        "category_id": 106,
+        "name": "Bracelets & Bangles",
+        "items": 424
+      },
+      {
+        "category_id": 318,
+        "name": "Handbags",
+        "items": 382
+      },
+      {
+        "category_id": 57,
+        "name": "Sunglasses",
+        "items": 355
+      },
+      {
+        "category_id": 65,
+        "name": "Rings",
+        "items": 319
+      },
+      {
+        "category_id": 2,
+        "name": "Clothing",
+        "items": 315
+      },
+      {
+        "category_id": 36,
+        "name": "Tote Bags",
+        "items": 306
+      },
+      {
+        "category_id": 55,
+        "name": "Hats",
+        "items": 246
+      },
+      {
+        "category_id": 182,
+        "name": "Home Decor",
+        "items": 219
+      },
+      {
+        "category_id": 118,
+        "name": "Accent Tables",
+        "items": 198
+      },
+      {
+        "category_id": 1967,
+        "name": "Tech Accessories",
+        "items": 186
+      },
+      {
+        "category_id": 4438,
+        "name": "Floral Decor",
+        "items": 180
+      },
+      {
+        "category_id": 144,
+        "name": "Throw Pillows",
+        "items": 171
+      },
+      {
+        "category_id": 61,
+        "name": "Watches",
+        "items": 142
+      },
+      {
+        "category_id": 4503,
+        "name": "Ceiling Lights",
+        "items": 137
+      },
+      {
+        "category_id": 259,
+        "name": "Backpacks",
+        "items": 135
+      },
+      {
+        "category_id": 222,
+        "name": "Nail Polish",
+        "items": 133
+      }
+    ]
+  },
+  "overall": {
+    "raw_outfits": 21889,
+    "raw_items": 142480,
+    "supported_items": 61687,
+    "supported_item_image_matches": 31055,
+    "supported_item_image_missing": 30632,
+    "retained_outfits_minimum_3_slots": 4412,
+    "excluded_fewer_than_3_supported_slots": 8279,
+    "excluded_due_to_images_after_3_supported_slots": 9198,
+    "supported_item_image_match_rate": 0.503428599218636
+  }
+}

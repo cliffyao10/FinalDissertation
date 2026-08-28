@@ -240,7 +240,19 @@ def score_tensors(model, embeddings, masks, device, batch_size=256):
 def ranking_metrics(model, dataset, device, seed=42, batch_size=256):
     """Evaluate matched ranking and a deterministic four-choice completion task."""
 
-    groups = infer_matched_replacement_groups(dataset)
+    try:
+        groups = infer_matched_replacement_groups(dataset)
+    except ValueError as error:
+        return {
+            "matched_pairs": None,
+            "pair_ranking_accuracy": None,
+            "fitb4_examples": None,
+            "fitb4_accuracy": None,
+            "fitb4_mean_reciprocal_rank": None,
+            "fitb4_ndcg": None,
+            "fitb4_protocol": "unavailable_for_unpaired_published_rows",
+            "unavailable_reason": str(error),
+        }
     all_scores = score_tensors(
         model, dataset.embeddings, dataset.masks, device, batch_size=batch_size
     )
@@ -421,12 +433,16 @@ def summarise(runs):
         }
         for metric_name in metric_names:
             values = [run["test_metrics"][metric_name] for run in model_runs]
+            available = [value for value in values if value is not None]
             summary[model_name]["metrics"][metric_name] = {
                 "values": values,
-                "mean": float(np.mean(values)),
+                "mean": float(np.mean(available)) if available else None,
                 "sample_standard_deviation": (
-                    float(np.std(values, ddof=1)) if len(values) > 1 else 0.0
+                    float(np.std(available, ddof=1)) if len(available) > 1 else 0.0
+                    if available
+                    else None
                 ),
+                "available_runs": len(available),
             }
     return summary
 

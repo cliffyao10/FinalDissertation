@@ -1,0 +1,88 @@
+{
+  "generated_utc": "2026-08-21T03:49:56.749946+00:00",
+  "git_revision_at_generation": "2f3c48a5f11cef2adc6a88e0c29d6506ff499287",
+  "git_worktree_dirty_at_generation": true,
+  "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "Pillow": "12.3.0",
+    "scikit-learn": "1.9.0",
+    "torch": "2.13.0",
+    "transformers": "5.15.0",
+    "streamlit": "1.61.1"
+  },
+  "artifacts": {
+    "data\\processed_disjoint\\train.pt": {
+      "exists": true,
+      "bytes": 224318415,
+      "sha256": "39c58675e02e95fc4a7a38da346e9be60fe43465eb7244a9fa3c1f53522d755f"
+    },
+    "data\\processed_disjoint\\validation.pt": {
+      "exists": true,
+      "bytes": 40259644,
+      "sha256": "d2f3c9da6c4f767f69dc63dd1921dc086fb25a3c167eafceee6809fc7a2008d8"
+    },
+    "data\\processed_disjoint\\test.pt": {
+      "exists": true,
+      "bytes": 197500742,
+      "sha256": "ca6b2df665c64091da0ed5905b3624c6e8cb1e5109cf26d31ed517e82d152f8d"
+    },
+    "models\\disjoint\\compatibility_ranker.pt": {
+      "exists": true,
+      "bytes": 1523167,
+      "sha256": "f5f000e24fd5a396e135081cbd65dfab1a981747fb0dd70d8a1eb2787cdb2262"
+    },
+    "models\\catalogue_embeddings.pt": {
+      "exists": true,
+      "bytes": 1088196,
+      "sha256": "d821a5364acf3eebff7828e556f50dc90e148ace8124102c0b30676dbbbe80ff"
+    },
+    "data\\catalogue.csv": {
+      "exists": true,
+      "bytes": 94868,
+      "sha256": "2a5cff1ea9971d323c24303f375e023c5d71c176fd0b87e58f93b5ba3df0e6d8"
+    },
+    "results\\disjoint_compatibility_test_metrics.json": {
+      "exists": true,
+      "bytes": 2730,
+      "sha256": "264b4011035410b25291257b6a17121ddf3b0f9a311452daac170fed956bc716"
+    },
+    "results\\disjoint_fashion_model_comparison.json": {
+      "exists": true,
+      "bytes": 6090021,
+      "sha256": "238cf8b181a7d28ec72f0ca03897093bcbd21a91149e5b7573c5e619320dc893"
+    },
+    "results\\disjoint_official_fitb_comparison.json": {
+      "exists": true,
+      "bytes": 8115,
+      "sha256": "e570f6af99d7b1212fed52443ee7f264b25f8f7c6ae5904699a0774f4dc7e7f2"
+    },
+    "results\\disjoint_imbalance_study.json": {
+      "exists": true,
+      "bytes": 32794,
+      "sha256": "958dea8e60c1f50cd77a2ba8f7b6f3a51577ce255bf7d1bdbc83f1c8a777fd3b"
+    },
+    "results\\disjoint_bias_audit.json": {
+      "exists": true,
+      "bytes": 5985,
+      "sha256": "b0b7e10b4a079fbd71617c5d52c850d3a1232719fbed064b2ed934444edadfee"
+    },
+    "results\\disjoint_domain_shift.json": {
+      "exists": true,
+      "bytes": 3167,
+      "sha256": "43945e3145fe997e2a81e80ec77f65c3e57dc1a59ec79d9946217cd8590c625b"
+    },
+    "results\\disjoint_runtime_benchmark.json": {
+      "exists": true,
+      "bytes": 2154,
+      "sha256": "ff54e893b32c4d993cff34de58a163a63949ab04132f5bc41dbee730747b39fd"
+    },
+    "results\\disjoint_release_check.json": {
+      "exists": true,
+      "bytes": 4593,
+      "sha256": "e1443846f04b64e5a6e7850b5228a3155b10a17e0e74ad2de3476d4892cbb75a"
+    }
+  }
+}

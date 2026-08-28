@@ -136,6 +136,15 @@ ALTERNATIVE_COLOUR_PALETTES = {
     "Yellow": ["Grey", "Navy", "White"],
 }
 
+MULTI_SLOT_CATEGORIES = {
+    "Dress": {"inner_top", "bottom"},
+    "One-piece": {"inner_top", "bottom"},
+}
+
+
+def occupied_slots_for_category(category):
+    return set(MULTI_SLOT_CATEGORIES.get(category, {CATEGORY_TO_SLOT.get(category, "inner_top")}))
+
 
 NEUTRALS = {"Black", "White", "Grey", "Navy", "Brown", "Beige", "Cream"}
 LIGHT_COLOURS = {"White", "Beige", "Cream", "Pink", "Yellow"}
@@ -324,7 +333,8 @@ def _weather_adjustment(slot, item_name, weather):
 def _build_outfit(category, colour, style, weather, ranked_candidate):
     input_slot = CATEGORY_TO_SLOT.get(category, "inner_top")
     style_items = STYLE_ITEMS.get(style, STYLE_ITEMS["Casual"])
-    recommendation_slots = [slot for slot in SLOTS if slot != input_slot]
+    occupied_slots = occupied_slots_for_category(category)
+    recommendation_slots = [slot for slot in SLOTS if slot not in occupied_slots]
     outfit_score, palette, score_components = ranked_candidate
     items = []
     constraints = []
@@ -414,6 +424,7 @@ def recommend_outfit(
     weather=None,
     selected_style=None,
     input_embedding=None,
+    audience="womenswear",
 ):
     """Use trained compatibility ranking when possible, else the baseline."""
 
@@ -421,6 +432,7 @@ def recommend_outfit(
     primary_style = selected_style or recognised_styles[0]
 
     input_slot = CATEGORY_TO_SLOT.get(category, "inner_top")
+    occupied_slots = occupied_slots_for_category(category)
     fallback_reason = "trained artifacts or input embedding unavailable"
     try:
         trained_result = recommend_with_trained_model(
@@ -431,6 +443,8 @@ def recommend_outfit(
             style=primary_style,
             weather=weather,
             slot_labels=SLOT_LABELS,
+            input_occupied_slots=occupied_slots,
+            audience=audience,
         )
         if trained_result is not None:
             trained_result.update(
@@ -439,6 +453,7 @@ def recommend_outfit(
                     "input_category": category,
                     "input_colour": colour,
                     "weather": weather,
+                    "audience": audience,
                 }
             )
             return trained_result
@@ -447,7 +462,7 @@ def recommend_outfit(
         # product catalogue is incomplete. Developer metadata records why.
         fallback_reason = f"{type(error).__name__}: {error}"
 
-    recommendation_slots = [slot for slot in SLOTS if slot != input_slot]
+    recommendation_slots = [slot for slot in SLOTS if slot not in occupied_slots]
     ranked_candidates = RANKER.rank(
         colour, primary_style, recommendation_slots, weather
     )
@@ -485,6 +500,7 @@ def recommend_outfit(
         "input_category": category,
         "input_colour": colour,
         "weather": weather,
+        "audience": audience,
         "explanation": (
             "A lightweight linear model ranks complete outfits using colour "
             "harmony, palette coherence, style, weather and slot versatility."

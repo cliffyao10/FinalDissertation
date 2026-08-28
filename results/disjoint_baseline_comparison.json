@@ -1,0 +1,93 @@
+{
+  "test_dataset": "data\\processed_disjoint\\test.pt",
+  "examples": 16062,
+  "baselines": {
+    "random_ranking": {
+      "auc": 0.49400960147564166,
+      "auc_95_percent_ci": [
+        0.4855917309209638,
+        0.5028850222812847
+      ]
+    },
+    "mean_pairwise_siglip_cosine": {
+      "auc": 0.7011980068332212,
+      "auc_95_percent_ci": [
+        0.6926717206466676,
+        0.7087933605514214
+      ]
+    },
+    "learned_compatibility_ranker": {
+      "auc": 0.8572591583035982,
+      "auc_95_percent_ci": [
+        0.8518396684493293,
+        0.8629114496310418
+      ]
+    }
+  },
+  "checkpoint_metadata": {
+    "checkpoint_version": 2,
+    "best_epoch": 5,
+    "best_validation_metrics": {
+      "accuracy": 0.7748930971288943,
+      "auc": 0.8599991267904062,
+      "groups_unavailable_reason": "Expected each pair to end with a negative example."
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 18243,
+    "validation_examples": 3274,
+    "train_positive_rate": 0.4999725818634033,
+    "validation_positive_rate": 0.5,
+    "seed": 42,
+    "training_config": {
+      "batch_size": 512,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 5,
+      "balance": "none",
+      "balance_exponent": 0.5,
+      "maximum_sample_weight": 3.0
+    },
+    "calibration": {
+      "temperature": 1.2891900539398193,
+      "validation_nll_before": 0.47990134358406067,
+      "validation_nll_after": 0.47102686762809753,
+      "validation_ece_before": 0.05570172553651021,
+      "validation_ece_after": 0.0369791798134293,
+      "dataset": "data\\processed_disjoint\\validation.pt",
+      "method": "scalar_temperature_scaling",
+      "fit_scope": "validation_only"
+    }
+  },
+  "dataset_metadata": {
+    "positive_examples": 8031,
+    "negative_examples": 8031,
+    "minimum_slots": 3,
+    "skipped_rows": {
+      "fewer_than_minimum_slots": 14228,
+      "missing_embedding": 0,
+      "duplicate_slot": 1414
+    },
+    "negative_strategy": "published_same-type_hard_negatives",
+    "source_rows": 30290,
+    "siglip_model": "google/siglip-base-patch16-224",
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "source": "Polyvore Outfits disjoint official compatibility split"
+  },
+  "notes": {
+    "random": "Deterministic random scores provide a chance-level control.",
+    "cosine": "Mean pairwise similarity uses the same frozen image features but no learned compatibility parameters.",
+    "rule_based": "The production colour/weather generator cannot score arbitrary Polyvore outfits and is therefore excluded from this AUC table."
+  }
+}

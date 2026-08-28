@@ -1,0 +1,32 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small,
+    entity/.style={draw=wmgdarkblue!60, rounded corners=2pt, align=left,
+      minimum width=42mm, minimum height=19mm, fill=gray!6, inner sep=3mm},
+    store/.style={entity, fill=wmgblue!10, draw=wmgblue!70},
+    artefact/.style={entity, fill=green!6, draw=green!45!black},
+    rel/.style={-{Latex[length=2mm]}, thick, draw=wmgdarkblue!65}
+  ]
+    \node[store] (wardrobe) {\textbf{wardrobe.json}\\version, pieces[], outfits[],\\outfit\_groups[]};
+    \node[entity, below left=12mm and -2mm of wardrobe] (piece) {\textbf{Piece}\\id, position, type, colour,\\image\_path, source, created\_at};
+    \node[entity, below right=12mm and -2mm of wardrobe] (outfit) {\textbf{Outfit}\\id, title, mood, style, group,\\four position values, created\_at};
+    \node[entity, below=14mm of piece] (images) {\textbf{wardrobe\_images/}\\local PNG files referenced\\by Piece.image\_path};
+    \node[entity, below=14mm of outfit] (prefs) {\textbf{user\_preferences.json}\\up to six saved cities};
+    \node[store, right=20mm of outfit] (runtime) {\textbf{Application runtime}\\loads local user state and\\available model artefacts};
+    \node[artefact, above=14mm of runtime] (model) {\textbf{Model artefacts}\\compatibility checkpoint and\\abstract prototype catalogue};
+    \node[artefact, below=14mm of runtime] (results) {\textbf{Research outputs}\\evaluation JSON, manifests,\\hashes and training histories};
+
+    \draw[rel] (wardrobe) -- node[left,font=\scriptsize]{contains} (piece);
+    \draw[rel] (wardrobe) -- node[right,font=\scriptsize]{contains} (outfit);
+    \draw[rel] (outfit) -- node[above,font=\scriptsize]{0--4 embedded piece values} (piece);
+    \draw[rel] (piece) -- node[left,font=\scriptsize]{references} (images);
+    \draw[rel] (wardrobe.east) -| (runtime.north west);
+    \draw[rel] (prefs) -- node[below,font=\scriptsize]{read by} (runtime);
+    \draw[rel] (model) -- node[right,font=\scriptsize]{loaded by} (runtime);
+    \draw[rel,dashed] (model.east) -- ++(5mm,0) |- node[right,font=\scriptsize]{documented by} (results.east);
+  \end{tikzpicture}}
+  \caption{Logical relationships among local user data and model artefacts; the prototype uses files rather than a relational database}
+  \label{fig:local-data-relationships}
+\end{figure}

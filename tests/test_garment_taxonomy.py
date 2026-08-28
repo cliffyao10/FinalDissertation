@@ -34,6 +34,12 @@ class GarmentTaxonomyTests(unittest.TestCase):
             "No Outer Layer",
         )
 
+    def test_t_shirt_is_not_collapsed_into_shirt(self):
+        self.assertEqual(
+            broad_garment_category("inner_top", "T-Shirt"),
+            "T-Shirt",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

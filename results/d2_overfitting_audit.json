@@ -1,0 +1,41 @@
+{
+  "protocol": "Frozen final D2 checkpoint evaluated on its train, validation and held-out test tensors. Checkpoint selection used validation AUC only.",
+  "splits": {
+    "train": {
+      "examples": 18243,
+      "auc": 0.9699365861987393,
+      "average_precision": 0.9704020091311755,
+      "accuracy": 0.8997423669352629,
+      "f1": 0.9050806995692563
+    },
+    "validation": {
+      "examples": 3274,
+      "auc": 0.8597901535542801,
+      "average_precision": 0.856195284581091,
+      "accuracy": 0.7687843616371411,
+      "f1": 0.784514659834899
+    },
+    "test": {
+      "examples": 16062,
+      "auc": 0.8583435427290906,
+      "average_precision": 0.8558434447646524,
+      "accuracy": 0.7664051799277799,
+      "f1": 0.786599931748379
+    }
+  },
+  "audit": {
+    "train_minus_test_auc": 0.11159304346964871,
+    "absolute_validation_minus_test_auc": 0.0014466108251894871,
+    "best_epoch": 6,
+    "peak_validation_epoch": 6,
+    "peak_validation_auc": 0.8597901535542801,
+    "last_observed_validation_auc": 0.8498379897670284,
+    "validation_auc_drop_after_peak": 0.009952163787251722,
+    "training_fit_materially_higher": true,
+    "validation_test_agreement_within_0_02": true,
+    "best_checkpoint_matches_validation_peak": true,
+    "conclusion": "Training-set overfitting is visible, but validation-only early stopping selected the peak checkpoint and validation/test AUC remain closely aligned. No absence-of-overfitting claim is made.",
+    "decision": "retain_frozen_checkpoint"
+  },
+  "research_boundary": "Further tuning against the already inspected test result would risk test-set overfitting; new regularisation experiments require validation-only selection or a new untouched test split."
+}

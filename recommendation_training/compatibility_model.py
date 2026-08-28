@@ -47,6 +47,19 @@ class CompatibilityRanker(nn.Module):
         projected = self.image_projection(embeddings)
         items = torch.cat((projected, self.slot_embedding(slot_ids)), dim=-1)
 
+        return self.score_preprojected(items, mask)
+
+    def score_preprojected(self, items, mask):
+        """Score cached item features without repeating the image projection.
+
+        Catalogue search reuses each garment in many complete outfits.  Keeping
+        this operation separate makes exhaustive search substantially cheaper
+        while remaining numerically equivalent to :meth:`forward` in eval mode.
+        """
+
+        slot_count = items.shape[1]
+        if slot_count != self.config.number_of_slots:
+            raise ValueError(f"Expected {self.config.number_of_slots} slots.")
         float_mask = mask.float().unsqueeze(-1)
         pooled = (items * float_mask).sum(dim=1)
         pooled = pooled / float_mask.sum(dim=1).clamp_min(1.0)

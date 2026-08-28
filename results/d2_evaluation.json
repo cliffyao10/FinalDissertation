@@ -1,0 +1,254 @@
+{
+  "model_version": "D2",
+  "decision": "research_standard_pass",
+  "device": "cpu",
+  "selection_protocol": "Seed 42 was fixed by the highest validation compatibility AUC among the predefined seeds 42, 7 and 123. The corrected official test FITB labels were evaluated only after checkpoint selection.",
+  "fitb_bug_correction": "Disjoint answers are shuffled. The correct candidate is now found by matching its set_id to the question outfit rather than assuming index zero.",
+  "compatibility": {
+    "examples": 16062,
+    "positive_rate": 0.5,
+    "threshold": 0.5,
+    "auc": 0.8583435427290906,
+    "average_precision": 0.8558434447646524,
+    "accuracy": 0.7664051799277799,
+    "balanced_accuracy": 0.7664051799277798,
+    "precision": 0.72400795728196,
+    "recall": 0.8610384759058648,
+    "f1": 0.786599931748379,
+    "specificity": 0.6717718839496949,
+    "matthews_correlation_coefficient": 0.5426177750740351,
+    "brier_score": 0.15993804079922552,
+    "confusion_matrix": [
+      [
+        5395,
+        2636
+      ],
+      [
+        1116,
+        6915
+      ]
+    ],
+    "auc_95_percent_ci": [
+      0.8524301606394212,
+      0.8640712439623077
+    ]
+  },
+  "fitb": {
+    "questions": 4468,
+    "accuracy": 0.6025067144136079,
+    "mean_reciprocal_rank": 0.7704976126529394,
+    "ndcg": 0.8289434199858609,
+    "chance_accuracy": 0.25,
+    "accuracy_95_percent_bootstrap_ci": [
+      0.5872873769024172,
+      0.6175022381378693
+    ],
+    "coverage": {
+      "total_questions": 15145,
+      "retained_questions": 4468,
+      "retained_fraction": 0.2950148563882469,
+      "skipped": {
+        "answer_slot_already_present": 567,
+        "duplicate_question_slot": 502,
+        "fewer_than_minimum_supported_slots": 3010,
+        "unsupported_answer_slot": 6598
+      }
+    },
+    "by_audience": {
+      "menswear": {
+        "questions": 46,
+        "accuracy": 0.43478260869565216,
+        "mean_reciprocal_rank": 0.6721014492753623,
+        "ndcg": 0.7553969314676149,
+        "chance_accuracy": 0.25
+      },
+      "womenswear": {
+        "questions": 4422,
+        "accuracy": 0.6042514699231117,
+        "mean_reciprocal_rank": 0.7715211819689431,
+        "ndcg": 0.8297084897443049,
+        "chance_accuracy": 0.25
+      }
+    }
+  },
+  "internal_fitb_baseline_means": {
+    "bilstm": 0.48216950164130107,
+    "type_aware_pairwise": 0.5130558042375409,
+    "set_transformer": 0.4538943598925694
+  },
+  "corrected_structural_ablation": {
+    "summary": {
+      "no_slot": {
+        "accuracy": {
+          "values": [
+            0.5955684870188004,
+            0.5946732318710832,
+            0.5937779767233662
+          ],
+          "mean": 0.5946732318710832,
+          "sample_standard_deviation": 0.0008952551477171
+        },
+        "mean_reciprocal_rank": {
+          "values": [
+            0.7666554759773203,
+            0.764286780065652,
+            0.7652379886601014
+          ],
+          "mean": 0.7653934149010245,
+          "sample_standard_deviation": 0.0011919723435399802
+        },
+        "ndcg": {
+          "values": [
+            0.8260931422521017,
+            0.8242302629876774,
+            0.8250047917990475
+          ],
+          "mean": 0.8251093990129422,
+          "sample_standard_deviation": 0.00093583480933048
+        }
+      },
+      "no_pairwise": {
+        "accuracy": {
+          "values": [
+            0.49395702775290956,
+            0.4959713518352731,
+            0.49977618621307074
+          ],
+          "mean": 0.4965681886004178,
+          "sample_standard_deviation": 0.002955133142396068
+        },
+        "mean_reciprocal_rank": {
+          "values": [
+            0.7010034318113996,
+            0.701133989853775,
+            0.7043792897642495
+          ],
+          "mean": 0.7021722371431413,
+          "sample_standard_deviation": 0.0019124780534328846
+        },
+        "ndcg": {
+          "values": [
+            0.7768040717104086,
+            0.7768614483228415,
+            0.7793206393071427
+          ],
+          "mean": 0.7776620531134643,
+          "sample_standard_deviation": 0.00143666424063143
+        }
+      },
+      "full": {
+        "accuracy": {
+          "values": [
+            0.600940017905103,
+            0.5966875559534467,
+            0.6004923903312444
+          ],
+          "mean": 0.599373321396598,
+          "sample_standard_deviation": 0.002336684536461649
+        },
+        "mean_reciprocal_rank": {
+          "values": [
+            0.7685951954640406,
+            0.7658348254252462,
+            0.7685019397194868
+          ],
+          "mean": 0.7676439868695911,
+          "sample_standard_deviation": 0.00156747344706426
+        },
+        "ndcg": {
+          "values": [
+            0.827468810398806,
+            0.8254029143910675,
+            0.8274225763751534
+          ],
+          "mean": 0.826764767055009,
+          "sample_standard_deviation": 0.0011796255359007549
+        }
+      }
+    },
+    "paired_comparisons": {
+      "no_slot": {
+        "mean_accuracy_difference_full_minus_ablation": 0.004700089525514772,
+        "paired_question_bootstrap_95_percent_ci": [
+          -0.001268278125932558,
+          0.010593852581319008
+        ],
+        "iterations": 5000,
+        "unit_resampled": "official_fitb_question",
+        "seed_repeats_averaged_within_question": 3
+      },
+      "no_pairwise": {
+        "mean_accuracy_difference_full_minus_ablation": 0.10280513279618025,
+        "paired_question_bootstrap_95_percent_ci": [
+          0.08960011936735304,
+          0.1157117278424351
+        ],
+        "iterations": 5000,
+        "unit_resampled": "official_fitb_question",
+        "seed_repeats_averaged_within_question": 3
+      }
+    },
+    "interpretation": "The pairwise module has clear positive evidence. The slot embedding has a small positive point estimate but its paired 95% interval crosses zero, so no clear benefit is claimed."
+  },
+  "catalogue_audience_audit": {
+    "schema": "abstract_garment_prototypes_v2",
+    "records": 1670,
+    "records_by_audience_and_slot": {
+      "menswear:bottom": 37,
+      "menswear:inner_top": 56,
+      "menswear:outer_top": 22,
+      "menswear:shoes": 47,
+      "womenswear:bottom": 317,
+      "womenswear:inner_top": 522,
+      "womenswear:outer_top": 280,
+      "womenswear:shoes": 389
+    },
+    "both_ranges_cover_all_four_slots": true,
+    "prohibited_menswear_concepts": []
+  },
+  "raw_compatibility_rows_by_audience": {
+    "train": {
+      "label_0:menswear": 34,
+      "label_0:mixed": 186,
+      "label_0:unknown": 120,
+      "label_0:womenswear": 16655,
+      "label_1:menswear": 34,
+      "label_1:mixed": 186,
+      "label_1:unknown": 120,
+      "label_1:womenswear": 16655
+    },
+    "validation": {
+      "label_0:menswear": 7,
+      "label_0:mixed": 36,
+      "label_0:unknown": 30,
+      "label_0:womenswear": 2927,
+      "label_1:menswear": 7,
+      "label_1:mixed": 36,
+      "label_1:unknown": 30,
+      "label_1:womenswear": 2927
+    },
+    "test": {
+      "label_0:menswear": 63,
+      "label_0:mixed": 200,
+      "label_0:unknown": 209,
+      "label_0:womenswear": 14673,
+      "label_1:menswear": 63,
+      "label_1:mixed": 200,
+      "label_1:unknown": 209,
+      "label_1:womenswear": 14673
+    }
+  },
+  "audience_policy": "User-selected clothing range; no gender inference from a person or garment photo. Candidate filtering is hard. The compatibility head is shared because the disjoint training split contains too few pure menswear rows for a defensible separate menswear model.",
+  "gates": {
+    "compatibility_auc_ci_above_frozen_cosine": true,
+    "fitb_above_chance": true,
+    "fitb_exceeds_internal_architecture_baselines": true,
+    "corrected_structural_ablation_completed": true,
+    "pairwise_module_supported_by_paired_fitb_interval": true,
+    "validation_only_calibration_improves_nll": true,
+    "candidate_ranges_cover_all_slots": true,
+    "menswear_excludes_prohibited_concepts": true,
+    "test_not_used_for_checkpoint_selection": true
+  },
+  "passed": true
+}

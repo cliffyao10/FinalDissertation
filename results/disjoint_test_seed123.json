@@ -1,0 +1,82 @@
+{
+  "checkpoint": "models\\disjoint\\compatibility_ranker_seed123.pt",
+  "test_dataset": "data\\processed_disjoint\\test.pt",
+  "device": "cuda",
+  "metrics": {
+    "examples": 16062,
+    "positive_rate": 0.5,
+    "threshold": 0.5,
+    "auc": 0.8604926052252291,
+    "average_precision": 0.8573216393806391,
+    "accuracy": 0.7753704395467563,
+    "balanced_accuracy": 0.7753704395467563,
+    "precision": 0.8092574465109775,
+    "recall": 0.7205827418752335,
+    "f1": 0.7623501514951917,
+    "specificity": 0.8301581372182791,
+    "matthews_correlation_coefficient": 0.5540772625001616,
+    "brier_score": 0.15872724283213188,
+    "confusion_matrix": [
+      [
+        6667,
+        1364
+      ],
+      [
+        2244,
+        5787
+      ]
+    ],
+    "auc_95_percent_ci": null
+  },
+  "checkpoint_metadata": {
+    "checkpoint_version": 1,
+    "best_epoch": 6,
+    "best_validation_metrics": {
+      "accuracy": 0.7730604764813683,
+      "auc": 0.8582493491043444,
+      "groups_unavailable_reason": "Expected each pair to end with a negative example."
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 18243,
+    "validation_examples": 3274,
+    "train_positive_rate": 0.4999725818634033,
+    "validation_positive_rate": 0.5,
+    "seed": 123,
+    "training_config": {
+      "batch_size": 512,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 5,
+      "balance": "none",
+      "balance_exponent": 0.5,
+      "maximum_sample_weight": 3.0
+    }
+  },
+  "dataset_metadata": {
+    "positive_examples": 8031,
+    "negative_examples": 8031,
+    "minimum_slots": 3,
+    "skipped_rows": {
+      "fewer_than_minimum_slots": 14228,
+      "missing_embedding": 0,
+      "duplicate_slot": 1414
+    },
+    "negative_strategy": "published_same-type_hard_negatives",
+    "source_rows": 30290,
+    "siglip_model": "google/siglip-base-patch16-224",
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "source": "Polyvore Outfits disjoint official compatibility split"
+  }
+}

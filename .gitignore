@@ -1,7 +1,22 @@
 .venv/
 .venv_broken_*/
 __pycache__/
+.tools/
 *.pyc
+
+# Local LaTeX build products (the source remains versioned).
+dissertation/*.aux
+dissertation/*.bbl
+dissertation/*.bcf
+dissertation/*.blg
+dissertation/*.log
+dissertation/*.lof
+dissertation/*.lot
+dissertation/*.out
+dissertation/*.run.xml
+dissertation/*.toc
+dissertation/*.pdf
+dissertation/Cove-dissertation-overleaf.zip
 
 results/*
 !results/*.json
@@ -14,8 +29,10 @@ data/polyvore/
 data/polyvore_hardneg/
 data/polyvore_images/
 data/polyvore_nondisjoint/
+data/polyvore_disjoint/
 data/polyvore_source/
 data/processed/
+data/processed_disjoint/
 data/incoming/
 data/zara_products/
 data/user_preferences.json
@@ -28,4 +45,8 @@ models/ablations/
 models/fashion_model_comparison/
 models/ranking_objective/
 models/imbalance_mitigation/
+models/disjoint/
+models/disjoint_ablations/
+models/disjoint_fashion_model_comparison/
+models/disjoint_imbalance/
 tmp/

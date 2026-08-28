@@ -1,0 +1,43 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{0.96\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small,
+    actor/.style={draw=wmgdarkblue!70, rounded corners=2pt, align=center,
+      text width=24mm, minimum height=12mm, fill=gray!6},
+    usecase/.style={draw=wmgblue!75, ellipse, align=center,
+      text width=30mm, minimum height=12mm, fill=wmgblue!7, font=\scriptsize},
+    external/.style={draw=green!45!black, rounded corners=2pt, align=center,
+      text width=28mm, minimum height=12mm, fill=green!7},
+    association/.style={thick, draw=wmgdarkblue!70},
+    include/.style={-{Latex[length=2mm]}, dashed, draw=wmgdarkblue!65}
+  ]
+    \node[actor] (user) at (0,1.0) {Wardrobe user};
+    \node[usecase] (city) at (4.1,5.6) {Set or restore city};
+    \node[usecase] (select) at (4.1,3.1) {Upload and circle a garment};
+    \node[usecase] (analyse) at (9.0,4.1) {Analyse type, colour and style};
+    \node[usecase] (context) at (4.1,0.6) {Choose clothing range and style};
+    \node[usecase] (recommend) at (9.0,1.6) {Receive complete-outfit recommendation};
+    \node[usecase] (save) at (4.1,-1.9) {Save a piece or outfit};
+    \node[usecase] (alternatives) at (9.0,-0.9) {Inspect outfit and position alternatives};
+    \node[usecase] (manage) at (9.0,-3.4) {Manage local wardrobe};
+    \node[external] (weather) at (14.0,5.6) {Open-Meteo geocoding and forecast service};
+
+    \node[draw=wmgdarkblue!45, rounded corners=3pt,
+      fit=(city)(select)(analyse)(context)(recommend)(alternatives)(save)(manage),
+      inner sep=6mm, label={[font=\bfseries\color{wmgdarkblue}]above:Cove system boundary}] {};
+
+    \draw[association] (user) -- (city);
+    \draw[association] (user) -- (select);
+    \draw[association] (user) -- (context);
+    \draw[association] (user) -- (recommend);
+    \draw[association] (user) -- (save);
+    \draw[association] (user) -- (manage);
+    \draw[association] (weather) -- (city);
+    \draw[include] (select) -- node[above,font=\scriptsize]{\guillemotleft include\guillemotright} (analyse);
+    \draw[include] (recommend) -- node[right,font=\scriptsize]{\guillemotleft include\guillemotright} (analyse);
+    \draw[include] (alternatives) -- node[right,font=\scriptsize]{\guillemotleft extend\guillemotright} (recommend);
+  \end{tikzpicture}}
+  \caption{UML use-case view of the implemented Cove prototype}
+  \label{fig:use-case}
+\end{figure}

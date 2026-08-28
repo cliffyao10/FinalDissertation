@@ -1,0 +1,366 @@
+\chapter{Literature Review}
+
+\section{Introduction}
+
+This chapter critically reviews the research underpinning the project's
+representation, compatibility-modelling, retrieval and evaluation choices.
+Fashion recommendation includes visual similar-item retrieval, substitute
+recommendation, personalised ranking, outfit compatibility prediction and
+complementary-item retrieval \parencite{deldjoo2023review,sarkar2023outfittransformer}.
+Because these tasks differ in their inputs, supervision and definitions of
+success, evidence obtained for one cannot automatically support another.
+
+The review first positions complete-outfit recommendation within recommender
+systems, then examines the development of fashion-compatibility models and the
+role of frozen vision--language representations. It subsequently considers
+learning objectives, evaluation, candidate search and responsible design. The
+literature is used to derive controlled alternatives, not to assume that the
+newest or most complex architecture is necessarily appropriate.
+
+\section{Positioning complete-outfit recommendation}
+
+Traditional recommender systems often learn from interactions such as ratings,
+clicks or purchases and ask which item should be presented to a particular
+user. Evaluation must be connected to the user task, available observations and
+intended use; otherwise, nominally similar experiments may not be comparable
+\parencite{herlocker2004evaluation}. Fashion recommenders extend this setting
+with visual, textual, contextual and social information
+\parencite{deldjoo2023review}.
+
+Cove has no longitudinal user--item history and therefore does not claim to
+learn stable individual preferences or compare collaborative-filtering
+algorithms. Its learned task is content-based outfit compatibility: estimating
+whether relationships within a set of garments resemble those observed in the
+training outfits. At runtime, that score ranks completions around a
+user-selected garment. Dataset compatibility and personal preference must
+remain distinct, because following a dataset regularity does not establish what
+one person will prefer.
+
+Complete-outfit recommendation is consequently considered at three connected
+levels. Representation converts garment images into features; relational
+scoring evaluates garments jointly; decision and interaction filter infeasible
+candidates, search combinations and expose alternatives. Secondary outfit data
+can evaluate the first two levels. The third can be tested for deterministic
+behaviour, completeness and runtime, but not for satisfaction without human
+evidence. This separation prevents the compatibility classifier from being
+treated as the entire recommender system.
+
+\section{Development of fashion-compatibility models}
+
+Early image-based recommendation distinguished visual similarity from
+complementarity. Items serving the same role may be substitutes, whereas items
+from different roles may be complementary despite being visually dissimilar
+\parencite{mcauley2015styles}. Pairwise metric learning operationalises this
+distinction by learning spaces in which compatible pairs are close. Such models
+support efficient nearest-neighbour retrieval, but a complete outfit contains
+several interacting pairs. Summing local scores assumes that pairwise
+compatibility is sufficient to represent the set.
+
+\textcite{han2017bilstm} represented outfits as ordered garment sequences and
+used a bidirectional long short-term memory network. This aggregates information
+from garments on both sides of an item, although outfits have no natural
+linguistic order and must be ordered through garment categories. The method
+therefore provides a useful structured baseline while retaining possible
+sensitivity to that imposed sequence.
+
+\textcite{vasileva2018typeaware} argued that compatibility depends on item type
+and proposed type-aware embedding spaces. A top--shoe relationship need not use
+the same transformation as a top--top relationship, making category or slot
+identity part of the learned relation rather than descriptive metadata. This
+supports testing slot-pair-specific projections and explicit slot
+representations.
+
+Context-aware graph modelling provides another response to isolated pair
+relations. \textcite{cucurull2019context} generated product embeddings
+conditioned on known compatible context and reported stronger compatibility
+prediction when more context was available. The finding supports the view that
+compatibility is conditional rather than intrinsic to one item. Graph
+construction, however, requires available nodes and edges that may not exist
+for a newly uploaded garment.
+
+Attention allows each garment representation to interact with every other
+garment without requiring a fixed sequence. OutfitTransformer uses task-specific
+tokens and self-attention for outfit compatibility and complementary-item
+retrieval \parencite{sarkar2023outfittransformer}. Treating an outfit as an
+unordered set is appropriate because rearranging the same garments should not
+change compatibility. Attention offers flexible higher-order interaction but
+also adds capacity. Results obtained under OutfitTransformer's original
+protocol do not establish that equal capacity is required with frozen inputs
+and a smaller processed dataset.
+
+These studies support several modelling assumptions rather than one universal
+architecture. Pairwise models prioritise local relations and efficiency;
+recurrent models learn structured aggregation; type-aware models encode
+category-dependent relations; and attention learns set-level interactions
+\parencite{han2017bilstm,vasileva2018typeaware,sarkar2023outfittransformer}.
+Their differences motivate controlled comparisons using the same features,
+splits and training conditions.
+
+\section{Polyvore data and label construction}
+
+Polyvore datasets convert outfits assembled by platform users into observable
+item sets and are consequently practical secondary data for compatibility
+research \parencite{han2017bilstm,vasileva2018typeaware}. A positive example
+records an outfit retained in the dataset; it is not evidence of an objective
+or universally shared aesthetic judgement.
+
+Negative outfits are commonly constructed by replacing an item in a positive
+outfit. Same-type replacement is harder than arbitrary-category replacement
+because the negative remains structurally plausible
+\parencite{vasileva2018typeaware}. Since replacements are generated rather than
+independently judged incompatible, they may include false negatives. This risk
+follows from the published construction procedure; it does not establish that
+a known proportion of labels is incorrect.
+
+Splitting the data changes the generalisation question. If a product appears in
+both training and testing outfits, a model may benefit from recognising an
+observed item. The Polyvore Outfits disjoint split prevents item overlap across
+its principal divisions and gives a more demanding test on unseen garments
+\parencite{vasileva2018typeaware}. It does not remove shared photography,
+category distributions, platform culture or labelling assumptions.
+
+In the common fill-in-the-blank (FITB) task, one garment is removed and the
+model selects the correct completion from four candidates
+\parencite{han2017bilstm,vasileva2018typeaware}. FITB evaluates relative ranking
+within a small set and is closer to recommendation than binary classification,
+but remains smaller than full-catalogue retrieval. OutfitTransformer evaluates
+compatibility prediction and large-scale retrieval separately, reinforcing
+that FITB does not establish scalable retrieval quality
+\parencite{sarkar2023outfittransformer}.
+
+Polyvore is therefore suitable for controlled training and offline evaluation,
+but cannot represent all clothing practices. Filtering official questions to
+four supported slots introduces an additional coverage boundary. The retained
+fraction must accompany the subset result so that it is not presented as the
+complete official benchmark.
+
+\section{Frozen vision--language representations}
+
+Earlier compatibility systems commonly used convolutional encoders pretrained
+on ImageNet and adapted to fashion data \parencite{vasileva2018typeaware}.
+Vision--language models instead learn from large collections of image--text
+pairs. CLIP demonstrated transferable visual representations and zero-shot
+recognition across numerous downstream datasets \parencite{radford2021clip}.
+
+SigLIP belongs to this family but replaces a global softmax contrastive
+objective with independent sigmoid losses over image--text pairs
+\parencite{zhai2023siglip}. It was not pretrained for outfit compatibility; its
+image encoder instead supplies a general visual representation from which a
+smaller downstream model can attempt to learn garment relationships.
+
+Freezing the encoder converts each image into a fixed vector and restricts
+training to the compatibility head. For this project, that reduces trainable
+parameters, repeated image-processing cost and representation variation across
+baselines. It also permits comparisons with identical inputs. These are
+computational and experimental advantages within the project, not evidence
+that frozen features are universally preferable.
+
+The downstream head cannot recover information absent from the frozen vector.
+Transfer is not guaranteed by source-model scale alone:
+\textcite{kornblith2019transfer} found that transfer depends on both
+representation and target task, with limited benefit on some fine-grained
+datasets. Web-scale pretraining can also transmit biases in the source data
+\parencite{radford2021clip,mehrabi2021bias}. Frozen SigLIP is thus a
+resource-conscious hypothesis to test rather than an assumed fashion-specific
+solution.
+
+\section{Learning objectives and controlled baselines}
+
+Compatibility classification and recommendation ranking are related but
+distinct. Binary cross-entropy trains separation of labelled positive and
+negative outfits. Its score can order candidates, but the loss does not
+directly optimise order among competing completions. Pairwise ranking instead
+encourages a preferred observation to score above an alternative; Bayesian
+Personalised Ranking is one established formulation for implicit observations
+\parencite{rendle2009bpr}.
+
+Neither objective is automatically preferable here. Binary labels are directly
+available in the compatibility rows, whereas ranking requires defensible
+positive--negative pairs. If a synthetic negative is noisy, a ranking objective
+may optimise an unreliable comparison. The choice must be evaluated rather
+than inferred from the fact that runtime recommendation uses ranking.
+
+The controlled baselines form a hierarchy. Chance provides a lower bound for
+four-choice FITB. Non-learned cosine similarity tests whether frozen features
+already contain useful structure. A linear model over pooled features tests
+whether learned weighting is sufficient without nonlinear interaction. These
+controls prevent the downstream architecture from receiving credit for
+information already present in SigLIP.
+
+A recurrent baseline represents the sequence assumption of
+\textcite{han2017bilstm}; a type-aware model represents relation-specific
+transformations from \textcite{vasileva2018typeaware}; and attention represents
+set-level interaction following \textcite{sarkar2023outfittransformer}. These
+are controlled approximations, not exact reproductions, which would require the
+original encoders, preprocessing, objectives and hyperparameters.
+
+Structural ablation addresses component contribution. Removing the pairwise
+module tests whether explicit item--item interaction adds evidence beyond
+pooled outfit information. Removing slot embeddings tests whether slot identity
+adds evidence beyond visual vectors. If removal does not produce a consistent
+decline across repeated runs, the component's benefit remains uncertain.
+
+\section{Evaluation beyond a single score}
+
+Evaluation should match the task claimed \parencite{herlocker2004evaluation}.
+Compatibility classification, candidate completion, confidence interpretation
+and application behaviour therefore require separate evidence.
+
+ROC--AUC measures discrimination across thresholds and can be interpreted as
+the probability that a randomly selected positive receives a higher score than
+a randomly selected negative \parencite{fawcett2006roc}. It does not measure
+whether the correct completion ranks first in a candidate set, nor whether a
+score is a calibrated probability.
+
+FITB evaluates completion more directly. In a balanced four-choice question,
+chance accuracy is 25\%, but performance still depends on candidate and label
+construction. Correct answers must be matched through the documented dataset
+relationship rather than assumed to occupy a fixed array position. Retaining
+question-level outputs makes label correction and paired comparison auditable.
+
+Calibration is separate from discrimination. Neural networks may rank examples
+correctly while remaining overconfident; temperature scaling was effective in
+several classification settings examined by \textcite{guo2017calibration}.
+Because a positive scalar temperature does not alter logit order, it can improve
+confidence interpretation without improving FITB ranking.
+
+Stochastic training variation must also be reported. Parameter initialisation,
+data order and other benchmark stages can alter an otherwise unchanged
+experiment \parencite{bouthillier2021variance}. Cove uses three seeded runs for
+its principal architecture comparisons. This is a resource-constrained
+repeated-run design, not a complete characterisation of training variance.
+
+Structural ablations are evaluated on the same FITB questions and matched
+seeds. Pairing preserves the full--ablation relationship on each evaluation
+unit instead of treating their predictions as independent
+\parencite{dietterich1998tests}. The project's bootstrap averages the three
+seeded outcomes within each question and then resamples questions, following
+the bootstrap principle of estimating sampling uncertainty by resampling
+\parencite{efron1993bootstrap}. Its interval is conditional on those runs and
+does not represent every possible training seed.
+
+Overfitting is examined through training, validation and held-out test
+behaviour. Validation-based early stopping is intended to stop iterative
+training when further training improvement is no longer accompanied by better
+validation performance \parencite{prechelt1998early}. A small
+validation--test difference supports only the consistency of the selected
+checkpoint on the current test split, not general reliability. Stronger
+training than validation and test performance is consistent with training-set
+overfitting, although data composition can also contribute.
+
+No offline metric establishes user benefit. Without participant evidence,
+claims remain limited to discrimination, controlled completion ranking,
+calibration, runtime, coverage and deterministic system behaviour.
+
+\section{Candidate search and explicit constraints}
+
+A model scores only candidates that reach it. If a strong candidate is removed
+by a frequency quota or similarity shortlist, later ranking cannot recover it.
+Candidate generation is therefore part of recommendation behaviour rather than
+neutral preprocessing.
+
+Large-scale complementary-item systems commonly use embedding retrieval.
+OutfitTransformer creates a target representation and applies nearest-neighbour
+retrieval \parencite{sarkar2023outfittransformer}. Vector indexes and
+approximate search make this efficient at very large scale, trading retrieval
+completeness for speed or memory \parencite{johnson2021similarity}.
+
+Cove instead assigns a non-additive score to a complete combination. An item
+that is not individually closest to the uploaded garment can still participate
+in the highest-scoring complete outfit, so independent slot shortlists may not
+preserve the final optimum. This follows from the deployed scoring function
+rather than from a claim made by the retrieval literature.
+
+For a bounded four-slot space, batched exhaustive scoring can remain feasible.
+Here, \emph{exact} means that every combination surviving the declared filters
+is evaluated under one deployed objective. It does not mean that the model has
+identified an objectively best human outfit. A safety limit is required so an
+oversized search fails explicitly rather than presenting a partial prefix as
+complete.
+
+Weather suitability, slot occupancy and the user-selected clothing range are
+feasibility requirements, not aesthetic preferences inferred from Polyvore.
+The model ranks feasible outfits, while deterministic rules define what is
+allowed. This keeps model behaviour, search completeness and functional
+constraints separately auditable.
+
+\section{Bias, personalisation and responsible design}
+
+Bias can enter through data selection, labels, pretrained representations,
+candidate construction and interaction design, and cannot be reduced to
+overall accuracy \parencite{mehrabi2021bias}. Clothing practice is also
+cultural, temporal and subjective \parencite{deldjoo2023review}.
+
+Polyvore reflects a historical platform population and may over-represent some
+categories, presentation styles and commercial photography. Synthetic
+same-type negatives add another assumption, while SigLIP carries uncertainty
+from web-scale pretraining. These sources justify an audit and explicit
+limitations, but do not permit demographic fairness to be measured without
+demographic attributes.
+
+Automatic gender inference would add an uncertain identity classification, a
+practice criticised in human--computer interaction research
+\parencite{keyes2018misgendering}. Cove asks the user to choose a menswear or
+womenswear candidate range instead. Those terms remain simplified catalogue
+filters and are not definitions of the user.
+
+Local execution reduces external transmission of wardrobe data but does not
+resolve feedback bias. Exposure influences which clicks become observable, and
+simulation evidence shows that algorithmically confounded feedback can
+increase behavioural homogeneity without increasing utility
+\parencite{chaney2018confounding}. Defensible long-term self-learning would
+need exposure logging, exploration, feedback-loop controls and separate
+evaluation, so it lies outside the frozen study.
+
+Fairness cannot be detached from social context or treated solely as a property
+of an isolated component \parencite{selbst2019fairness}. The proportionate
+response is not to claim that bias has been solved, but to document limitations,
+avoid identity inference, retain the selected garment, expose alternatives and
+permit rejection or replacement.
+
+\section{Synthesis and research framework}
+
+The literature supports four conclusions. First, compatibility is relational:
+visual similarity is insufficient and category identity can form part of the
+relation, although maximum model complexity is not always justified
+\parencite{mcauley2015styles,vasileva2018typeaware,sarkar2023outfittransformer}.
+This supports evaluating a lightweight relational head against progressively
+stronger alternatives.
+
+Second, frozen vision--language features offer a feasible representation
+strategy rather than a fashion-specific solution. They reduce training burden
+while retaining transfer, domain and inherited-bias risks
+\parencite{radford2021clip,zhai2023siglip,kornblith2019transfer}. The downstream
+head must consequently be compared with non-learned and learned controls.
+
+Third, ROC--AUC, FITB, calibration, repeated runs, ablation, coverage and domain
+diagnostics answer different questions
+\parencite{fawcett2006roc,guo2017calibration,bouthillier2021variance}. None
+establishes human satisfaction.
+
+Fourth, candidate generation and explicit constraints affect deployed
+behaviour as well as scoring. Approximate retrieval is appropriate at very
+large scale, but a bounded non-additive four-slot objective creates a testable
+case for exact constrained search
+\parencite{sarkar2023outfittransformer,johnson2021similarity}.
+
+The remaining empirical questions are whether a small relational head on
+frozen SigLIP features can balance discrimination, completion ranking, runtime
+and auditability under one secondary-data protocol, and how much deployed-model
+quality is lost through quota candidate generation. Chapter 3 translates those
+questions into controlled experiments.
+
+\section{Summary}
+
+Cove has been positioned as a content-based compatibility and constrained-search
+system rather than a conventional personalised collaborative recommender. The
+literature shows a progression from pairwise visual relations to sequence,
+type-aware, contextual and attention-based modelling. It supports frozen
+vision--language features as a resource-conscious experimental layer while
+requiring explicit treatment of transfer, labels, evaluation and bias.
+
+Compatibility classification, completion ranking, calibration, search
+completeness and user benefit are distinct claims. The first four can be
+examined with secondary data and system experiments; user benefit cannot be
+claimed without participant evidence. Chapter 3 specifies the methodology
+derived from these boundaries.

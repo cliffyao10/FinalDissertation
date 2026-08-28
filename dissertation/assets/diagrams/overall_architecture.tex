@@ -1,0 +1,43 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small,
+    component/.style={draw=wmgblue!70, rounded corners=2pt, align=center,
+      text width=29mm, minimum height=12mm, fill=wmgblue!7, font=\scriptsize},
+    core/.style={component, fill=wmgblue!15, font=\small\bfseries},
+    store/.style={component, fill=green!7, draw=green!45!black},
+    external/.style={component, fill=gray!8, draw=gray!65},
+    arrow/.style={-{Latex[length=2mm]}, thick, draw=wmgdarkblue!70}
+  ]
+    \node[core, text width=45mm] (app) at (7.2,6.0) {Streamlit presentation and session-state orchestration\\{\ttfamily app.py}};
+
+    \node[component] (recognition) at (0,3.7) {Garment recognition\\{\ttfamily recognition.py}};
+    \node[component] (colour) at (3.6,3.7) {Colour analysis\\{\ttfamily colour\_detection.py}};
+    \node[component] (weather) at (7.2,3.7) {Weather adapter\\{\ttfamily weather.py}};
+    \node[component] (recommendation) at (10.8,3.7) {Recommendation orchestration\\{\ttfamily recommendation.py}};
+    \node[component] (wardrobe) at (14.4,3.7) {Wardrobe service\\{\ttfamily wardrobe.py}};
+
+    \node[component] (trained) at (9.0,1.3) {Trained-model adapter\\{\ttfamily trained\_}\\{\ttfamily recommender.py}};
+    \node[component] (fallback) at (12.6,1.3) {Deterministic fallback\\Lightweight outfit ranker};
+    \node[component] (ranker) at (5.4,1.3) {Candidate search and ranking\\Outfit candidate ranker};
+
+    \node[store] (modelstore) at (4.8,-1.1) {Model checkpoint and abstract prototype catalogue};
+    \node[store] (userstore) at (14.4,-1.1) {Local JSON documents and wardrobe images};
+    \node[external] (openmeteo) at (8.0,-1.1) {External Open-Meteo APIs};
+
+    \draw[arrow] (app) -- (recognition);
+    \draw[arrow] (app) -- (colour);
+    \draw[arrow] (app) -- (weather);
+    \draw[arrow] (app) -- (recommendation);
+    \draw[arrow] (app) -- (wardrobe);
+    \draw[arrow] (recommendation) -- (trained);
+    \draw[arrow] (recommendation) -- (fallback);
+    \draw[arrow] (trained) -- (ranker);
+    \draw[arrow] (ranker) -- (modelstore);
+    \draw[arrow] (weather) -- (openmeteo);
+    \draw[arrow] (wardrobe) -- (userstore);
+  \end{tikzpicture}}
+  \caption{Overall UML-style component view of the Cove software}
+  \label{fig:overall-architecture}
+\end{figure}

@@ -1,0 +1,35 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small,
+    box/.style={draw=wmgdarkblue!55, rounded corners=2pt, align=center,
+      minimum width=35mm, minimum height=11mm, fill=wmgblue!6},
+    evidence/.style={box, fill=green!7, draw=green!45!black},
+    arrow/.style={-{Latex[length=2.2mm]}, thick, draw=wmgdarkblue!70}
+  ]
+    \node[box] (splits) {Disjoint train, validation\\and held-out test data};
+    \node[box, right=7mm of splits] (model) {Selected model and\\controlled alternatives};
+
+    \node[box, below left=14mm and 1mm of model] (classification) {Classification\\AUC and threshold metrics};
+    \node[box, right=5mm of classification] (ranking) {Completion ranking\\FITB, MRR and NDCG};
+    \node[box, right=5mm of ranking] (robustness) {Robustness\\seeds, ablation, calibration};
+    \node[box, right=5mm of robustness] (system) {System behaviour\\coverage, search and runtime};
+
+    \node[evidence, below=15mm of ranking] (claims) {Evidence with confidence intervals, coverage and stated boundaries};
+    \node[evidence, right=7mm of claims] (decision) {Model selection, deployment gate and prioritised limitations};
+
+    \draw[arrow] (splits) -- (model);
+    \draw[arrow] (model) -- (classification);
+    \draw[arrow] (model) -- (ranking);
+    \draw[arrow] (model) -- (robustness);
+    \draw[arrow] (model) -- (system);
+    \draw[arrow] (classification) -- (claims);
+    \draw[arrow] (ranking) -- (claims);
+    \draw[arrow] (robustness) -- (decision);
+    \draw[arrow] (system) -- (decision);
+    \draw[arrow] (claims) -- (decision);
+  \end{tikzpicture}}
+  \caption{Evaluation framework connecting model, ranking and system evidence}
+  \label{fig:evaluation-framework}
+\end{figure}

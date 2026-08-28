@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-08-20T15:10:02.096071+00:00",
-  "git_revision_at_generation": "7508261887b39377b0b8d79bb605d8fa23c88101",
+  "generated_utc": "2026-08-21T06:47:22.788829+00:00",
+  "git_revision_at_generation": "2f3c48a5f11cef2adc6a88e0c29d6506ff499287",
   "git_worktree_dirty_at_generation": true,
   "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
   "platform": "Windows-11-10.0.26200-SP0",
@@ -29,20 +29,125 @@
       "bytes": 8781510,
       "sha256": "d7449d6220e7d0fcf3fd8177b0315bd38a16fc8160720d09a3cbc35b6bf28d1d"
     },
+    "data/processed_disjoint/train.pt": {
+      "exists": true,
+      "bytes": 224318415,
+      "sha256": "39c58675e02e95fc4a7a38da346e9be60fe43465eb7244a9fa3c1f53522d755f"
+    },
+    "data/processed_disjoint/validation.pt": {
+      "exists": true,
+      "bytes": 40259644,
+      "sha256": "d2f3c9da6c4f767f69dc63dd1921dc086fb25a3c167eafceee6809fc7a2008d8"
+    },
+    "data/processed_disjoint/test.pt": {
+      "exists": true,
+      "bytes": 197500742,
+      "sha256": "ca6b2df665c64091da0ed5905b3624c6e8cb1e5109cf26d31ed517e82d152f8d"
+    },
     "models/compatibility_ranker.pt": {
       "exists": true,
-      "bytes": 1523807,
-      "sha256": "8aa315b3029bb2d70007a54a239b8c3c9a394ac3d6ab4ea5eb72ffef832867a7"
+      "bytes": 1523615,
+      "sha256": "01d1c683143a51cd456240154a2b3184ee37b007bda3463a787196c032c0a548"
     },
     "models/catalogue_embeddings.pt": {
       "exists": true,
-      "bytes": 1081988,
-      "sha256": "a29d66223ed6b975fa37b3cb41d5e1609461001f0d385046f390ed9446f278b0"
+      "bytes": 1088196,
+      "sha256": "d821a5364acf3eebff7828e556f50dc90e148ace8124102c0b30676dbbbe80ff"
+    },
+    "models/polyvore_abstract_prototypes.pt": {
+      "exists": true,
+      "bytes": 5846093,
+      "sha256": "7f866c9ab6beff066520a26ed7168d8a03e2e05bf3d578317597dfc3ca52e3a6"
     },
     "data/catalogue.csv": {
       "exists": true,
-      "bytes": 91993,
-      "sha256": "1c0bb593598134dea01116348f9b7c3b3fc572956ef33b1ff17506d1cc987ea6"
+      "bytes": 94868,
+      "sha256": "2a5cff1ea9971d323c24303f375e023c5d71c176fd0b87e58f93b5ba3df0e6d8"
+    },
+    "results/abstract_prototype_build.json": {
+      "exists": true,
+      "bytes": 446,
+      "sha256": "872d12fbbb2a65cc911a8919261ab4d8bed85ccc6712bad72bd867a447059451"
+    },
+    "results/abstract_search_benchmark.json": {
+      "exists": true,
+      "bytes": 7826,
+      "sha256": "a71e34cba4182952b45d4ef925abb0b8d1bd0952b910fe565865b202bc004f4c"
+    },
+    "results/v3_system_comparison.json": {
+      "exists": true,
+      "bytes": 50634,
+      "sha256": "b07776c9628bc8987abfc975de54e05445744079020929fd021454d0bff489c2"
+    },
+    "results/v3_release_check.json": {
+      "exists": true,
+      "bytes": 4746,
+      "sha256": "0d006fedd7f506b366629093cca55182bd6fbc129f57772b911d904977ac2a83"
+    },
+    "results/d2_compatibility_test_metrics.json": {
+      "exists": true,
+      "bytes": 2720,
+      "sha256": "f01d0b779d2b1b2ea5e82b0a502300852b2f7b189d5c727ba700c1d6d0f2af1d"
+    },
+    "results/d2_evaluation.json": {
+      "exists": true,
+      "bytes": 8266,
+      "sha256": "37eeeb9384cec98150ca9d9f138051f06e431d7345e6cc2d0151f87dce0f2b04"
+    },
+    "results/d2_official_fitb_ablation.json": {
+      "exists": true,
+      "bytes": 7200,
+      "sha256": "370e17e893e8b5be0e233be823d3ec70bd6d6001392206360c64a570022c12aa"
+    },
+    "results/d2_overfitting_audit.json": {
+      "exists": true,
+      "bytes": 1763,
+      "sha256": "f36c4aba1731bbd520df356a98815f614068abce767bcf197874cb6bf1de9f9c"
+    },
+    "results/d2_promotion.json": {
+      "exists": true,
+      "bytes": 440,
+      "sha256": "b4a8f138e24f44a5226d281dce687f4129a2c8fa432f20473f01c5f6c93da754"
+    },
+    "results/disjoint_official_fitb_comparison.json": {
+      "exists": true,
+      "bytes": 8233,
+      "sha256": "b755e6079cf813543dc06ee47ed1cab097aac2cf3b0b06884abfdd76ec54ff21"
+    },
+    "results/disjoint_fashion_model_comparison.json": {
+      "exists": true,
+      "bytes": 6090021,
+      "sha256": "238cf8b181a7d28ec72f0ca03897093bcbd21a91149e5b7573c5e619320dc893"
+    },
+    "results/disjoint_imbalance_study.json": {
+      "exists": true,
+      "bytes": 32794,
+      "sha256": "958dea8e60c1f50cd77a2ba8f7b6f3a51577ce255bf7d1bdbc83f1c8a777fd3b"
+    },
+    "results/disjoint_bias_audit.json": {
+      "exists": true,
+      "bytes": 5985,
+      "sha256": "b0b7e10b4a079fbd71617c5d52c850d3a1232719fbed064b2ed934444edadfee"
+    },
+    "results/disjoint_domain_shift.json": {
+      "exists": true,
+      "bytes": 3167,
+      "sha256": "43945e3145fe997e2a81e80ec77f65c3e57dc1a59ec79d9946217cd8590c625b"
+    },
+    "results/disjoint_runtime_benchmark.json": {
+      "exists": true,
+      "bytes": 2154,
+      "sha256": "ff54e893b32c4d993cff34de58a163a63949ab04132f5bc41dbee730747b39fd"
+    },
+    "results/research_readiness_check.json": {
+      "exists": true,
+      "bytes": 10054,
+      "sha256": "114c287961150b85c5fad5fcc33bce53479b9ac43b8e6625732ec13ef702024d"
+    },
+    "requirements-reproducible.txt": {
+      "exists": true,
+      "bytes": 233,
+      "sha256": "ac6a0229474f2ca0c6bbdd55b8263485e925c6105eb98531f31ef6a42254c725"
     }
   }
 }

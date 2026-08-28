@@ -63,11 +63,11 @@
       "shoes|WOMAN": 38
     },
     "by_inferred_colour": {
-      "Black": 77,
-      "Beige": 63,
-      "Grey": 34,
-      "Blue": 32,
-      "White": 31,
+      "Black": 80,
+      "Beige": 61,
+      "Blue": 35,
+      "Grey": 31,
+      "White": 30,
       "Brown": 30,
       "Green": 19,
       "Yellow": 4,
@@ -76,7 +76,7 @@
       "Orange": 2,
       "Purple": 2
     },
-    "largest_colour_share": 0.25666666666666665,
+    "largest_colour_share": 0.26666666666666666,
     "slot_count_gap": 0,
     "section_balance_note": "Published MAN/WOMAN sections are catalogue-source metadata, not user identity labels and are not used by the compatibility model."
   },
@@ -169,12 +169,12 @@
   "unresolved_domain_shift": {
     "polyvore_items": 1162,
     "catalogue_items": 300,
-    "centroid_cosine_similarity": 0.7468692462286403,
-    "catalogue_to_polyvore_nearest_cosine_mean": 0.6111301344347811,
-    "catalogue_to_polyvore_nearest_cosine_min": 0.47962270624728665,
+    "centroid_cosine_similarity": 0.7484742875990007,
+    "catalogue_to_polyvore_nearest_cosine_mean": 0.6116053565088349,
+    "catalogue_to_polyvore_nearest_cosine_min": 0.4796227145648676,
     "domain_classifier_cross_validated_auc": 1.0,
-    "rbf_mmd_squared": 0.1935748405555282,
-    "rbf_bandwidth_median_heuristic": 0.9851538188527392,
+    "rbf_mmd_squared": 0.1917890195605534,
+    "rbf_bandwidth_median_heuristic": 0.9854317031598823,
     "interpretation": "Domain-classifier AUC near 0.5 indicates overlapping feature distributions; values near 1.0 indicate separable domains."
   },
   "risk_register": [

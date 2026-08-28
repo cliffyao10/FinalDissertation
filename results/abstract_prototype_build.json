@@ -1,0 +1,14 @@
+{
+  "model_name": "google/siglip-base-patch16-224",
+  "schema": "abstract_garment_prototypes_v2",
+  "source_split": "data/polyvore_disjoint/train.json",
+  "source_policy": "training_split_only_no_product_media_or_brand_output",
+  "source_unique_items": 71967,
+  "classified_items": 38119,
+  "prototype_count": 1670,
+  "skipped_items": {
+    "unsupported_category": 33848
+  },
+  "device": "cpu",
+  "build_seconds": 4.280002200044692
+}

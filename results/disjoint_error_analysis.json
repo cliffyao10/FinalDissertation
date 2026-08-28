@@ -1,0 +1,496 @@
+{
+  "checkpoint": "models\\disjoint\\compatibility_ranker.pt",
+  "test_dataset": "data\\processed_disjoint\\test.pt",
+  "checkpoint_metadata": {
+    "checkpoint_version": 2,
+    "best_epoch": 5,
+    "best_validation_metrics": {
+      "accuracy": 0.7748930971288943,
+      "auc": 0.8599991267904062,
+      "groups_unavailable_reason": "Expected each pair to end with a negative example."
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 18243,
+    "validation_examples": 3274,
+    "train_positive_rate": 0.4999725818634033,
+    "validation_positive_rate": 0.5,
+    "seed": 42,
+    "training_config": {
+      "batch_size": 512,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 5,
+      "balance": "none",
+      "balance_exponent": 0.5,
+      "maximum_sample_weight": 3.0
+    },
+    "calibration": {
+      "temperature": 1.2891900539398193,
+      "validation_nll_before": 0.47990134358406067,
+      "validation_nll_after": 0.47102686762809753,
+      "validation_ece_before": 0.05570172553651021,
+      "validation_ece_after": 0.0369791798134293,
+      "dataset": "data\\processed_disjoint\\validation.pt",
+      "method": "scalar_temperature_scaling",
+      "fit_scope": "validation_only"
+    }
+  },
+  "dataset_metadata": {
+    "positive_examples": 8031,
+    "negative_examples": 8031,
+    "minimum_slots": 3,
+    "skipped_rows": {
+      "fewer_than_minimum_slots": 14228,
+      "missing_embedding": 0,
+      "duplicate_slot": 1414
+    },
+    "negative_strategy": "published_same-type_hard_negatives",
+    "source_rows": 30290,
+    "siglip_model": "google/siglip-base-patch16-224",
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "source": "Polyvore Outfits disjoint official compatibility split"
+  },
+  "analysis": {
+    "overall": {
+      "examples": 16062,
+      "positive_rate": 0.5,
+      "threshold": 0.5,
+      "auc": 0.8572591583035982,
+      "average_precision": 0.8531294335065984,
+      "accuracy": 0.7758685095255884,
+      "balanced_accuracy": 0.7758685095255884,
+      "precision": 0.7889656971436024,
+      "recall": 0.7532063254887311,
+      "f1": 0.7706714231112244,
+      "specificity": 0.7985306935624455,
+      "matthews_correlation_coefficient": 0.5523046099233083,
+      "brier_score": 0.15417842614073685,
+      "confusion_matrix": [
+        [
+          6413,
+          1618
+        ],
+        [
+          1982,
+          6049
+        ]
+      ]
+    },
+    "calibration": {
+      "bins": 10,
+      "ece": 0.018711140318072382,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "upper": 0.1,
+          "examples": 2221,
+          "mean_probability": 0.05244762760595213,
+          "positive_rate": 0.06033318325078793
+        },
+        {
+          "lower": 0.1,
+          "upper": 0.2,
+          "examples": 1956,
+          "mean_probability": 0.14821667996652288,
+          "positive_rate": 0.16002044989775052
+        },
+        {
+          "lower": 0.2,
+          "upper": 0.30000000000000004,
+          "examples": 1552,
+          "mean_probability": 0.24941000186828607,
+          "positive_rate": 0.25966494845360827
+        },
+        {
+          "lower": 0.30000000000000004,
+          "upper": 0.4,
+          "examples": 1392,
+          "mean_probability": 0.3503680106723446,
+          "positive_rate": 0.3563218390804598
+        },
+        {
+          "lower": 0.4,
+          "upper": 0.5,
+          "examples": 1274,
+          "mean_probability": 0.4500496793345342,
+          "positive_rate": 0.49921507064364207
+        },
+        {
+          "lower": 0.5,
+          "upper": 0.6000000000000001,
+          "examples": 1321,
+          "mean_probability": 0.5491027131304427,
+          "positive_rate": 0.5874337623012869
+        },
+        {
+          "lower": 0.6000000000000001,
+          "upper": 0.7000000000000001,
+          "examples": 1356,
+          "mean_probability": 0.650120627255918,
+          "positive_rate": 0.68952802359882
+        },
+        {
+          "lower": 0.7000000000000001,
+          "upper": 0.8,
+          "examples": 1459,
+          "mean_probability": 0.7515217741521112,
+          "positive_rate": 0.7772446881425634
+        },
+        {
+          "lower": 0.8,
+          "upper": 0.9,
+          "examples": 1745,
+          "mean_probability": 0.8515946582258601,
+          "positive_rate": 0.8607449856733524
+        },
+        {
+          "lower": 0.9,
+          "upper": 1.0,
+          "examples": 1786,
+          "mean_probability": 0.9442735556325347,
+          "positive_rate": 0.9529675251959686
+        }
+      ]
+    },
+    "by_present_slot_count": {
+      "3": {
+        "examples": 12000,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.8476306250000001,
+        "average_precision": 0.841807370422252,
+        "accuracy": 0.7646666666666667,
+        "balanced_accuracy": 0.7646666666666666,
+        "precision": 0.7822609313899751,
+        "recall": 0.7335,
+        "f1": 0.7570961637708584,
+        "specificity": 0.7958333333333333,
+        "matthews_correlation_coefficient": 0.5303646873896506,
+        "brier_score": 0.1601113150064322,
+        "confusion_matrix": [
+          [
+            4775,
+            1225
+          ],
+          [
+            1599,
+            4401
+          ]
+        ]
+      },
+      "4": {
+        "examples": 4062,
+        "positive_rate": 0.5,
+        "threshold": 0.5,
+        "auc": 0.890737876067192,
+        "average_precision": 0.891403085379515,
+        "accuracy": 0.8089611029049729,
+        "balanced_accuracy": 0.8089611029049729,
+        "precision": 0.8074473297403234,
+        "recall": 0.811422944362383,
+        "f1": 0.8094302554027505,
+        "specificity": 0.8064992614475628,
+        "matthews_correlation_coefficient": 0.6179296959830783,
+        "brier_score": 0.13665142801460575,
+        "confusion_matrix": [
+          [
+            1638,
+            393
+          ],
+          [
+            383,
+            1648
+          ]
+        ]
+      }
+    },
+    "by_replaced_slot": {
+      "inner_top": {
+        "matched_pairs": 0,
+        "pair_ranking_accuracy": null,
+        "classification": null
+      },
+      "outer_top": {
+        "matched_pairs": 0,
+        "pair_ranking_accuracy": null,
+        "classification": null
+      },
+      "bottom": {
+        "matched_pairs": 0,
+        "pair_ranking_accuracy": null,
+        "classification": null
+      },
+      "shoes": {
+        "matched_pairs": 0,
+        "pair_ranking_accuracy": null,
+        "classification": null
+      }
+    },
+    "pair_diagnostics_available": false,
+    "pair_diagnostics_unavailable_reason": "Expected each pair to end with a negative example.",
+    "highest_confidence_mistakes": [
+      {
+        "example_index": 15878,
+        "label": 0,
+        "probability": 0.9914167523384094,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 14902,
+        "label": 0,
+        "probability": 0.9913382530212402,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 9286,
+        "label": 0,
+        "probability": 0.9912000298500061,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 2157,
+        "label": 1,
+        "probability": 0.013400695286691189,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 1236,
+        "label": 1,
+        "probability": 0.014361612498760223,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 13580,
+        "label": 0,
+        "probability": 0.9844953417778015,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 7921,
+        "label": 1,
+        "probability": 0.015829360112547874,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 1782,
+        "label": 1,
+        "probability": 0.015998274087905884,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 5826,
+        "label": 1,
+        "probability": 0.01680845394730568,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 9091,
+        "label": 0,
+        "probability": 0.9824121594429016,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 2881,
+        "label": 1,
+        "probability": 0.018119370564818382,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 13150,
+        "label": 0,
+        "probability": 0.9817370176315308,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 12131,
+        "label": 0,
+        "probability": 0.9813889861106873,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 11125,
+        "label": 0,
+        "probability": 0.9793548583984375,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 3488,
+        "label": 1,
+        "probability": 0.02082730457186699,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 7759,
+        "label": 1,
+        "probability": 0.024344196543097496,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 2267,
+        "label": 1,
+        "probability": 0.025932351127266884,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 4082,
+        "label": 1,
+        "probability": 0.02688809484243393,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 4260,
+        "label": 1,
+        "probability": 0.027621688321232796,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 2119,
+        "label": 1,
+        "probability": 0.027955155819654465,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 4881,
+        "label": 1,
+        "probability": 0.028458673506975174,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 619,
+        "label": 1,
+        "probability": 0.028509007766842842,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 10434,
+        "label": 0,
+        "probability": 0.9693446755409241,
+        "present_slots": [
+          "outer_top",
+          "bottom",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 1074,
+        "label": 1,
+        "probability": 0.03122827410697937,
+        "present_slots": [
+          "inner_top",
+          "outer_top",
+          "shoes"
+        ]
+      },
+      {
+        "example_index": 7598,
+        "label": 1,
+        "probability": 0.031407617032527924,
+        "present_slots": [
+          "inner_top",
+          "bottom",
+          "shoes"
+        ]
+      }
+    ]
+  }
+}

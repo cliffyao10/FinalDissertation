@@ -28,6 +28,22 @@ class SumScorer(torch.nn.Module):
 
 
 class FashionModelComparisonTests(unittest.TestCase):
+    def test_ranking_metrics_marks_published_unpaired_rows_unavailable(self):
+        class Dataset:
+            labels = torch.tensor([1.0, 1.0, 0.0])
+            masks = torch.ones(3, 4, dtype=torch.bool)
+            embeddings = torch.zeros(3, 4, 8)
+
+            def __len__(self):
+                return len(self.labels)
+
+        model = torch.nn.Sequential()
+        report = ranking_metrics(model, Dataset(), "cpu")
+        self.assertEqual(
+            report["fitb4_protocol"], "unavailable_for_unpaired_published_rows"
+        )
+        self.assertIsNone(report["pair_ranking_accuracy"])
+
     def test_representative_models_return_one_logit_per_outfit(self):
         embeddings = torch.randn(3, 4, 8)
         masks = torch.tensor(

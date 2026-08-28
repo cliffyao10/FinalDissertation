@@ -6,6 +6,7 @@ from src.recommendation import (
     COLOUR_PALETTES,
     SLOT_LABELS,
     STYLE_ITEMS,
+    occupied_slots_for_category,
     recommend_outfit,
 )
 
@@ -25,11 +26,11 @@ class RecommendationMatrixTests(unittest.TestCase):
         self.assertIn("primary", result)
         self.assertIn("alternative", result)
         input_slot = CATEGORY_TO_SLOT[category]
-        expected_slots = set(SLOT_LABELS) - {input_slot}
+        expected_slots = set(SLOT_LABELS) - occupied_slots_for_category(category)
 
         for outfit_name in ("primary", "alternative"):
             outfit = result[outfit_name]
-            self.assertEqual(len(outfit["items"]), 3)
+            self.assertEqual(len(outfit["items"]), len(expected_slots))
             self.assertEqual(
                 {item["slot"] for item in outfit["items"]}, expected_slots
             )

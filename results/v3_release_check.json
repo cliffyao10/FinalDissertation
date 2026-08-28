@@ -1,0 +1,165 @@
+{
+  "passed": true,
+  "system_version": "3.0",
+  "decision": "v3_release_ready",
+  "checks": [
+    {
+      "name": "artifact:results/compatibility_test_metrics.json",
+      "passed": true,
+      "blocking": true,
+      "detail": "results/compatibility_test_metrics.json"
+    },
+    {
+      "name": "artifact:results/abstract_prototype_build.json",
+      "passed": true,
+      "blocking": true,
+      "detail": "results/abstract_prototype_build.json"
+    },
+    {
+      "name": "artifact:results/abstract_search_benchmark.json",
+      "passed": true,
+      "blocking": true,
+      "detail": "results/abstract_search_benchmark.json"
+    },
+    {
+      "name": "artifact:results/v3_system_comparison.json",
+      "passed": true,
+      "blocking": true,
+      "detail": "results/v3_system_comparison.json"
+    },
+    {
+      "name": "artifact:models/compatibility_ranker.pt",
+      "passed": true,
+      "blocking": true,
+      "detail": "models/compatibility_ranker.pt"
+    },
+    {
+      "name": "artifact:models/polyvore_abstract_prototypes.pt",
+      "passed": true,
+      "blocking": true,
+      "detail": "models/polyvore_abstract_prototypes.pt"
+    },
+    {
+      "name": "artifact:results/d2_evaluation.json",
+      "passed": true,
+      "blocking": true,
+      "detail": "results/d2_evaluation.json"
+    },
+    {
+      "name": "artifact:results/d2_official_fitb_ablation.json",
+      "passed": true,
+      "blocking": true,
+      "detail": "results/d2_official_fitb_ablation.json"
+    },
+    {
+      "name": "shared_head_auc_above_0_70",
+      "passed": true,
+      "blocking": true,
+      "detail": 0.8583435427290906
+    },
+    {
+      "name": "shared_head_auc_ci_above_chance",
+      "passed": true,
+      "blocking": true,
+      "detail": [
+        0.8524301606394212,
+        0.8640712439623077
+      ]
+    },
+    {
+      "name": "exact_search_deterministic",
+      "passed": true,
+      "blocking": true,
+      "detail": true
+    },
+    {
+      "name": "exact_search_never_worse_than_quota_objective",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "mean": 0.01785727341969808,
+        "median": 0.004524946212768555,
+        "sample_standard_deviation": 0.03427974890560174,
+        "minimum": 0.0,
+        "p95": 0.0555474996566771,
+        "maximum": 0.14539170265197754,
+        "bootstrap_95_percent_ci_for_mean": [
+          0.006286984682083129,
+          0.03565973780221408
+        ],
+        "queries_with_positive_regret": 13
+      }
+    },
+    {
+      "name": "all_weather_style_cases_have_logical_slots",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "cases": 36
+      }
+    },
+    {
+      "name": "abstract_output_has_no_product_media",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "all_abstract": true,
+        "nonempty_image_paths": 0,
+        "records_with_forbidden_commercial_fields": 0
+      }
+    },
+    {
+      "name": "cpu_median_exact_search_below_1_second",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "mean": 0.8226684777505903,
+        "median": 0.4735728499945253,
+        "sample_standard_deviation": 0.7891784097687478,
+        "minimum": 0.09167739993426949,
+        "p95": 2.1073573399859,
+        "maximum": 3.206248899921775
+      }
+    },
+    {
+      "name": "cpu_p95_exact_search_below_3_seconds",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "mean": 0.8226684777505903,
+        "median": 0.4735728499945253,
+        "sample_standard_deviation": 0.7891784097687478,
+        "minimum": 0.09167739993426949,
+        "p95": 2.1073573399859,
+        "maximum": 3.206248899921775
+      }
+    },
+    {
+      "name": "d2_research_gate_passed",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "compatibility_auc_ci_above_frozen_cosine": true,
+        "fitb_above_chance": true,
+        "fitb_exceeds_internal_architecture_baselines": true,
+        "corrected_structural_ablation_completed": true,
+        "pairwise_module_supported_by_paired_fitb_interval": true,
+        "validation_only_calibration_improves_nll": true,
+        "candidate_ranges_cover_all_slots": true,
+        "menswear_excludes_prohibited_concepts": true,
+        "test_not_used_for_checkpoint_selection": true
+      }
+    },
+    {
+      "name": "corrected_disjoint_candidate_promoted",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "promotion_allowed": true,
+        "decision": "promote_disjoint_candidate",
+        "blocking_failures": []
+      }
+    }
+  ],
+  "blocking_failures": []
+}

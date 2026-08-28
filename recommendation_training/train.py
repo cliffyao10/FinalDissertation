@@ -44,7 +44,13 @@ def evaluate(model, loader, device, dataset=None):
         "auc": roc_auc_score(labels, probabilities) if len(set(labels)) > 1 else 0.0,
     }
     if dataset is not None:
-        metrics["groups"] = group_diagnostics(dataset, labels, probabilities)
+        try:
+            metrics["groups"] = group_diagnostics(dataset, labels, probabilities)
+        except ValueError as error:
+            # Published compatibility files contain balanced labelled rows but
+            # do not guarantee the adjacent positive/negative pair structure
+            # required by the synthetic-pair diagnostics.
+            metrics["groups_unavailable_reason"] = str(error)
     return metrics
 
 
@@ -138,7 +144,22 @@ def main():
                     "checkpoint_version": 1,
                     "best_epoch": epoch,
                     "best_validation_metrics": {
-                        key: float(value) for key, value in metrics.items()
+                        "accuracy": float(metrics["accuracy"]),
+                        "auc": float(metrics["auc"]),
+                        **(
+                            {"groups": metrics["groups"]}
+                            if "groups" in metrics
+                            else {}
+                        ),
+                        **(
+                            {
+                                "groups_unavailable_reason": metrics[
+                                    "groups_unavailable_reason"
+                                ]
+                            }
+                            if "groups_unavailable_reason" in metrics
+                            else {}
+                        ),
                     },
                     "slots": 4,
                     "slot_names": list(train_data.metadata.get("slot_names", [])),

@@ -16,7 +16,25 @@ from recommendation_training.dataset import OutfitDataset, SLOTS
 
 
 def dataset_group_counts(dataset):
-    groups = infer_pair_groups(dataset)
+    try:
+        groups = infer_pair_groups(dataset)
+    except ValueError as error:
+        present_counts = Counter(
+            int(value) for value in dataset.masks.sum(dim=1).tolist()
+        )
+        label_counts = Counter(int(value) for value in dataset.labels.tolist())
+        return {
+            "examples": len(dataset),
+            "positive_rate": dataset.positive_rate,
+            "examples_by_outfit_length": {
+                str(key): int(value) for key, value in sorted(present_counts.items())
+            },
+            "examples_by_label": {
+                str(key): int(value) for key, value in sorted(label_counts.items())
+            },
+            "changed_slot_diagnostics": "unavailable_for_unpaired_published_rows",
+            "unavailable_reason": str(error),
+        }
     joint = Counter(
         (SLOTS[group["slot"]], group["present_slots"]) for group in groups
     )
@@ -69,6 +87,10 @@ def main():
     args = parser.parse_args()
     domain_shift = json.loads(Path(args.domain_shift).read_text(encoding="utf-8"))
     imbalance = json.loads(Path(args.imbalance_study).read_text(encoding="utf-8"))
+    selection = imbalance["selection"]
+    chosen = selection["chosen_configuration"]
+    deployed = selection.get("deployed_configuration", chosen)
+    published_unpaired = "changed_slot_note" in imbalance.get("protocol", {})
     report = {
         "scope": (
             "Operational data and performance slices. No demographic attributes "
@@ -84,18 +106,32 @@ def main():
         },
         "catalogue": catalogue_audit(args.catalogue),
         "mitigation_result": {
-            "chosen_configuration": imbalance["selection"]["chosen_configuration"],
-            "deployment_gate": imbalance["selection"]["deployment_gate"],
-            "summary": imbalance["summary"][
-                imbalance["selection"]["chosen_configuration"]
-            ],
+            "chosen_configuration": chosen,
+            "deployed_configuration": deployed,
+            "deployment_gate": selection["deployment_gate"],
+            "summary": imbalance["summary"][deployed],
         },
         "unresolved_domain_shift": domain_shift["overall"],
         "risk_register": [
             {
-                "risk": "changed-slot and outfit-length imbalance",
-                "status": "mitigated_not_eliminated",
-                "control": "capped square-root inverse-frequency weighted BCE",
+                "risk": "outfit-length imbalance",
+                "status": "measured_no_safe_weighting_gain" if published_unpaired else "mitigated_not_eliminated",
+                "control": (
+                    "Three/four-item slices and a validation-only weighting study; "
+                    "unweighted BCE retained because the candidate reduced the worst-group AUC."
+                    if published_unpaired
+                    else "capped square-root inverse-frequency weighted BCE"
+                ),
+            },
+            {
+                "risk": "changed-slot imbalance",
+                "status": "unavailable_in_published_rows" if published_unpaired else "measured",
+                "control": (
+                    "No changed-slot fairness claim because official compatibility "
+                    "rows do not expose defensible adjacent replacement pairs."
+                    if published_unpaired
+                    else "paired changed-slot diagnostics"
+                ),
             },
             {
                 "risk": "candidate slot and published-section imbalance",
@@ -118,9 +154,14 @@ def main():
                 "control": "no objective-taste claim, no protected-attribute inference, user control",
             },
             {
-                "risk": "false negatives from random item replacement",
+                "risk": "plausible false negatives from item replacement",
                 "status": "unresolved_label_noise",
-                "control": "ranking metrics, error analysis, explicit limitation",
+                "control": (
+                    "Published same-type hard negatives, error analysis and an "
+                    "explicit limitation; no claim that every negative is aesthetically invalid."
+                    if published_unpaired
+                    else "ranking metrics, error analysis, explicit limitation"
+                ),
             },
         ],
     }

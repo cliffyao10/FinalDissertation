@@ -1,0 +1,41 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\small,
+    box/.style={draw=wmgdarkblue!55, rounded corners=2pt, minimum width=43mm,
+      minimum height=10mm, align=center, fill=wmgblue!5},
+    service/.style={box, fill=wmgblue!13, draw=wmgblue!75, font=\small\bfseries},
+    output/.style={box, fill=green!7, draw=green!45!black},
+    arrow/.style={-{Latex[length=2.2mm]}, thick, draw=wmgdarkblue!70}
+  ]
+    \node[font=\bfseries\color{wmgdarkblue}] (inputtitle) {User and context inputs};
+    \node[box, below=4mm of inputtitle] (garment) {Selected garment\\image or wardrobe item};
+    \node[box, below=2.5mm of garment] (context) {City weather, style\\and clothing range};
+    \node[box, below=2.5mm of context] (wardrobe) {Local wardrobe, saved\\pieces and outfits};
+
+    \node[font=\bfseries\color{wmgdarkblue}, right=17mm of inputtitle] (servicetitle) {System functions};
+    \node[service, below=4mm of servicetitle] (recognition) {Garment recognition\\and feature extraction};
+    \node[service, below=2.5mm of recognition] (generation) {Candidate generation\\and constraint filtering};
+    \node[service, below=2.5mm of generation] (ranking) {Complete-outfit\\compatibility ranking};
+    \node[service, below=2.5mm of ranking] (management) {Wardrobe storage\\and outfit editing};
+
+    \node[font=\bfseries\color{wmgdarkblue}, right=17mm of servicetitle] (outputtitle) {User-facing outputs};
+    \node[output, below=4mm of outputtitle] (primary) {Primary recommendation\\and diverse alternative};
+    \node[output, below=2.5mm of primary] (replacement) {Model-ranked colour\\alternatives by position};
+    \node[output, below=2.5mm of replacement] (weather) {Weather-aware clothing\\cue and masked absence};
+    \node[output, below=2.5mm of weather] (saved) {Saved garment or\\four-position outfit};
+
+    \draw[arrow] (garment.east) -- (recognition.west);
+    \draw[arrow] (context.east) -- (generation.west);
+    \draw[arrow] (wardrobe.east) -- (management.west);
+    \draw[arrow] (recognition.east) -- (primary.west);
+    \draw[arrow] (generation.east) -- (weather.west);
+    \draw[arrow] (ranking.east) -- (replacement.west);
+    \draw[arrow] (management.east) -- (saved.west);
+    \draw[arrow] (recognition) -- (generation);
+    \draw[arrow] (generation) -- (ranking);
+  \end{tikzpicture}}
+  \caption{Functional scope of the Cove complete-outfit recommendation system}
+  \label{fig:functional-scope}
+\end{figure}

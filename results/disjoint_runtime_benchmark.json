@@ -1,0 +1,68 @@
+{
+  "device": "cpu",
+  "torch_threads": 8,
+  "trainable_parameters": 379265,
+  "checkpoint_size_bytes": 1523167,
+  "catalogue_embedding_size_bytes": 1088196,
+  "single_outfit_head_latency": {
+    "iterations": 300,
+    "mean_ms": 0.5370250022194037,
+    "median_ms": 0.41194999357685447,
+    "p95_ms": 1.0962949658278376,
+    "minimum_ms": 0.278900028206408,
+    "maximum_ms": 2.0583999576047063
+  },
+  "warm_end_to_end_catalogue_ranking_latency": {
+    "iterations": 10,
+    "mean_ms": 43.229680007789284,
+    "median_ms": 42.485699988901615,
+    "p95_ms": 49.321365053765476,
+    "minimum_ms": 38.46950002480298,
+    "maximum_ms": 49.88130007404834
+  },
+  "notes": {
+    "warm_runtime": "One-time artifact loading is excluded from ranking latency.",
+    "input": "One held-out inner_top embedding with a Casual style filter."
+  },
+  "checkpoint_metadata": {
+    "checkpoint_version": 2,
+    "best_epoch": 5,
+    "best_validation_metrics": {
+      "accuracy": 0.7748930971288943,
+      "auc": 0.8599991267904062,
+      "groups_unavailable_reason": "Expected each pair to end with a negative example."
+    },
+    "slots": 4,
+    "slot_names": [
+      "inner_top",
+      "outer_top",
+      "bottom",
+      "shoes"
+    ],
+    "siglip_model": "google/siglip-base-patch16-224",
+    "train_examples": 18243,
+    "validation_examples": 3274,
+    "train_positive_rate": 0.4999725818634033,
+    "validation_positive_rate": 0.5,
+    "seed": 42,
+    "training_config": {
+      "batch_size": 512,
+      "learning_rate": 0.0003,
+      "weight_decay": 0.0001,
+      "patience": 5,
+      "balance": "none",
+      "balance_exponent": 0.5,
+      "maximum_sample_weight": 3.0
+    },
+    "calibration": {
+      "temperature": 1.2891900539398193,
+      "validation_nll_before": 0.47990134358406067,
+      "validation_nll_after": 0.47102686762809753,
+      "validation_ece_before": 0.05570172553651021,
+      "validation_ece_after": 0.0369791798134293,
+      "dataset": "data\\processed_disjoint\\validation.pt",
+      "method": "scalar_temperature_scaling",
+      "fit_scope": "validation_only"
+    }
+  }
+}

@@ -1,0 +1,124 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% Compile with XeLaTeX and Biber. WMG specifies 12-point text but does not
+% mandate a font family. Verdana is currently selected only to resemble the
+% supplied Word template and can be changed here without altering the layout.
+\usepackage{fontspec}
+\setmainfont{Verdana}
+\setsansfont{Verdana}
+\usepackage[british]{babel}
+\usepackage[a4paper,left=25.4mm,right=25.4mm,top=25.4mm,bottom=25.4mm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{microtype}
+\usepackage{csquotes}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc,fit,positioning,shapes.geometric}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+\usepackage[
+  backend=biber,
+  style=authoryear,
+  sorting=nyt,
+  giveninits=true,
+  maxcitenames=2,
+  maxbibnames=99,
+  uniquename=false,
+  dashed=false,
+  doi=true,
+  url=true,
+  isbn=false
+]{biblatex}
+\addbibresource{references.bib}
+% Warwick Harvard in-text citations use a comma between author and year.
+\renewcommand*{\nameyeardelim}{\addcomma\space}
+
+\definecolor{wmgblue}{HTML}{2E74B5}
+\definecolor{wmgdarkblue}{HTML}{1F4D78}
+
+\titleformat{\chapter}[block]
+  {\centering\normalfont\fontsize{16}{19}\selectfont\color{wmgblue}}
+  {Chapter \thechapter:}{0.45em}{}
+\titleformat{name=\chapter,numberless}[hang]
+  {\normalfont\fontsize{16}{19}\selectfont\color{wmgblue}}
+  {}{0pt}{}
+\titlespacing*{\chapter}{0pt}{0pt}{12pt}
+\titleformat{\section}
+  {\normalfont\fontsize{13}{16}\selectfont\color{wmgblue}}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\fontsize{12}{15}\selectfont\color{wmgdarkblue}}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalfont\itshape\color{wmgblue}}
+  {\thesubsubsection}{1em}{}
+
+\captionsetup{font={small,it},labelfont=it,justification=centering}
+\setlist{itemsep=3pt,topsep=5pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{8pt}
+% Allow modest inter-word flexibility before LaTeX creates an overfull line.
+% This is especially useful with 12-point Verdana and Harvard references.
+\setlength{\emergencystretch}{3em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+\newcommand{\projecttitle}{Design and Evaluation of a Lightweight Complete-Outfit Recommendation System Using Frozen SigLIP Representations, Task-Specific Compatibility Learning and Constrained Candidate Search}
+\newcommand{\studentname}{[Student name]}
+\newcommand{\studentid}{[Student ID]}
+\newcommand{\submissiondate}{[Month Year]}
+\newcommand{\checkedbox}{$\boxtimes$}
+\newcommand{\emptybox}{$\square$}
+
+\begin{document}
+
+\input{frontmatter/proforma}
+
+\pagenumbering{roman}
+\input{frontmatter/titlepage}
+% The title page is preliminary page i. Continue at ii rather than restarting.
+\setcounter{page}{2}
+\input{frontmatter/declaration}
+\input{frontmatter/abstract}
+\input{frontmatter/acknowledgements}
+
+\tableofcontents
+\clearpage
+\listoftables
+\clearpage
+\listoffigures
+\clearpage
+
+% The body margins reproduce the approximately 0.59-inch margins used by the
+% supplied WMG template. Change only if WMG publishes a superseding rule.
+\newgeometry{left=15mm,right=15mm,top=15mm,bottom=15mm,includeheadfoot}
+\pagenumbering{arabic}
+
+\input{chapters/01_introduction}
+\input{chapters/02_literature_review}
+\input{chapters/03_methodology}
+\input{chapters/04_results}
+\input{chapters/05_analysis}
+\input{chapters/06_discussion}
+\input{chapters/07_conclusion}
+
+\printbibliography[heading=bibintoc,title={References}]
+
+\appendix
+\input{appendices/appendices}
+
+\end{document}

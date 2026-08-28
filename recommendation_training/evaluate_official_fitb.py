@@ -27,6 +27,7 @@ from recommendation_training.fashion_model_comparison import (
     score_tensors,
 )
 from recommendation_training.prepare_polyvore import CATEGORY_TO_SLOT
+from src.audience import audience_for_category_id
 
 
 def stable_item_id(item):
@@ -34,33 +35,88 @@ def stable_item_id(item):
     return match.group(1) if match else None
 
 
-def load_reference_lookup(metadata_path):
+def reference_set_id(reference):
+    """Return the outfit id from an official ``set_id_item_index`` key."""
+
+    value = str(reference)
+    return value.rsplit("_", 1)[0] if "_" in value else None
+
+
+def load_reference_lookup(metadata_path, item_metadata_path=None):
     """Map official ``set_id_item_index`` references to cached item metadata."""
 
+    item_metadata = (
+        json.loads(Path(item_metadata_path).read_text(encoding="utf-8"))
+        if item_metadata_path
+        else {}
+    )
     lookup = {}
     for outfit in json.loads(Path(metadata_path).read_text(encoding="utf-8")):
         set_id = str(outfit["set_id"])
         for item in outfit.get("items", []):
+            item_id = str(item.get("item_id") or stable_item_id(item) or "")
+            category_id = item.get("categoryid")
+            if category_id is None:
+                category_id = item_metadata.get(item_id, {}).get("category_id")
             lookup[f"{set_id}_{item['index']}"] = {
-                "item_id": stable_item_id(item),
-                "slot": CATEGORY_TO_SLOT.get(int(item["categoryid"])),
+                "item_id": item_id or None,
+                "slot": (
+                    CATEGORY_TO_SLOT.get(int(category_id))
+                    if category_id not in (None, "")
+                    else None
+                ),
+                "audience": (
+                    audience_for_category_id(category_id)
+                    if category_id not in (None, "")
+                    and CATEGORY_TO_SLOT.get(int(category_id)) is not None
+                    else None
+                ),
             }
     return lookup
 
 
-def prepare_official_fitb(metadata_path, questions_path, cache_path, minimum_slots=3):
+def prepare_official_fitb(
+    metadata_path,
+    questions_path,
+    cache_path,
+    minimum_slots=3,
+    item_metadata_path=None,
+):
     """Build fixed four-choice tensors and retain transparent coverage counts."""
 
-    references = load_reference_lookup(metadata_path)
+    references = load_reference_lookup(metadata_path, item_metadata_path)
     questions = json.loads(Path(questions_path).read_text(encoding="utf-8"))
     cache = torch.load(cache_path, map_location="cpu", weights_only=False)
     embedding_by_id = dict(zip(cache["item_ids"], cache["embeddings"].float()))
     dimension = cache["embeddings"].shape[-1]
     slot_to_index = {slot: index for index, slot in enumerate(SLOTS)}
-    examples, masks, retained_question_indices = [], [], []
+    examples, masks, retained_question_indices, correct_answer_indices = [], [], [], []
+    question_audiences = []
     skipped = Counter()
 
     for question_index, question in enumerate(questions):
+        question_set_ids = {
+            reference_set_id(reference) for reference in question["question"]
+        }
+        question_set_ids.discard(None)
+        if len(question_set_ids) != 1:
+            skipped["ambiguous_question_set"] += 1
+            continue
+        question_set_id = next(iter(question_set_ids))
+        matching_answers = [
+            index
+            for index, reference in enumerate(question["answers"])
+            if reference_set_id(reference) == question_set_id
+        ]
+        # Some small third-party/synthetic fixtures preserve the historical
+        # nondisjoint convention where every answer key shares the same set
+        # prefix and the correct answer is first.  Official disjoint questions
+        # have exactly one set-id match and take the branch above.
+        if len(matching_answers) == len(question["answers"]):
+            matching_answers = [0]
+        if len(matching_answers) != 1:
+            skipped["ambiguous_correct_answer"] += 1
+            continue
         answer_records = [references.get(reference) for reference in question["answers"]]
         if any(record is None for record in answer_records):
             skipped["unknown_answer_reference"] += 1
@@ -68,6 +124,9 @@ def prepare_official_fitb(metadata_path, questions_path, cache_path, minimum_slo
         answer_slots = [record["slot"] for record in answer_records]
         if any(slot is None for slot in answer_slots):
             skipped["unsupported_answer_slot"] += 1
+            continue
+        if len(set(answer_slots)) != 1:
+            skipped["answer_slot_mismatch"] += 1
             continue
         if any(
             record["item_id"] not in embedding_by_id
@@ -114,6 +173,10 @@ def prepare_official_fitb(metadata_path, questions_path, cache_path, minimum_slo
             examples.append(candidate)
             masks.append(candidate_mask)
         retained_question_indices.append(question_index)
+        correct_answer_indices.append(matching_answers[0])
+        question_audiences.append(
+            answer_records[matching_answers[0]].get("audience")
+        )
 
     return {
         "embeddings": (
@@ -127,6 +190,8 @@ def prepare_official_fitb(metadata_path, questions_path, cache_path, minimum_slo
             else torch.empty(0, len(SLOTS), dtype=torch.bool)
         ),
         "retained_question_indices": retained_question_indices,
+        "correct_answer_indices": correct_answer_indices,
+        "question_audiences": question_audiences,
         "total_questions": len(questions),
         "retained_questions": len(retained_question_indices),
         "skipped": dict(sorted(skipped.items())),
@@ -134,11 +199,25 @@ def prepare_official_fitb(metadata_path, questions_path, cache_path, minimum_slo
     }
 
 
-def fitb_metrics(scores):
-    """The official JSON stores the correct answer at index zero."""
+def fitb_metrics(scores, correct_answer_indices=None):
+    """Rank the answer belonging to the question outfit.
+
+    The nondisjoint file commonly puts the correct answer first, whereas the
+    official disjoint file shuffles answer order.  Callers should therefore
+    pass the answer indices derived from the shared outfit/set identifier.
+    """
 
     rows = np.asarray(scores, dtype=np.float64).reshape(-1, 4)
-    ranks = 1 + np.sum(rows[:, 1:] >= rows[:, [0]], axis=1)
+    if correct_answer_indices is None:
+        correct_answer_indices = np.zeros(len(rows), dtype=np.int64)
+    correct_answer_indices = np.asarray(correct_answer_indices, dtype=np.int64)
+    if correct_answer_indices.shape != (len(rows),):
+        raise ValueError("FITB needs one correct-answer index per question.")
+    if np.any((correct_answer_indices < 0) | (correct_answer_indices >= 4)):
+        raise ValueError("FITB correct-answer indices must be between 0 and 3.")
+    correct_scores = rows[np.arange(len(rows)), correct_answer_indices]
+    competitors = np.arange(4)[None, :] != correct_answer_indices[:, None]
+    ranks = 1 + np.sum((rows >= correct_scores[:, None]) & competitors, axis=1)
     return {
         "questions": int(len(rows)),
         "accuracy": float(np.mean(ranks == 1)),
@@ -175,6 +254,7 @@ def summarise(runs):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--metadata", default="data/polyvore/test_no_dup.json")
+    parser.add_argument("--item-metadata")
     parser.add_argument("--questions", default="data/polyvore/fill_in_blank_test.json")
     parser.add_argument("--cache", default="data/processed/fitb_item_embeddings.pt")
     parser.add_argument(
@@ -191,6 +271,7 @@ def main():
         args.questions,
         args.cache,
         minimum_slots=args.minimum_slots,
+        item_metadata_path=args.item_metadata,
     )
     coverage = {
         "total_questions": payload["total_questions"],
@@ -241,7 +322,7 @@ def main():
                 device,
                 batch_size=args.batch_size,
             )
-            metrics = fitb_metrics(scores)
+            metrics = fitb_metrics(scores, payload["correct_answer_indices"])
             metrics.update({"seed": seed, "checkpoint": str(checkpoint_path)})
             runs[model_name].append(metrics)
 
@@ -249,7 +330,9 @@ def main():
         "protocol": (
             "Official Polyvore fill_in_blank_test.json questions, restricted to "
             "questions representable by the project's four-slot taxonomy with "
-            "available frozen embeddings. The correct answer is index zero."
+            "available frozen embeddings. The correct answer is identified by "
+            "matching the answer set_id to the question outfit; disjoint answer "
+            "order is shuffled."
         ),
         "coverage": coverage,
         "device": device,

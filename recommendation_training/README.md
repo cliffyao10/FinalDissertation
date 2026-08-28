@@ -11,8 +11,133 @@ and hard weather constraints remain separate from compatibility learning.
 3. Frozen `google/siglip-base-patch16-224` image vectors are cached once.
 4. `CompatibilityRanker` learns a probability for a masked four-slot outfit.
 5. The epoch with the highest validation AUC is saved.
-6. Zara catalogue combinations are ranked, hard weather constraints are
-   applied, and a colour-diverse alternative is selected.
+6. Brand-free abstract garment prototypes derived from the Polyvore training
+   split are searched exactly after hard weather constraints; the earlier Zara
+   catalogue remains a documented legacy/domain-shift artifact, not the user-
+   visible recommendation source.
+
+## Abstract recommendation search
+
+The product does not present Polyvore or Zara records as products a user owns
+or should buy. Learned recommendations are deliberately abstract: the UI
+shows only a filled icon with a broad garment type and colour, while genuine
+user wardrobe items retain their own photographs.
+
+Build the compact search space from the **Polyvore training split only**:
+
+```powershell
+$env:HF_HUB_OFFLINE='1'
+.\.venv\Scripts\python.exe -m recommendation_training.build_abstract_prototypes
+```
+
+Every retained item is classified into a slot, broad type, colour, primary
+style and catalogue clothing range (`menswear` or `womenswear`) with frozen
+SigLIP vectors. Each distinct state is represented by the
+observed item embedding nearest its group centroid (a medoid). The resulting
+artifact intentionally contains no source photograph, product title, brand,
+URL or price. Support frequency is recorded as evidence but is not used as a
+hard filter, so low-frequency abstract states remain searchable.
+
+At runtime the compatibility head projects each unique prototype once, streams
+the complete Cartesian product in bounded batches, and retains the global
+top-k in a heap. The safety limit raises an error instead of returning a prefix
+when exact enumeration is too large. This replaces the previous ten-per-slot
+quota and 1,000-combination prefix cutoff.
+
+Benchmark the full abstract search with:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.benchmark_abstract_search
+```
+
+The machine-readable build and runtime evidence is written to
+`results/abstract_prototype_build.json` and
+`results/abstract_search_benchmark.json`. The current local CPU benchmark
+scores approximately 204,624--350,784 complete Casual outfits per query; the
+median across four possible fixed slots and three repetitions is about 4.05
+seconds. These timings are machine-specific and must not be presented as a
+general latency guarantee.
+
+### Cove v3 system comparison
+
+Version 3.0 now deploys the gated D2 disjoint checkpoint and keeps the exact
+candidate/search layer. A controlled legacy replay uses the same D2 head, so
+its classification metrics are identical by design; claiming an AUC
+improvement from exact search would be methodologically incorrect. The valid comparison isolates the
+old ten-per-slot quota and the exact search on the same abstract candidate
+space, using held-out positive embeddings from the disjoint test split:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.evaluate_v3_system
+.\.venv\Scripts\python.exe -m recommendation_training.v3_release_check
+```
+
+The report includes global-top-one recovery, top-ten recall, model-objective
+regret with a bootstrap interval, candidate-state coverage, privacy fields,
+weather/style coverage, deterministic repeats and same-machine latency for the
+v1 rule ranker, v2 Zara quota path, the quota ablation and v3 exact search.
+Absolute model scores from Zara and abstract candidates are not treated as a
+quality comparison because the two candidate distributions differ.
+
+The current 18-query CPU experiment found that the quota path examined about
+3.41% of the abstract combination space, recovered the exact top result in
+27.78% of queries and recalled 24.44% of the exact top ten. Exact search had a
+median latency of about 0.47 seconds across all nine styles (p95 about 2.11
+seconds). These results measure optimisation of the deployed model objective,
+not human aesthetic preference.
+
+## D2 disjoint production head
+
+The stronger research candidate uses the Polyvore Outfits **disjoint** split
+and the published compatibility labels rather than locally generated random
+negatives.  It is prepared under `data/processed_disjoint/`, while its
+research checkpoints remain under `models/disjoint/`; the gated D2 checkpoint
+is stored under `models/d2/` and promoted explicitly.
+
+The full candidate release chain includes validation-only scalar temperature
+calibration, three-seed architecture comparisons, structural ablations,
+three/four-item length weighting, official FITB subset evaluation, error
+analysis, domain-shift measurement, runtime benchmarking and an explicit
+release gate. Run the final gate with:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.disjoint_release_check
+```
+
+The original FITB evaluator incorrectly assumed that the correct disjoint
+answer was always first. Disjoint answers are shuffled; the correct answer is
+the candidate whose `set_id` matches the question outfit. After correcting
+that defect, the proposed lightweight architecture reaches 59.94% mean FITB
+accuracy across three seeds. The freshly trained and validation-calibrated D2
+checkpoint reaches AUC 0.8583 and FITB 60.25%, passes the recorded gate and is
+now the production `models/compatibility_ranker.pt`.
+
+The corrected structural FITB ablation uses the same 4,468 retained questions
+and the same three seeds. Removing the pairwise module reduces mean FITB from
+59.94% to 49.66%; the paired question-bootstrap interval for the full-minus-
+ablation difference is +8.96 to +11.57 percentage points. Removing the slot
+embedding produces 59.47%; the corresponding interval is -0.13 to +1.06
+points, so the slot embedding's small positive estimate is **not** claimed as
+clear evidence of benefit. Reproduce this result with:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.evaluate_d2_ablations
+```
+
+The UI asks users to select a clothing range rather than inferring gender from
+an image. Candidate filtering is hard: menswear and womenswear prototypes are
+never mixed. Only 34 positive and 34 negative pure-menswear source rows exist
+in the disjoint training file, so a separate reliable menswear head is not
+claimed; the shared head is used with an explicit limitation.
+
+The correction follows the public Polyvore annotation contract documented by
+[OpenMMLab MMFashion](https://github.com/open-mmlab/mmfashion/blob/master/docs/dataset/FASHION_COMPATIBILITY_DATASET.md):
+the correct FITB answer is identified by matching the question outfit's
+`set_id`. The experiment also keeps compatibility prediction and FITB as
+separate reported tasks, consistent with the official
+[type-aware compatibility implementation](https://github.com/mvasil/fashion-compatibility)
+and the 100+ star
+[context-aware compatibility implementation](https://github.com/gcucurull/visual-compatibility).
 
 The official metadata is from the
 [Maryland Polyvore repository](https://github.com/xthan/polyvore-dataset). The
@@ -141,21 +266,28 @@ two deterministic replacements from other test pairs. It is reproducible and
 fair across the four local models, but it is not the official Polyvore FITB
 protocol and may contain plausible false negatives.
 
-## Official FITB availability and diagnostics
+## Official FITB subset and diagnostics
 
-The official `fill_in_blank_test.json` can be parsed without downloading or
-scraping any additional source. Extend a separate cache with locally available
-secondary-data images, then evaluate all comparison checkpoints:
+The official disjoint `fill_in_blank_test.json` is evaluated without scraping
+additional sources. With the locally supplied secondary-data archive, 4,468
+of 15,145 questions are representable by the product's four slots. The result
+therefore carries a 29.50% coverage warning and is not numerically
+interchangeable with a published full-dataset FITB score. Evaluate all
+comparison checkpoints with explicit disjoint paths:
 
 ```powershell
-.\.venv\Scripts\python.exe -m recommendation_training.prepare_official_fitb_cache
-.\.venv\Scripts\python.exe -m recommendation_training.evaluate_official_fitb
+.\.venv\Scripts\python.exe -m recommendation_training.evaluate_official_fitb `
+  --metadata data/polyvore_disjoint/test.json `
+  --item-metadata data/polyvore_nondisjoint/polyvore_item_metadata.json `
+  --questions data/polyvore_disjoint/fill_in_blank_test.json `
+  --cache data/processed_disjoint/fitb_item_embeddings.pt `
+  --checkpoint-directory models/disjoint_fashion_model_comparison `
+  --output results/disjoint_official_fitb_comparison.json
 ```
 
-The current image archive does not contain all four answer images for any
-question that can be mapped into the product's four slots. The evaluator writes
-an explicit `unavailable_with_current_image_archive` result with exclusion
-counts rather than silently reporting a selected or incomplete score.
+Correct answers are determined by matching answer `set_id` to the question
+outfit because disjoint answer order is shuffled. Coverage and every exclusion
+reason are written alongside the scores.
 
 Generate structural error slices and a frozen-feature domain-shift diagnostic:
 
@@ -185,6 +317,13 @@ the datasets and trained artifacts used for a result:
 
 ```powershell
 .\.venv\Scripts\python.exe -m recommendation_training.reproducibility_manifest
+```
+
+Before freezing dissertation results, run the combined evidence and software
+audit:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.research_readiness_check --run-tests
 ```
 
 ## Published Maryland hard negatives
@@ -259,4 +398,11 @@ distribution audit with:
 
 ```powershell
 .\.venv\Scripts\python.exe -m recommendation_training.bias_audit
+```
+
+For official unpaired compatibility rows, changed-slot labels cannot be
+reconstructed defensibly. Use the separate length-only study instead:
+
+```powershell
+.\.venv\Scripts\python.exe -m recommendation_training.disjoint_imbalance_study
 ```

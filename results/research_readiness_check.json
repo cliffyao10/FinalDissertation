@@ -1,0 +1,290 @@
+{
+  "decision": "ready_for_report_rewrite",
+  "ready_for_report_rewrite": true,
+  "version_scope_note": "V1/V2/V3 identify retrieval-system generations; D2 identifies the second disjoint-trained compatibility head. D2 is used inside V3 and is not a fourth system generation.",
+  "version_matrix": {
+    "v1_rule_baseline": {
+      "complete": true,
+      "artifact_count": 2,
+      "missing": []
+    },
+    "v2_historical_learned_retrieval": {
+      "complete": true,
+      "artifact_count": 3,
+      "missing": []
+    },
+    "d2_disjoint_model": {
+      "complete": true,
+      "artifact_count": 12,
+      "missing": []
+    },
+    "v3_abstract_retrieval_system": {
+      "complete": true,
+      "artifact_count": 6,
+      "missing": []
+    },
+    "reproducibility_and_governance": {
+      "complete": true,
+      "artifact_count": 4,
+      "missing": []
+    }
+  },
+  "checks": [
+    {
+      "name": "artifact_family:v1_rule_baseline",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "complete": true,
+        "artifact_count": 2,
+        "missing": []
+      }
+    },
+    {
+      "name": "artifact_family:v2_historical_learned_retrieval",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "complete": true,
+        "artifact_count": 3,
+        "missing": []
+      }
+    },
+    {
+      "name": "artifact_family:d2_disjoint_model",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "complete": true,
+        "artifact_count": 12,
+        "missing": []
+      }
+    },
+    {
+      "name": "artifact_family:v3_abstract_retrieval_system",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "complete": true,
+        "artifact_count": 6,
+        "missing": []
+      }
+    },
+    {
+      "name": "artifact_family:reproducibility_and_governance",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "complete": true,
+        "artifact_count": 4,
+        "missing": []
+      }
+    },
+    {
+      "name": "d2_gate",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "compatibility_auc_ci_above_frozen_cosine": true,
+        "fitb_above_chance": true,
+        "fitb_exceeds_internal_architecture_baselines": true,
+        "corrected_structural_ablation_completed": true,
+        "pairwise_module_supported_by_paired_fitb_interval": true,
+        "validation_only_calibration_improves_nll": true,
+        "candidate_ranges_cover_all_slots": true,
+        "menswear_excludes_prohibited_concepts": true,
+        "test_not_used_for_checkpoint_selection": true
+      }
+    },
+    {
+      "name": "d2_corrected_three_seed_ablation",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "summary": {
+          "no_slot": {
+            "accuracy": {
+              "values": [
+                0.5955684870188004,
+                0.5946732318710832,
+                0.5937779767233662
+              ],
+              "mean": 0.5946732318710832,
+              "sample_standard_deviation": 0.0008952551477171
+            },
+            "mean_reciprocal_rank": {
+              "values": [
+                0.7666554759773203,
+                0.764286780065652,
+                0.7652379886601014
+              ],
+              "mean": 0.7653934149010245,
+              "sample_standard_deviation": 0.0011919723435399802
+            },
+            "ndcg": {
+              "values": [
+                0.8260931422521017,
+                0.8242302629876774,
+                0.8250047917990475
+              ],
+              "mean": 0.8251093990129422,
+              "sample_standard_deviation": 0.00093583480933048
+            }
+          },
+          "no_pairwise": {
+            "accuracy": {
+              "values": [
+                0.49395702775290956,
+                0.4959713518352731,
+                0.49977618621307074
+              ],
+              "mean": 0.4965681886004178,
+              "sample_standard_deviation": 0.002955133142396068
+            },
+            "mean_reciprocal_rank": {
+              "values": [
+                0.7010034318113996,
+                0.701133989853775,
+                0.7043792897642495
+              ],
+              "mean": 0.7021722371431413,
+              "sample_standard_deviation": 0.0019124780534328846
+            },
+            "ndcg": {
+              "values": [
+                0.7768040717104086,
+                0.7768614483228415,
+                0.7793206393071427
+              ],
+              "mean": 0.7776620531134643,
+              "sample_standard_deviation": 0.00143666424063143
+            }
+          },
+          "full": {
+            "accuracy": {
+              "values": [
+                0.600940017905103,
+                0.5966875559534467,
+                0.6004923903312444
+              ],
+              "mean": 0.599373321396598,
+              "sample_standard_deviation": 0.002336684536461649
+            },
+            "mean_reciprocal_rank": {
+              "values": [
+                0.7685951954640406,
+                0.7658348254252462,
+                0.7685019397194868
+              ],
+              "mean": 0.7676439868695911,
+              "sample_standard_deviation": 0.00156747344706426
+            },
+            "ndcg": {
+              "values": [
+                0.827468810398806,
+                0.8254029143910675,
+                0.8274225763751534
+              ],
+              "mean": 0.826764767055009,
+              "sample_standard_deviation": 0.0011796255359007549
+            }
+          }
+        },
+        "paired_comparisons": {
+          "no_slot": {
+            "mean_accuracy_difference_full_minus_ablation": 0.004700089525514772,
+            "paired_question_bootstrap_95_percent_ci": [
+              -0.001268278125932558,
+              0.010593852581319008
+            ],
+            "iterations": 5000,
+            "unit_resampled": "official_fitb_question",
+            "seed_repeats_averaged_within_question": 3
+          },
+          "no_pairwise": {
+            "mean_accuracy_difference_full_minus_ablation": 0.10280513279618025,
+            "paired_question_bootstrap_95_percent_ci": [
+              0.08960011936735304,
+              0.1157117278424351
+            ],
+            "iterations": 5000,
+            "unit_resampled": "official_fitb_question",
+            "seed_repeats_averaged_within_question": 3
+          }
+        },
+        "interpretation": "The pairwise module has clear positive evidence. The slot embedding has a small positive point estimate but its paired 95% interval crosses zero, so no clear benefit is claimed."
+      }
+    },
+    {
+      "name": "d2_pairwise_module_supported",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "mean_accuracy_difference_full_minus_ablation": 0.10280513279618025,
+        "paired_question_bootstrap_95_percent_ci": [
+          0.08960011936735304,
+          0.1157117278424351
+        ],
+        "iterations": 5000,
+        "unit_resampled": "official_fitb_question",
+        "seed_repeats_averaged_within_question": 3
+      }
+    },
+    {
+      "name": "disjoint_model_release_gate",
+      "passed": true,
+      "blocking": true,
+      "detail": "promote_disjoint_candidate"
+    },
+    {
+      "name": "v3_system_release_gate",
+      "passed": true,
+      "blocking": true,
+      "detail": "v3_release_ready"
+    },
+    {
+      "name": "d2_overfitting_audited",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "train_minus_test_auc": 0.11159304346964871,
+        "absolute_validation_minus_test_auc": 0.0014466108251894871,
+        "best_epoch": 6,
+        "peak_validation_epoch": 6,
+        "peak_validation_auc": 0.8597901535542801,
+        "last_observed_validation_auc": 0.8498379897670284,
+        "validation_auc_drop_after_peak": 0.009952163787251722,
+        "training_fit_materially_higher": true,
+        "validation_test_agreement_within_0_02": true,
+        "best_checkpoint_matches_validation_peak": true,
+        "conclusion": "Training-set overfitting is visible, but validation-only early stopping selected the peak checkpoint and validation/test AUC remain closely aligned. No absence-of-overfitting claim is made.",
+        "decision": "retain_frozen_checkpoint"
+      }
+    },
+    {
+      "name": "unit_test_suite",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "tests_run": 98,
+        "tail": "resumed_cached_items=1\nembedded_missing=2/2\ncache_saved_items=3\nresumed_cached_items=3\n\n----------------------------------------------------------------------\nRan 98 tests in 1.787s\n\nOK"
+      }
+    },
+    {
+      "name": "python_compile",
+      "passed": true,
+      "blocking": true,
+      "detail": ""
+    }
+  ],
+  "blocking_failures": [],
+  "known_limitations_to_preserve_in_the_dissertation": [
+    "Corrected official FITB covers 4,468 of 15,145 questions (29.50%) because the product taxonomy has four slots.",
+    "Pure menswear evidence is sparse; the interface applies a user-selected hard candidate-range filter rather than claiming a separately validated menswear model.",
+    "The frozen-feature catalogue/domain diagnostic is strongly separable (domain classifier AUC 1.0), so external catalogue generalisation is not established.",
+    "The slot embedding's small FITB point gain is not clear under the paired 95% interval; only the pairwise module has clear ablation support.",
+    "No participant study is claimed; usability evidence is software verification only under the project's ethics constraint.",
+    "Dress-specific modelling is intentionally outside the frozen four-slot scope.",
+    "Historical V1/V2 metrics use different candidate/data protocols and must not be presented as a causal head-to-head performance gain."
+  ]
+}

@@ -10,6 +10,7 @@ from recommendation_training.compatibility_model import (
     save_checkpoint,
 )
 from src.trained_recommender import (
+    _audience_filter,
     _shortlist_candidates,
     _style_filter,
     _weather_filter,
@@ -18,6 +19,20 @@ from src.trained_recommender import (
 
 
 class TrainedRecommendationAdapterTests(unittest.TestCase):
+    def test_audience_filter_never_mixes_clothing_ranges(self):
+        items = [
+            {"item_id": "trousers", "audience": "menswear"},
+            {"item_id": "skirt", "audience": "womenswear"},
+            {"item_id": "neutral", "audience": "neutral"},
+        ]
+        self.assertEqual(
+            {item["item_id"] for item in _audience_filter(items, "menswear")},
+            {"trousers", "neutral"},
+        )
+        self.assertEqual(
+            {item["item_id"] for item in _audience_filter(items, "womenswear")},
+            {"skirt", "neutral"},
+        )
     def test_shortlist_depends_on_input_and_keeps_colour_variety(self):
         items = [
             {
@@ -172,6 +187,94 @@ class TrainedRecommendationAdapterTests(unittest.TestCase):
             for slot, candidates in result["primary"]["alternatives_by_slot"].items():
                 for candidate in candidates:
                     self.assertEqual(candidate["type"], current_by_slot[slot]["type"])
+
+    def test_abstract_catalogue_is_searched_exactly_and_never_exposes_images(self):
+        torch.manual_seed(11)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            checkpoint = root / "ranker.pt"
+            catalogue = root / "abstract.pt"
+            save_checkpoint(
+                checkpoint,
+                CompatibilityRanker(
+                    ModelConfig(
+                        embedding_dim=8, hidden_dim=16, slot_dim=4, dropout=0.0
+                    )
+                ),
+            )
+            items = []
+            for slot in ("inner_top", "outer_top", "bottom", "shoes"):
+                for index, colour in enumerate(("Black", "Blue", "Red")):
+                    items.append(
+                        {
+                            "item_id": f"abstract-{slot}-{index}",
+                            "slot": slot,
+                            "type": {
+                                "inner_top": "T-Shirt",
+                                "outer_top": "Jacket",
+                                "bottom": "Trousers",
+                                "shoes": "Trainers",
+                            }[slot],
+                            "colour": colour,
+                            "style": "Casual",
+                            "image_path": "",
+                            "abstract": True,
+                            "embedding": torch.randn(8),
+                        }
+                    )
+            torch.save({"items": items, "model_name": "test-siglip"}, catalogue)
+
+            result = recommend_with_trained_model(
+                input_slot="inner_top",
+                input_category="T-Shirt",
+                input_colour="White",
+                input_embedding=torch.randn(8),
+                style="Casual",
+                weather=None,
+                slot_labels={
+                    "inner_top": "Inner Top",
+                    "outer_top": "Outer Layer",
+                    "bottom": "Bottom",
+                    "shoes": "Shoes",
+                },
+                checkpoint=checkpoint,
+                catalogue=catalogue,
+            )
+
+            self.assertEqual(
+                result["method"], "cove_v3_abstract_exact_search"
+            )
+            self.assertEqual(result["system_version"], "3.0")
+            self.assertTrue(result["model"]["search"]["exact"])
+            self.assertEqual(
+                result["model"]["search"]["combinations_evaluated"], 27
+            )
+            for outfit in (result["primary"], result["alternative"]):
+                self.assertTrue(all(not item["image_path"] for item in outfit["items"]))
+
+            hot_result = recommend_with_trained_model(
+                input_slot="inner_top",
+                input_category="T-Shirt",
+                input_colour="White",
+                input_embedding=torch.randn(8),
+                style="Casual",
+                weather={"feels_like": 32, "rain_probability": 0},
+                slot_labels={
+                    "inner_top": "Inner Top",
+                    "outer_top": "Outer Layer",
+                    "bottom": "Bottom",
+                    "shoes": "Shoes",
+                },
+                checkpoint=checkpoint,
+                catalogue=catalogue,
+            )
+            hot_outer = next(
+                item
+                for item in hot_result["primary"]["items"]
+                if item["slot"] == "outer_top"
+            )
+            self.assertEqual(hot_outer["type"], "No Outer Layer")
+            self.assertIsNone(hot_outer["colour"])
 
 
 if __name__ == "__main__":

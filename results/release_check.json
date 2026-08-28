@@ -44,9 +44,54 @@
       "detail": "present"
     },
     {
+      "name": "required:results/abstract_prototype_build.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/abstract_search_benchmark.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/v3_system_comparison.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/v3_release_check.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/d2_evaluation.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/d2_official_fitb_ablation.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/d2_overfitting_audit.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/d2_promotion.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
+      "name": "required:results/research_readiness_check.json",
+      "status": "pass",
+      "detail": "present"
+    },
+    {
       "name": "trained_artifacts",
       "status": "pass",
-      "detail": "checkpoint_dim=768, catalogue_items=300, catalogue_dims=[768]"
+      "detail": "model_version=D2, checkpoint_dim=768, abstract_prototypes=1670, catalogue_dims=[768], abstract_safe=True"
     },
     {
       "name": "catalogue_schema",
@@ -56,7 +101,12 @@
     {
       "name": "model_evidence",
       "status": "pass",
-      "detail": "auc=0.7447214179789564, calibrated=True"
+      "detail": "auc=0.8583435427290906, calibrated=True"
+    },
+    {
+      "name": "research_readiness",
+      "status": "pass",
+      "detail": "ready_for_report_rewrite"
     },
     {
       "name": "local_privacy:data/user_preferences.json",

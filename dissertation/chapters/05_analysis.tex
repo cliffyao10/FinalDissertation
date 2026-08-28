@@ -1,0 +1,233 @@
+\chapter{Analysis}
+
+\section{Introduction}
+
+This chapter analyses what can reasonably be concluded from the results in
+Chapter 4. It considers the evidence provided by the controlled baselines,
+structural ablations, generalisation audit and candidate-search experiment. It
+also distinguishes results that support the proposed design from those that
+reveal uncertainty or limitations.
+
+The analysis remains within the scope of the experiments. A model score
+represents compatibility learned from the processed Polyvore data. It does not
+measure whether an individual user likes an outfit, whether the outfit is
+objectively fashionable or whether a recommended concept will lead to a
+purchase.
+
+\section{Compatibility performance and baseline evidence}
+
+The selected compatibility model achieved an AUC of 0.8583 on the held-out
+test data. This means that the model usually assigned a higher score to a
+randomly selected positive outfit than to a randomly selected negative outfit
+\parencite{fawcett2006roc}. It does not mean that 85.83\% of recommendations are
+correct or will be liked by users.
+
+The non-learned SigLIP similarity baseline reached an AUC of 0.7012. Frozen
+visual features therefore contained some information related to the dataset
+labels without compatibility training. The learned model nevertheless
+performed substantially better under the same processed test protocol. This
+difference supports the need to learn relationships among garments rather than
+relying only on general visual similarity, consistent with the distinction
+between similarity and complementarity made by \textcite{mcauley2015styles}.
+
+The proposed architecture also exceeded the three controlled learned baselines
+across the predefined seeds. Paired AUC intervals remained above zero for the
+comparisons with the bidirectional LSTM, type-aware model and set Transformer.
+Within this experiment, the result was therefore not produced by one favourable
+initialisation or one unusually weak baseline run.
+
+This does not demonstrate that the proposed model is universally superior to
+the published architectures. The comparison models were controlled adaptations
+using frozen SigLIP inputs and the project's four-position representation. The
+evidence shows that, under these shared conditions, the lightweight design was
+more effective than the selected alternatives. Direct comparison with published
+headline values would not be valid because the encoders, filtering and test
+coverage differ.
+
+The proposed model was also the fastest of the four learned architectures in
+the recorded training experiment. This supports its description as lightweight
+within the project. The timing remains dependent on the implementation,
+hardware and frozen-input pipeline and is not a universal speed comparison.
+
+\section{Architectural evidence}
+
+Removing the pairwise module reduced mean FITB accuracy by 10.28 percentage
+points. The paired confidence interval remained entirely above zero. This
+provides the clearest structural evidence in the study: explicitly comparing
+garments contributed information that was not recovered by the overall outfit
+summary alone.
+
+The finding accords with the relational treatment of compatibility in earlier
+work \parencite{vasileva2018typeaware,sarkar2023outfittransformer}. A garment
+may be plausible in one combination but not another, so an average outfit
+representation can lose differences between particular items. The pairwise
+component preserves a summary of these relationships without requiring a much
+larger attention model. This is evidence about the tested implementation rather
+than proof that pairwise aggregation is always preferable to attention.
+
+Removing clothing-position information produced only a small reduction, and
+its confidence interval crossed zero. The experiment therefore does not provide
+clear evidence that the position embedding improved FITB performance. One
+possible explanation is that the visual representation and pairwise relations
+already contain information that distinguishes broad garment roles. This is a
+possible explanation rather than a demonstrated cause.
+
+The position embedding was retained because it adds little computational cost
+and gives the model an explicit indication of clothing role. Nevertheless, it
+should not be described as an empirically necessary component. A simpler model
+without it remains a reasonable alternative for future evaluation.
+
+\section{Generalisation, overfitting and calibration}
+
+Training AUC of 0.9699 was considerably higher than test AUC of 0.8583. The
+difference shows that the model fitted the training data more strongly than it
+generalised to unseen examples. The results therefore contain evidence of
+training-set overfitting.
+
+Validation and test AUC differed by only 0.00145, and the saved checkpoint
+corresponded to the highest observed validation AUC. Validation-based checkpoint
+selection therefore behaved consistently on the held-out test split. It does
+not remove the train--test gap, but continuing beyond the selected epoch was not
+supported by the validation results. This is the limited role expected of early
+stopping: it controls continued fitting after validation performance peaks but
+does not guarantee the absence of overfitting \parencite{prechelt1998early}.
+
+Further tuning against the current test results would weaken the independence of
+the test set. Additional regularisation experiments should therefore use
+validation-only decisions or introduce a new untouched evaluation split. The
+current checkpoint is a more defensible stopping point than repeatedly changing
+the model after inspecting its test performance.
+
+Temperature scaling reduced validation negative log-likelihood and expected
+calibration error. The original scores were therefore more confident than
+necessary on the validation data. Calibration improves the interpretation of
+confidence but does not alter recommendation order or provide evidence of
+improved compatibility ranking \parencite{guo2017calibration}.
+
+\section{Outfit-length imbalance}
+
+The dataset was balanced between positive and negative labels, so the principal
+imbalance did not concern class counts. Instead, three-item outfits were more
+common than four-item outfits. Moderate length weighting produced a slightly
+higher overall mean AUC but reduced performance for the weakest length group and
+increased the difference between the two groups.
+
+Selecting that configuration only because its overall AUC was marginally higher
+would conflict with the purpose of the weighting experiment. The predefined
+gate required the weakest group to improve rather than allowing a small overall
+gain to hide weaker group performance. Retaining the unweighted configuration
+was therefore consistent with the stated decision rule.
+
+This result does not show that weighting can never improve the model. It shows
+only that the tested schemes did not provide a sufficiently balanced improvement
+under the present data and acceptance criteria.
+
+\section{Relationship between learned scores and explicit constraints}
+
+The application does not allow the compatibility score to decide every part of
+an outfit. This separation is necessary because statistical compatibility and
+feasibility answer different questions. The model estimates whether a complete
+combination resembles compatible relationships in the processed training data.
+It does not know that an outer layer may be unnecessary in hot weather, that a
+user-selected garment must remain fixed, or that a candidate belongs to the
+requested clothing range. These conditions are applied before or during search
+rather than learned indirectly from the score.
+
+The arrangement has two analytical advantages. First, a recommendation can be
+traced through candidate construction, constraint filtering and final scoring.
+If no outer layer is shown, the system can identify a weather mask rather than
+attribute the decision vaguely to the neural model. If an unsuitable clothing
+range appears, the error lies in filtering or metadata rather than in the
+compatibility score. This is a limited form of procedural explanation: it does
+not explain the visual features learned by SigLIP, but it identifies which
+system component made a deterministic decision.
+
+Second, the rules stop the model from being evaluated for knowledge that its
+training objective did not provide. A positive or negative outfit label does
+not directly encode local weather, personal wardrobe ownership or application
+state. Expecting the compatibility head to infer these factors would mix
+separate sources of evidence and make failures harder to diagnose. The modular
+design therefore supports auditability even though it may be less flexible
+than one end-to-end model.
+
+This division also creates limitations. A rule can exclude a combination that
+the model would score highly, and errors in garment metadata can remove valid
+candidates before ranking. The reported model AUC does not test those rule
+failures. For this reason, model evaluation and 36-case candidate-availability
+testing were reported separately. The deterministic fallback is handled in the
+same way. It keeps the application usable when model artefacts are absent, but
+its output should not be combined with learned-model results or described as
+equivalent in quality.
+
+\section{Candidate-search completeness and latency}
+
+Quota-limited search examined an average of 3.41\% of the feasible combinations.
+It recovered the same highest-scoring result as exact search in 27.78\% of 18
+queries and recovered an average of 24.44\% of the exact top ten. The quota
+stage therefore frequently removed combinations that the compatibility model
+would otherwise have ranked highly.
+
+A positive score loss in 13 of the 18 queries confirms that the change was not
+limited to rearranging equally scored candidates. Score loss refers only to the
+deployed model objective, however; it does not establish that a person would
+prefer the exact-search result.
+
+Exact search increased median runtime from approximately 0.028 seconds to 0.474
+seconds on the recorded CPU experiment. Its 95th-percentile runtime remained
+close to two seconds. The experiment identifies a clear trade-off: exact search
+provides completeness under the model objective, while quota search provides
+lower latency. This reflects the broader retrieval trade-off between search
+coverage and computational cost \parencite{johnson2021similarity}.
+
+Within the tested candidate sizes, the additional runtime remained compatible
+with an interactive prototype. This statement applies only to the recorded
+hardware and bounded search space. A substantially larger catalogue could
+require approximate retrieval, staged ranking or another search strategy.
+
+\section{Coverage, domain shift and bias limitations}
+
+Only 29.50\% of the official FITB questions could be represented by the four
+supported clothing positions. The resulting FITB accuracy is valid only for the
+retained subset and cannot be presented as performance on the complete official
+benchmark.
+
+Menswear evidence was particularly sparse. Only 46 retained FITB questions
+were labelled as menswear, and the training data contained very few purely
+menswear outfits. The figures identify a coverage problem but do not estimate a
+dependable performance difference between clothing ranges.
+
+The feature-domain classifier separated Polyvore and Zara items with an AUC of
+1.000. Their frozen feature distributions were therefore distinguishable under
+the diagnostic procedure. This does not measure how much compatibility accuracy
+would decline on Zara because compatible Zara outfit labels were unavailable.
+The result instead prevents an unsupported assumption that performance transfers
+unchanged between the two sources.
+
+The candidate system avoids presenting historical product brands and allows the
+user to choose a clothing range, retain the uploaded garment and reject
+alternatives. These choices improve control and reduce some immediate product
+risks, but they do not remove bias inherited from Polyvore labels or the frozen
+visual representation \parencite{mehrabi2021bias,selbst2019fairness}.
+
+Finally, no participant evidence is available. The project can support claims
+about offline compatibility discrimination, candidate completion, search
+completeness and system behaviour. It cannot establish emotional benefit, trust,
+usability across populations or preference improvement.
+
+\section{Summary}
+
+The strongest model evidence comes from the controlled architecture comparison
+and removal of the pairwise module. Together, these results support a lightweight
+relational head on frozen visual representations within the processed Polyvore
+task. Evidence for the clothing-position embedding is inconclusive.
+
+The selected checkpoint retains an overfitting tendency, although
+validation-based selection produced closely aligned validation and test results.
+Calibration improved validation confidence measures, while the tested
+length-weighting schemes did not provide a sufficiently balanced improvement.
+
+Exact search substantially improved completeness under the model score at the
+cost of increased runtime. The evidence remains bounded by restricted FITB
+coverage, sparse menswear data, measurable feature-domain separation and the
+absence of participant evaluation. Chapter 6 uses these positive and negative
+findings to answer the research questions and assess the contribution.

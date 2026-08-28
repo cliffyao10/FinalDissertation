@@ -101,6 +101,12 @@ class RecommendationModelTests(unittest.TestCase):
         self.assertEqual(first["primary"], second["primary"])
         self.assertEqual(first["alternative"], second["alternative"])
 
+    def test_fallback_preserves_selected_clothing_range(self):
+        result = recommend_outfit(
+            "T-Shirt", "Blue", selected_style="Casual", audience="menswear"
+        )
+        self.assertEqual(result["audience"], "menswear")
+
 
 if __name__ == "__main__":
     unittest.main()

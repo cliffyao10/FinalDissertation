@@ -1,0 +1,162 @@
+{
+  "passed": true,
+  "production_promotion_allowed": true,
+  "decision": "promote_disjoint_candidate",
+  "checks": [
+    {
+      "name": "artifact:test",
+      "passed": true,
+      "blocking": true,
+      "detail": "results\\disjoint_compatibility_test_metrics.json"
+    },
+    {
+      "name": "artifact:baselines",
+      "passed": true,
+      "blocking": true,
+      "detail": "results\\disjoint_baseline_comparison.json"
+    },
+    {
+      "name": "artifact:architectures",
+      "passed": true,
+      "blocking": true,
+      "detail": "results\\disjoint_fashion_model_comparison.json"
+    },
+    {
+      "name": "artifact:fitb",
+      "passed": true,
+      "blocking": true,
+      "detail": "results\\disjoint_official_fitb_comparison.json"
+    },
+    {
+      "name": "artifact:imbalance",
+      "passed": true,
+      "blocking": true,
+      "detail": "results\\disjoint_imbalance_study.json"
+    },
+    {
+      "name": "artifact:bias",
+      "passed": true,
+      "blocking": true,
+      "detail": "results\\disjoint_bias_audit.json"
+    },
+    {
+      "name": "artifact:domain_shift",
+      "passed": true,
+      "blocking": true,
+      "detail": "results\\disjoint_domain_shift.json"
+    },
+    {
+      "name": "artifact:runtime",
+      "passed": true,
+      "blocking": true,
+      "detail": "results\\disjoint_runtime_benchmark.json"
+    },
+    {
+      "name": "artifact:checkpoint",
+      "passed": true,
+      "blocking": true,
+      "detail": "models\\disjoint\\compatibility_ranker.pt"
+    },
+    {
+      "name": "validation_only_calibration",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "temperature": 1.2891900539398193,
+        "validation_nll_before": 0.47990134358406067,
+        "validation_nll_after": 0.47102686762809753,
+        "validation_ece_before": 0.05570172553651021,
+        "validation_ece_after": 0.0369791798134293,
+        "dataset": "data\\processed_disjoint\\validation.pt",
+        "method": "scalar_temperature_scaling",
+        "fit_scope": "validation_only"
+      }
+    },
+    {
+      "name": "compatibility_auc_exceeds_frozen_cosine",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "learned": {
+          "auc": 0.8572591583035982,
+          "auc_95_percent_ci": [
+            0.8518396684493293,
+            0.8629114496310418
+          ]
+        },
+        "cosine": {
+          "auc": 0.7011980068332212,
+          "auc_95_percent_ci": [
+            0.6926717206466676,
+            0.7087933605514214
+          ]
+        }
+      }
+    },
+    {
+      "name": "three_seed_architecture_result",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "proposed": {
+          "values": [
+            0.8586043224579217,
+            0.8602335697646281,
+            0.8600033108536695
+          ],
+          "mean": 0.8596137343587399,
+          "sample_standard_deviation": 0.000881725059558691,
+          "available_runs": 3
+        },
+        "baselines": {
+          "bilstm": 0.7927777222454454,
+          "type_aware_pairwise": 0.7918095267568757,
+          "set_transformer": 0.774404965116625
+        }
+      }
+    },
+    {
+      "name": "imbalance_decision_is_guarded",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "validation_scores": {
+          "unweighted": 0.8629049650747893,
+          "length_sqrt": 0.8655311291851713,
+          "length_inverse": 0.8622003130514061
+        },
+        "chosen_configuration": "length_sqrt",
+        "deployment_gate": {
+          "passed": false,
+          "checks": {
+            "overall_auc_loss_at_most_0_01": true,
+            "macro_length_auc_loss_at_most_0_002": true,
+            "worst_length_auc_not_lower": false
+          }
+        },
+        "deployed_configuration": "unweighted",
+        "representative_checkpoint": "models\\disjoint_imbalance\\unweighted_seed42.pt"
+      }
+    },
+    {
+      "name": "official_fitb_above_chance",
+      "passed": true,
+      "blocking": true,
+      "detail": {
+        "mean_accuracy": 0.599373321396598,
+        "chance_accuracy": 0.25,
+        "retained_questions": 4468,
+        "retained_fraction": 0.2950148563882469
+      }
+    },
+    {
+      "name": "polyvore_catalogue_domain_overlap",
+      "passed": false,
+      "blocking": false,
+      "detail": {
+        "domain_classifier_auc": 1.0
+      }
+    }
+  ],
+  "blocking_failures": []
+}

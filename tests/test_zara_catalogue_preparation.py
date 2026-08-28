@@ -3,6 +3,7 @@ import unittest
 from recommendation_training.prepare_zara_catalogue import (
     has_precipitation_protection,
     infer_slot,
+    occupied_slots,
 )
 
 
@@ -36,9 +37,14 @@ class ZaraCataloguePreparationTests(unittest.TestCase):
             "bottom",
         )
 
-    def test_rejects_accessories_and_one_piece_garments(self):
+    def test_rejects_accessories_and_maps_one_piece_garments(self):
         self.assertIsNone(infer_slot("Rubberized Belt Bag With Pockets", ""))
-        self.assertIsNone(infer_slot("Rib T-Shirt Dress", ""))
+        self.assertEqual(infer_slot("Rib T-Shirt Dress", ""), "inner_top")
+        self.assertEqual(
+            occupied_slots("Rib T-Shirt Dress", "inner_top"),
+            "inner_top;bottom",
+        )
+        self.assertEqual(occupied_slots("Linen Shirt", "inner_top"), "inner_top")
         self.assertIsNone(infer_slot("Medicine Ball", ""))
 
 

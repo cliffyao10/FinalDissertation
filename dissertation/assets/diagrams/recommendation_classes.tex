@@ -1,0 +1,36 @@
+\begin{figure}[htbp]
+  \centering
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\scriptsize,
+    class/.style={draw=wmgdarkblue!65, rounded corners=1pt, align=left,
+      text width=42mm, fill=wmgblue!6, inner sep=2.5mm},
+    relation/.style={-{Latex[length=2mm]}, thick, draw=wmgdarkblue!70},
+    dependency/.style={-{Latex[length=2mm]}, dashed, draw=wmgdarkblue!65}
+  ]
+    \node[class] (config) at (0,5.0) {\textbf{ModelConfig}\\\hrulefill\\
+      embedding\_dim: int = 768\\hidden\_dim: int = 256\\slot\_dim: int = 32\\number\_of\_slots: int = 4\\dropout: float = 0.20};
+    \node[class] (model) at (5.3,5.0) {\textbf{CompatibilityRanker}\\\hrulefill\\
+      image\_projection: Sequential\\slot\_embedding: Embedding\\scorer: Sequential\\calibration\_temperature: float\\\hrulefill\\
+      forward(embeddings, mask)\\score\_preprojected(\\\quad items, mask)\\probability(embeddings, mask)};
+    \node[class] (candidate) at (10.6,5.0) {\textbf{OutfitCandidateRanker}\\\hrulefill\\
+      device\\model: CompatibilityRanker\\metadata\\last\_search\_stats\\\hrulefill\\
+      rank\_exact(fixed, candidates,\\\quad top\_k)\\rank(fixed, candidates, limit)\\\_iter\_combinations(...)};
+
+    \node[class] (adapter) at (5.3,-0.8) {\textbf{Trained recommender adapter}\\\hrulefill\\
+      artifacts\_available(...)\\recommend\_with\_trained\_\\\quad model(...)\\weather/style/audience filtering\\abstract-catalogue loading};
+    \node[class] (facade) at (10.6,-0.8) {\textbf{Recommendation facade}\\\hrulefill\\
+      occupied\_slots\_for\_\\\quad category(...)\\recommend\_outfit(...)\\\_build\_outfit(...)};
+    \node[class] (fallback) at (15.9,-0.8) {\textbf{LightweightOutfitRanker}\\\hrulefill\\
+      FEATURE\_WEIGHTS\\\hrulefill\\
+      features(input, style, slots, colours, weather)\\score(...)\\rank(...)};
+
+    \draw[relation] (config) -- (model);
+    \draw[relation] (model) -- (candidate);
+    \draw[dependency] (adapter) -- (candidate);
+    \draw[dependency] (facade) -- (adapter);
+    \draw[dependency] (facade) -- (fallback);
+  \end{tikzpicture}}
+  \caption{Module-level UML class and dependency diagram for recommendation}
+  \label{fig:recommendation-classes}
+\end{figure}

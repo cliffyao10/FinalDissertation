@@ -35,9 +35,12 @@ def predict(model, loader, device):
     labels, probabilities = [], []
     model.eval()
     for batch in loader:
-        batch_probabilities = model.probability(
-            batch["embeddings"].to(device), batch["mask"].to(device)
-        )
+        embeddings = batch["embeddings"].to(device)
+        mask = batch["mask"].to(device)
+        if hasattr(model, "probability"):
+            batch_probabilities = model.probability(embeddings, mask)
+        else:
+            batch_probabilities = torch.sigmoid(model(embeddings, mask))
         probabilities.extend(batch_probabilities.cpu().tolist())
         labels.extend(batch["label"].cpu().tolist())
     return np.asarray(labels, dtype=np.int64), np.asarray(probabilities, dtype=np.float64)

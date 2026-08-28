@@ -84,7 +84,9 @@ def main():
     temperature = fit_temperature(logits, labels)
     report = calibration_report(logits, labels, temperature)
     payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
-    payload.setdefault("extra", {})["calibration"] = {
+    extra = payload.setdefault("extra", {})
+    extra["checkpoint_version"] = max(int(extra.get("checkpoint_version", 1)), 2)
+    extra["calibration"] = {
         **report,
         "dataset": str(Path(args.validation)),
         "method": "scalar_temperature_scaling",

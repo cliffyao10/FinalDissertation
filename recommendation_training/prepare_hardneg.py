@@ -39,6 +39,22 @@ SPLIT_COMPATIBILITY = {
 }
 
 
+def split_metadata_path(directory, split):
+    """Resolve either Maryland ``*_no_dup`` or Polyvore-Outfits JSON names."""
+
+    directory = Path(directory)
+    primary = directory / SPLIT_METADATA[split]
+    if primary.is_file():
+        return primary
+    alternative_name = "valid.json" if split == "validation" else f"{split}.json"
+    alternative = directory / alternative_name
+    if alternative.is_file():
+        return alternative
+    raise FileNotFoundError(
+        f"No metadata file found for {split}: {primary} or {alternative}"
+    )
+
+
 def build_item_lookup(metadata_path, images_root=None, item_metadata=None):
     """Map each published ``set_id_index`` key to a supported item record."""
 
@@ -172,6 +188,10 @@ def main():
     parser.add_argument("--cache-save-every", type=int, default=10)
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument(
+        "--source-label",
+        default="Maryland Polyvore hard-negative compatibility split",
+    )
+    parser.add_argument(
         "--splits",
         nargs="+",
         choices=tuple(SPLIT_METADATA),
@@ -179,7 +199,6 @@ def main():
     )
     args = parser.parse_args()
 
-    cache = torch.load(args.embedding_cache, map_location="cpu", weights_only=False)
     item_metadata = (
         json.loads(Path(args.item_metadata).read_text(encoding="utf-8"))
         if args.item_metadata
@@ -187,7 +206,7 @@ def main():
     )
     lookups = {
         split: build_item_lookup(
-            Path(args.metadata_dir) / SPLIT_METADATA[split],
+            split_metadata_path(args.metadata_dir, split),
             args.images_dir,
             item_metadata,
         )
@@ -235,7 +254,7 @@ def main():
                 + payload["skipped_rows"]["fewer_than_minimum_slots"],
                 "siglip_model": cache.get("model_name"),
                 "slot_names": list(SLOTS),
-                "source": "Maryland Polyvore hard-negative compatibility split",
+                "source": args.source_label,
             }
         )
         output_path = output_dir / f"{split}.pt"

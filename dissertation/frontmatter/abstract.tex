@@ -1,0 +1,36 @@
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Complete-outfit recommendation requires a system to model relationships among
+garments while respecting practical constraints and the item already selected
+by a user. This study evaluates whether a lightweight compatibility model can
+support that task without training a large visual encoder or restricting the
+output to one retailer's catalogue. Frozen 768-dimensional SigLIP image
+representations were combined with a 379,265-parameter compatibility head and
+trained on the published Polyvore Outfits disjoint compatibility split. The
+model was compared with non-learned, linear, recurrent, type-aware and
+attention-based controlled baselines over three random seeds. Evaluation included
+classification, corrected FITB ranking, calibration, structural ablation,
+imbalance, overfitting, runtime, bias and domain shift.
+
+The selected compatibility model achieved a held-out ROC--AUC of 0.8583 (95\%
+bootstrap confidence interval 0.8524--0.8641) and 60.25\% FITB accuracy (95\%
+confidence interval 58.73--61.75). The three-seed mean FITB result was 59.94\%.
+Removing the pairwise relationship module reduced mean FITB by 10.28 percentage
+points, with a paired 95\% interval of 8.96--11.57 points; the smaller gain from
+slot embeddings was inconclusive. Training AUC was 0.9699, but validation and
+test AUC differed by only 0.00145 after validation-based early stopping.
+
+The model was integrated into an abstract, product-independent candidate space
+with weather and clothing-range constraints. Exact search exposed substantial
+loss from the previous quota path, which recovered the exact top result in
+27.78\% of 18 controlled queries. The findings support the feasibility of a
+lightweight and auditable system, but not universal preference or commercial
+generalisability: official FITB coverage was 29.50\%, pure-menswear evidence
+was sparse, catalogue domain shift was strong, and no participant study was
+conducted.
+
+\textbf{Keywords:} fashion recommendation; outfit compatibility; SigLIP;
+fill-in-the-blank; constrained search; responsible artificial intelligence
+
+\clearpage

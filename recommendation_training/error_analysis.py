@@ -50,7 +50,14 @@ def safe_metrics(labels, probabilities):
 
 
 def analyse(dataset, labels, probabilities):
-    groups = infer_matched_replacement_groups(dataset)
+    try:
+        groups = infer_matched_replacement_groups(dataset)
+        pair_diagnostics_available = True
+        pair_diagnostics_reason = None
+    except ValueError as error:
+        groups = []
+        pair_diagnostics_available = False
+        pair_diagnostics_reason = str(error)
     by_present_slots = {}
     present_counts = dataset.masks.sum(dim=1).numpy()
     for count in sorted(set(present_counts.tolist())):
@@ -97,6 +104,8 @@ def analyse(dataset, labels, probabilities):
         "calibration": expected_calibration_error(labels, probabilities),
         "by_present_slot_count": by_present_slots,
         "by_replaced_slot": by_replaced_slot,
+        "pair_diagnostics_available": pair_diagnostics_available,
+        "pair_diagnostics_unavailable_reason": pair_diagnostics_reason,
         "highest_confidence_mistakes": [
             {
                 "example_index": int(index),

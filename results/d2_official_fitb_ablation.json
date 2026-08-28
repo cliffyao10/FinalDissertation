@@ -1,0 +1,231 @@
+{
+  "protocol": "Controlled three-seed D2 structural ablation on the corrected official-disjoint FITB subset. Correct answers are matched by set_id.",
+  "coverage": {
+    "total_questions": 15145,
+    "retained_questions": 4468,
+    "retained_fraction": 0.2950148563882469,
+    "skipped": {
+      "answer_slot_already_present": 567,
+      "duplicate_question_slot": 502,
+      "fewer_than_minimum_supported_slots": 3010,
+      "unsupported_answer_slot": 6598
+    },
+    "selection_bias_warning": "The four-slot filtered result is not interchangeable with a published full-dataset FITB result."
+  },
+  "device": "cpu",
+  "seeds": [
+    42,
+    7,
+    123
+  ],
+  "runs": {
+    "no_slot": [
+      {
+        "questions": 4468,
+        "accuracy": 0.5955684870188004,
+        "mean_reciprocal_rank": 0.7666554759773203,
+        "ndcg": 0.8260931422521017,
+        "chance_accuracy": 0.25,
+        "seed": 42,
+        "checkpoint": "models\\disjoint_ablations\\seed42\\no_slot.pt",
+        "trainable_parameters": 362753
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.5946732318710832,
+        "mean_reciprocal_rank": 0.764286780065652,
+        "ndcg": 0.8242302629876774,
+        "chance_accuracy": 0.25,
+        "seed": 7,
+        "checkpoint": "models\\disjoint_ablations\\seed7\\no_slot.pt",
+        "trainable_parameters": 362753
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.5937779767233662,
+        "mean_reciprocal_rank": 0.7652379886601014,
+        "ndcg": 0.8250047917990475,
+        "chance_accuracy": 0.25,
+        "seed": 123,
+        "checkpoint": "models\\disjoint_ablations\\seed123\\no_slot.pt",
+        "trainable_parameters": 362753
+      }
+    ],
+    "no_pairwise": [
+      {
+        "questions": 4468,
+        "accuracy": 0.49395702775290956,
+        "mean_reciprocal_rank": 0.7010034318113996,
+        "ndcg": 0.7768040717104086,
+        "chance_accuracy": 0.25,
+        "seed": 42,
+        "checkpoint": "models\\disjoint_ablations\\seed42\\no_pairwise.pt",
+        "trainable_parameters": 305537
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.4959713518352731,
+        "mean_reciprocal_rank": 0.701133989853775,
+        "ndcg": 0.7768614483228415,
+        "chance_accuracy": 0.25,
+        "seed": 7,
+        "checkpoint": "models\\disjoint_ablations\\seed7\\no_pairwise.pt",
+        "trainable_parameters": 305537
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.49977618621307074,
+        "mean_reciprocal_rank": 0.7043792897642495,
+        "ndcg": 0.7793206393071427,
+        "chance_accuracy": 0.25,
+        "seed": 123,
+        "checkpoint": "models\\disjoint_ablations\\seed123\\no_pairwise.pt",
+        "trainable_parameters": 305537
+      }
+    ],
+    "full": [
+      {
+        "questions": 4468,
+        "accuracy": 0.600940017905103,
+        "mean_reciprocal_rank": 0.7685951954640406,
+        "ndcg": 0.827468810398806,
+        "chance_accuracy": 0.25,
+        "seed": 42,
+        "checkpoint": "models\\disjoint_ablations\\seed42\\full_retrained.pt",
+        "trainable_parameters": 379265
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.5966875559534467,
+        "mean_reciprocal_rank": 0.7658348254252462,
+        "ndcg": 0.8254029143910675,
+        "chance_accuracy": 0.25,
+        "seed": 7,
+        "checkpoint": "models\\disjoint_ablations\\seed7\\full_retrained.pt",
+        "trainable_parameters": 379265
+      },
+      {
+        "questions": 4468,
+        "accuracy": 0.6004923903312444,
+        "mean_reciprocal_rank": 0.7685019397194868,
+        "ndcg": 0.8274225763751534,
+        "chance_accuracy": 0.25,
+        "seed": 123,
+        "checkpoint": "models\\disjoint_ablations\\seed123\\full_retrained.pt",
+        "trainable_parameters": 379265
+      }
+    ]
+  },
+  "summary": {
+    "no_slot": {
+      "accuracy": {
+        "values": [
+          0.5955684870188004,
+          0.5946732318710832,
+          0.5937779767233662
+        ],
+        "mean": 0.5946732318710832,
+        "sample_standard_deviation": 0.0008952551477171
+      },
+      "mean_reciprocal_rank": {
+        "values": [
+          0.7666554759773203,
+          0.764286780065652,
+          0.7652379886601014
+        ],
+        "mean": 0.7653934149010245,
+        "sample_standard_deviation": 0.0011919723435399802
+      },
+      "ndcg": {
+        "values": [
+          0.8260931422521017,
+          0.8242302629876774,
+          0.8250047917990475
+        ],
+        "mean": 0.8251093990129422,
+        "sample_standard_deviation": 0.00093583480933048
+      }
+    },
+    "no_pairwise": {
+      "accuracy": {
+        "values": [
+          0.49395702775290956,
+          0.4959713518352731,
+          0.49977618621307074
+        ],
+        "mean": 0.4965681886004178,
+        "sample_standard_deviation": 0.002955133142396068
+      },
+      "mean_reciprocal_rank": {
+        "values": [
+          0.7010034318113996,
+          0.701133989853775,
+          0.7043792897642495
+        ],
+        "mean": 0.7021722371431413,
+        "sample_standard_deviation": 0.0019124780534328846
+      },
+      "ndcg": {
+        "values": [
+          0.7768040717104086,
+          0.7768614483228415,
+          0.7793206393071427
+        ],
+        "mean": 0.7776620531134643,
+        "sample_standard_deviation": 0.00143666424063143
+      }
+    },
+    "full": {
+      "accuracy": {
+        "values": [
+          0.600940017905103,
+          0.5966875559534467,
+          0.6004923903312444
+        ],
+        "mean": 0.599373321396598,
+        "sample_standard_deviation": 0.002336684536461649
+      },
+      "mean_reciprocal_rank": {
+        "values": [
+          0.7685951954640406,
+          0.7658348254252462,
+          0.7685019397194868
+        ],
+        "mean": 0.7676439868695911,
+        "sample_standard_deviation": 0.00156747344706426
+      },
+      "ndcg": {
+        "values": [
+          0.827468810398806,
+          0.8254029143910675,
+          0.8274225763751534
+        ],
+        "mean": 0.826764767055009,
+        "sample_standard_deviation": 0.0011796255359007549
+      }
+    }
+  },
+  "paired_comparisons": {
+    "no_slot": {
+      "mean_accuracy_difference_full_minus_ablation": 0.004700089525514772,
+      "paired_question_bootstrap_95_percent_ci": [
+        -0.001268278125932558,
+        0.010593852581319008
+      ],
+      "iterations": 5000,
+      "unit_resampled": "official_fitb_question",
+      "seed_repeats_averaged_within_question": 3
+    },
+    "no_pairwise": {
+      "mean_accuracy_difference_full_minus_ablation": 0.10280513279618025,
+      "paired_question_bootstrap_95_percent_ci": [
+        0.08960011936735304,
+        0.1157117278424351
+      ],
+      "iterations": 5000,
+      "unit_resampled": "official_fitb_question",
+      "seed_repeats_averaged_within_question": 3
+    }
+  },
+  "interpretation_rule": "A component has clear positive FITB evidence only when the paired 95% interval for full-minus-ablation lies entirely above zero."
+}

@@ -10,6 +10,7 @@ import json
 import random
 import re
 import sys
+import time
 from collections import defaultdict
 from pathlib import Path
 
@@ -123,7 +124,17 @@ def _save_embedding_cache(path, item_ids, embeddings, model_name):
         },
         temporary_path,
     )
-    temporary_path.replace(path)
+    # Windows virus scanners and file indexers can briefly hold the previous
+    # cache open. Preserve atomic replacement while tolerating that transient
+    # lock; a persistent failure still surfaces normally.
+    for attempt in range(10):
+        try:
+            temporary_path.replace(path)
+            break
+        except PermissionError:
+            if attempt == 9:
+                raise
+            time.sleep(0.25 * (attempt + 1))
 
 
 def create_embedding_cache(

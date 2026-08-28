@@ -16,8 +16,10 @@ from recommendation_training.evaluate_official_fitb import load_reference_lookup
 from recommendation_training.prepare_polyvore import create_embedding_cache
 
 
-def required_fitb_items(metadata_path, questions_path, images_root):
-    lookup = load_reference_lookup(metadata_path)
+def required_fitb_items(
+    metadata_path, questions_path, images_root, item_metadata_path=None
+):
+    lookup = load_reference_lookup(metadata_path, item_metadata_path)
     questions = json.loads(Path(questions_path).read_text(encoding="utf-8"))
     references = {
         reference
@@ -48,6 +50,7 @@ def required_fitb_items(metadata_path, questions_path, images_root):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--metadata", default="data/polyvore/test_no_dup.json")
+    parser.add_argument("--item-metadata")
     parser.add_argument("--questions", default="data/polyvore/fill_in_blank_test.json")
     parser.add_argument("--images-root", default="data/polyvore_images")
     parser.add_argument("--base-cache", default="data/processed/polyvore_item_embeddings.pt")
@@ -66,7 +69,7 @@ def main():
         shutil.copyfile(args.base_cache, output_path)
 
     items, skipped, reference_count = required_fitb_items(
-        args.metadata, args.questions, args.images_root
+        args.metadata, args.questions, args.images_root, args.item_metadata
     )
     cache = create_embedding_cache(
         items,
