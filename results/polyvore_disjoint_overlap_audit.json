@@ -1,0 +1,33 @@
+{
+  "source_directory": "data\\polyvore_disjoint",
+  "split_counts": {
+    "train": {
+      "outfits": 16995,
+      "unique_item_ids": 71967
+    },
+    "validation": {
+      "outfits": 3000,
+      "unique_item_ids": 14657
+    },
+    "test": {
+      "outfits": 15145,
+      "unique_item_ids": 70035
+    }
+  },
+  "pairwise_overlap": {
+    "train__validation": {
+      "outfit_set_ids": 0,
+      "item_ids": 3781
+    },
+    "train__test": {
+      "outfit_set_ids": 0,
+      "item_ids": 84
+    },
+    "validation__test": {
+      "outfit_set_ids": 0,
+      "item_ids": 34
+    }
+  },
+  "strict_item_disjoint_verified": false,
+  "outfit_set_disjoint_verified": true
+}

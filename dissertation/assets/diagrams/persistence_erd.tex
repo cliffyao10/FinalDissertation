@@ -18,7 +18,7 @@
 
     \draw[rel] (wardrobe) -- node[pos=0.15,left,font=\scriptsize]{1} node[pos=0.85,above,font=\scriptsize]{0..*} (piece);
     \draw[rel] (wardrobe) -- node[pos=0.15,left,font=\scriptsize]{1} node[pos=0.85,right,font=\scriptsize]{0..*} (outfit);
-    \draw[rel] (wardrobe) -- node[pos=0.15,right,font=\scriptsize]{1} node[pos=0.85,above,font=\scriptsize]{4..*} (group);
+    \draw[rel] (wardrobe) -- node[pos=0.15,right,font=\scriptsize]{1} node[pos=0.85,above,font=\scriptsize]{4..* defaults plus custom groups} (group);
     \draw[rel] (outfit) -- node[pos=0.15,left,font=\scriptsize]{1} node[pos=0.85,right,font=\scriptsize]{4} (slot);
     \draw[rel] (slot) -- node[above,font=\scriptsize]{0..1 snapshot} (piece);
     \draw[rel] (piece) -- node[right,font=\scriptsize]{0..1} (image);

@@ -16,7 +16,7 @@ semantic, contextual and user-related signals interact, while identifying
 evaluation, explanation and bias as continuing challenges
 \parencite{deldjoo2023review}.
 
-Outfit compatibility research has therefore moved beyond manually specified
+Outfit compatibility research has moved beyond manually specified
 colour or category rules towards learned relationships among items. A
 bidirectional long short-term memory model represented outfits as ordered
 garment sequences and learned their compatibility \parencite{han2017bilstm}.
@@ -36,11 +36,16 @@ layer for smaller downstream studies. SigLIP uses independent sigmoid losses
 over image--text pairs instead of requiring softmax normalisation across a
 global batch, and was evaluated as a transferable vision--language
 representation by \textcite{zhai2023siglip}. A frozen SigLIP image
-encoder can therefore supply reusable features while a smaller model learns
+encoder can supply reusable features while a smaller model learns
 the project-specific relationship among garments. Freezing does not make the
 representation neutral or guarantee transfer to fashion data; it instead
 reduces the number of trainable parameters and makes controlled comparisons
 feasible within the resources of an MSc project.
+
+Throughout this dissertation, \emph{lightweight} describes the project-specific
+compatibility head and the cost of downstream training on precomputed features.
+It does not describe the size or original pretraining cost of the SigLIP
+encoder on which those features depend.
 
 \section{Problem definition and motivation}
 
@@ -57,14 +62,14 @@ candidate ranking. This is separated from candidate feasibility. For example,
 weather logic may suppress an outer layer in hot conditions, and slot rules
 prevent two bottoms from occupying the same outfit. Such constraints should
 not be inferred indirectly from a compatibility score. The deployed system
-therefore combines a learned relational score with explicit constraints and a
+combines a learned relational score with explicit constraints and a
 deterministic fallback.
 
 The candidate representation is also deliberately product-independent.
-Recommendations are expressed as abstract garment states rather than as Zara
-or other branded products. The states are derived from secondary Polyvore
-training data and described by slot, broad type, colour, style and clothing
-range. This design reflects the intended interaction: a recommendation can
+Recommendations are expressed as abstract garment states defined by slot,
+broad type, colour, style and clothing range. The states are derived from
+secondary Polyvore training data. This design reflects the intended
+interaction: a recommendation can
 guide the use of an existing wardrobe or a later purchase without claiming
 that one retailer contains the only suitable solution. Product-independent
 candidate generation also creates a search problem because compatibility is a
@@ -83,7 +88,7 @@ search procedure.
 Figure~\ref{fig:functional-scope} summarises the system boundary from user and
 context inputs to the functions that produce and preserve recommendations. It
 also distinguishes learned compatibility ranking from recognition, explicit
-constraints and wardrobe management. Cove is therefore treated as a
+constraints and wardrobe management. Cove is treated as a
 context-aware complete-outfit recommender system. Search is the mechanism used
 to explore and rank feasible candidate combinations, rather than a separate
 product-search claim.
@@ -105,7 +110,7 @@ The broader fashion-recommender literature also cautions that offline accuracy
 alone does not resolve questions of explanation, bias or operational use
 \parencite{deldjoo2023review}.
 
-The gap addressed here is therefore bounded and empirical rather than a claim
+The gap addressed here is bounded and empirical rather than a claim
 that outfit recommendation itself is novel. First, it is uncertain whether a
 small relational head on frozen vision--language features can outperform
 non-learned and controlled learned alternatives under one consistent
@@ -122,7 +127,7 @@ distinct from claims about human taste or satisfaction.
 The primary research question is:
 
 \begin{quote}
-To what extent can a lightweight outfit-compatibility model built on frozen
+To what extent can a small project-specific outfit-compatibility head built on frozen
 vision--language embeddings, combined with exact constrained search over
 abstract garment states, provide accurate, computationally practical and
 auditable complete-outfit recommendations using secondary fashion data?
@@ -145,7 +150,7 @@ Three sub-questions operationalise the model and system components:
 The wording \emph{to what extent} requires negative as well as positive
 evidence. A high AUC is treated as evidence of discrimination, not as the
 percentage of recommendations that users will like. Model ranking, uncertainty,
-runtime, data coverage, bias and domain shift therefore contribute to the
+runtime, data coverage, bias and domain shift all contribute to the
 answer.
 
 \section{Research objectives}
@@ -153,30 +158,34 @@ answer.
 The research question is addressed through the following objectives:
 
 \begin{enumerate}[label=\textbf{O\arabic*.}]
-  \item Critically review fashion compatibility modelling, vision--language
-        representation learning, candidate retrieval and responsible
-        recommendation evaluation.
-  \item Construct an ethically bounded and reproducible secondary-data
-        pipeline consistent with the approved research scope.
-  \item Develop a lightweight compatibility model using frozen SigLIP
-        embeddings and the published Polyvore disjoint compatibility labels.
-  \item Compare non-learned, linear, recurrent, type-aware and attention-based
-        controlled baselines under consistent splits and three random seeds.
-  \item Evaluate discrimination, completion ranking, calibration, structural
-        ablation, imbalance, overfitting, runtime, bias and domain shift.
-  \item Integrate the validated model into a product-independent abstract
-        recommendation system with exact search, weather constraints,
-        clothing-range selection and deterministic fallback.
-  \item Critically assess the strength, limitations and practical implications
-        of the evidence without overstating generalisation or user benefit.
+  \item Critically synthesise research on fashion compatibility,
+        vision--language representation, recommendation evaluation and
+        responsible design, and define a reproducible secondary-data method
+        consistent with the approved ethical scope.
+  \item Develop and evaluate a lightweight project-specific complete-outfit
+        compatibility head
+        using frozen SigLIP embeddings, including controlled baselines and
+        evidence from classification, FITB, calibration, ablation,
+        generalisation, imbalance and uncertainty analyses.
+  \item Design and implement a product-independent recommendation prototype
+        that combines exact candidate search, explicit contextual constraints,
+        local wardrobe management, an interaction design intended to support
+        clear and accessible use, and a
+        deterministic fallback, then verify its functionality, coverage and
+        runtime.
+  \item Critically evaluate the confidence, limitations, practical value and
+        future deployment opportunities supported by the combined model and
+        system evidence.
 \end{enumerate}
 
 \section{Scope and boundaries}
 
-The investigation uses secondary datasets and does not conduct interviews,
-questionnaires or experiments with human participants. Ethical approval was
-waived; the confirmation and required ethics-training evidence are reserved
-for the appendices. The separately published Zara dataset retained locally is
+The investigation is confined to secondary datasets; no human participants
+were recruited for interviews, questionnaires or experiments. The project
+received confirmation dated 12 May 2026 that ethical approval was waived. The
+required research-integrity, information-security and WMG student-ethics
+training evidence, together with the waiver confirmation, is reproduced in
+Appendices A and B. The separately published Zara dataset retained locally is
 used for recognition and feature-domain diagnostics, not as the sole
 recommendation source.
 
@@ -212,7 +221,8 @@ exact-versus-quota search experiment.
 \section{Contributions}
 
 Within these boundaries, the dissertation makes four contributions. First, it
-provides a reproducible lightweight compatibility pipeline that separates a
+provides a reproducible compatibility pipeline with lightweight downstream
+training that separates a
 frozen visual representation, a learned relational head and explicit
 contextual constraints. Second, it provides a controlled evaluation comprising
 non-learned and learned baselines, three seeds, corrected set-identifier-based
@@ -224,10 +234,9 @@ the user retains the selected garment, chooses the clothing range, receives
 weather-aware alternatives and can fall back to deterministic rules if model
 artefacts are unavailable.
 
-The contributions are methodological, empirical and artefactual. They do not
-constitute a new general theory of fashion compatibility, an exact reproduction
-of every comparison architecture, evidence of user preference, or a claim of
-state-of-the-art performance on the complete official Polyvore benchmark.
+The contributions are methodological, empirical and artefactual. The comparison
+models are controlled adaptations rather than exact reproductions of the
+published architectures.
 
 \section{Dissertation structure}
 
@@ -247,7 +256,7 @@ assessing the objectives and identifying proportionate future work.
 This chapter has framed complete-outfit recommendation as relational
 compatibility scoring followed by constrained candidate search. It has defined
 a bounded empirical gap, one primary research question, three sub-questions
-and seven objectives. The scope excludes participant claims, online
+and four objectives. The scope excludes participant claims, online
 personalisation and unsupported garment structures, while retaining model,
 search, runtime, bias and reproducibility evidence. Chapter 2 now evaluates
 the literature from which the representation, compatibility and assessment

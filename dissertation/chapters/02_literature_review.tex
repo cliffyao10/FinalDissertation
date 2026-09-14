@@ -75,8 +75,8 @@ relations. \textcite{cucurull2019context} generated product embeddings
 conditioned on known compatible context and reported stronger compatibility
 prediction when more context was available. The finding supports the view that
 compatibility is conditional rather than intrinsic to one item. Graph
-construction, however, requires available nodes and edges that may not exist
-for a newly uploaded garment.
+construction requires available nodes and edges, which may not exist for a
+newly uploaded garment.
 
 Attention allows each garment representation to interact with every other
 garment without requiring a fixed sequence. OutfitTransformer uses task-specific
@@ -114,10 +114,13 @@ a known proportion of labels is incorrect.
 
 Splitting the data changes the generalisation question. If a product appears in
 both training and testing outfits, a model may benefit from recognising an
-observed item. The Polyvore Outfits disjoint split prevents item overlap across
-its principal divisions and gives a more demanding test on unseen garments
-\parencite{vasileva2018typeaware}. It does not remove shared photography,
-category distributions, platform culture or labelling assumptions.
+observed item. Vasileva et al. describe their revised Polyvore partition as a
+disjoint split intended to reduce this problem
+\parencite{vasileva2018typeaware}. The present project retains that published
+name, while independently auditing the locally acquired metadata rather than
+assuming complete item-level separation. Such a split also leaves shared
+photographic conventions, category distributions, platform culture and
+labelling assumptions unchanged.
 
 In the common fill-in-the-blank (FITB) task, one garment is removed and the
 model selects the correct completion from four candidates
@@ -128,8 +131,8 @@ compatibility prediction and large-scale retrieval separately, reinforcing
 that FITB does not establish scalable retrieval quality
 \parencite{sarkar2023outfittransformer}.
 
-Polyvore is therefore suitable for controlled training and offline evaluation,
-but cannot represent all clothing practices. Filtering official questions to
+Polyvore is therefore suitable for controlled training and offline evaluation.
+It cannot represent all clothing practices. Filtering official questions to
 four supported slots introduces an additional coverage boundary. The retained
 fraction must accompany the subset result so that it is not presented as the
 complete official benchmark.
@@ -236,7 +239,7 @@ unit instead of treating their predictions as independent
 \parencite{dietterich1998tests}. The project's bootstrap averages the three
 seeded outcomes within each question and then resamples questions, following
 the bootstrap principle of estimating sampling uncertainty by resampling
-\parencite{efron1993bootstrap}. Its interval is conditional on those runs and
+\parencite{efron1994bootstrap}. Its interval is conditional on those runs and
 does not represent every possible training seed.
 
 Overfitting is examined through training, validation and held-out test
@@ -273,8 +276,7 @@ rather than from a claim made by the retrieval literature.
 
 For a bounded four-slot space, batched exhaustive scoring can remain feasible.
 Here, \emph{exact} means that every combination surviving the declared filters
-is evaluated under one deployed objective. It does not mean that the model has
-identified an objectively best human outfit. A safety limit is required so an
+is evaluated under one deployed objective. A safety limit is required so an
 oversized search fails explicitly rather than presenting a partial prefix as
 complete.
 
@@ -313,10 +315,9 @@ need exposure logging, exploration, feedback-loop controls and separate
 evaluation, so it lies outside the frozen study.
 
 Fairness cannot be detached from social context or treated solely as a property
-of an isolated component \parencite{selbst2019fairness}. The proportionate
-response is not to claim that bias has been solved, but to document limitations,
-avoid identity inference, retain the selected garment, expose alternatives and
-permit rejection or replacement.
+of an isolated component \parencite{selbst2019fairness}. A proportionate
+response documents limitations, avoids identity inference, retains the
+selected garment, exposes alternatives and permits rejection or replacement.
 
 \section{Synthesis and research framework}
 
@@ -335,8 +336,7 @@ head must consequently be compared with non-learned and learned controls.
 
 Third, ROC--AUC, FITB, calibration, repeated runs, ablation, coverage and domain
 diagnostics answer different questions
-\parencite{fawcett2006roc,guo2017calibration,bouthillier2021variance}. None
-establishes human satisfaction.
+\parencite{fawcett2006roc,guo2017calibration,bouthillier2021variance}.
 
 Fourth, candidate generation and explicit constraints affect deployed
 behaviour as well as scoring. Approximate retrieval is appropriate at very
@@ -359,8 +359,5 @@ type-aware, contextual and attention-based modelling. It supports frozen
 vision--language features as a resource-conscious experimental layer while
 requiring explicit treatment of transfer, labels, evaluation and bias.
 
-Compatibility classification, completion ranking, calibration, search
-completeness and user benefit are distinct claims. The first four can be
-examined with secondary data and system experiments; user benefit cannot be
-claimed without participant evidence. Chapter 3 specifies the methodology
-derived from these boundaries.
+Chapter 3 applies this framework through the methodology used for model and
+system evaluation.

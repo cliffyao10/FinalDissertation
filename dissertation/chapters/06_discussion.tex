@@ -8,9 +8,6 @@ levels of claim. The first concerns discrimination and completion ranking on
 the processed Polyvore data. The second concerns the contribution of model
 components under controlled ablation. The third concerns the behaviour of the
 complete prototype, including candidate search, constraints and fallback.
-Keeping these levels separate is important because offline compatibility
-accuracy does not demonstrate that users will prefer, trust or purchase the
-resulting outfits.
 
 \section{Relationship to previous compatibility research}
 
@@ -19,41 +16,27 @@ pair relationships, or as a set processed by attention
 \parencite{han2017bilstm,vasileva2018typeaware,sarkar2023outfittransformer}.
 The present results support the premise shared by these approaches:
 compatibility is not adequately represented by isolated visual similarity.
-Mean pairwise SigLIP cosine similarity reached an AUC of 0.7012 in the
-fixed-seed comparison, whereas the learned relational head reached 0.8573 in
-the same experiment. The mean-pooled logistic baseline was weaker still, with
-test AUC of 0.5532 on the disjoint data. Frozen visual features therefore
-contained relevant information, but averaging them did not express the
-relationships required by the task.
+The non-learned cosine and mean-pooled baselines were weaker than the relational
+head, while the controlled three-seed comparison favoured the proposed head
+over the recurrent, type-aware and set-Transformer adaptations. This evidence
+supports the selected project-specific design under the shared protocol. The
+comparison models test architecture families under common tensors, frozen
+embeddings, labels and training conditions; they are not direct reproductions
+of published headline results produced with different experimental protocols.
+Under this project's protocol, the small relational head was more effective and
+stable than the three controlled alternatives.
 
-Across three seeds, the proposed model produced mean AUC of 0.8596, above the
-controlled bidirectional LSTM, type-aware pairwise and set-Transformer
-implementations. This is evidence for the selected lightweight design, but it
-does not show that it outperforms the original published systems. The
-comparison models were adapted to the same four-position tensors, frozen
-embeddings, processed labels and training conditions. They compare
-architecture families while controlling the surrounding pipeline. Published
-headline scores use different inputs, splits, negative construction and
-implementation details, so a direct numerical ranking against those results
-would not be valid. The supported conclusion is narrower: under this project's
-protocol, the small relational head was more effective and stable than the
-three controlled alternatives.
-
-The frozen SigLIP encoder also affects how the result should be interpreted.
-SigLIP was previously trained on large-scale image--text data and supplied a
-transferable representation \parencite{zhai2023siglip}. This project did not
-reproduce or fine-tune that representation learning. Its original training
-cost and learned biases remain part of the dependency, even though the
-project-specific head has approximately 379,000 trainable parameters and
-trains quickly. The short head-training time is consistent with reusing
-precomputed embeddings; it is not the total computational cost of creating the
-visual representation from first principles.
+The result also depends on frozen SigLIP representations learned from
+large-scale image--text pretraining \parencite{zhai2023siglip}. The project
+contribution therefore lies in the downstream relational modelling, controlled
+evaluation and system integration, while risks inherited from the pretrained
+representation remain relevant.
 
 \section{Answer to RQ1: comparative performance}
 
 RQ1 asked how the proposed model compared with non-learned and controlled
-learned baselines under consistent protocols. The evidence gives a positive
-but bounded answer. The selected checkpoint achieved test AUC of 0.8583, with
+learned baselines under consistent protocols. The evidence is positive within
+the defined experimental boundary. The selected checkpoint achieved test AUC of 0.8583, with
 a 95\% confidence interval of 0.8524--0.8641. It was clearly above
 deterministic random scores and mean pairwise cosine similarity. Across three
 seeds, its mean AUC exceeded each controlled learned architecture; paired
@@ -61,19 +44,18 @@ bootstrap intervals for the AUC differences did not include zero. Its standard
 deviation of 0.0009 was also lower than those of the comparison models.
 
 These results indicate that the model learned a repeatable distinction between
-observed and synthetically corrupted outfits within the processed disjoint
+observed and corrupted outfits within the processed benchmark
 setting. AUC measures the probability that a randomly selected positive
 example is ranked above a randomly selected negative example
-\parencite{fawcett2006roc}. It does not mean that 85.83\% of proposed outfits
-would be judged fashionable, nor does it measure individual taste. Using
-same-category replacements makes the negative task more demanding than
-arbitrary cross-category corruption, but compatibility is still defined by the
-available data and negative generator.
+\parencite{fawcett2006roc}. Same-category replacement reduces trivial
+category-based distinctions; compatibility remains defined by the available
+data and the published negative-generation protocol.
 
 FITB accuracy of 0.6025 provides a second form of evidence because the model
 must select one answer from four alternatives. The result is above the chance
-level of 0.25, and its confidence interval does not approach chance. However,
-only 29.50\% of the official questions were retained. It therefore applies to
+level of 0.25, and its confidence interval does not approach chance. Coverage
+limits its interpretation because only 29.50\% of the official questions were
+retained. The result applies to
 the four supported clothing positions with available embeddings, not to the
 complete Polyvore disjoint benchmark. Together, AUC and FITB demonstrate useful
 offline discrimination and completion ranking, while the coverage figure
@@ -90,59 +72,61 @@ compatibility depends on interactions among garments rather than only an
 outfit-level average.
 
 The evidence for clothing-position embeddings was weaker. Removing them
-reduced mean FITB accuracy by 0.47 percentage points, but the paired interval
+reduced mean FITB accuracy by 0.47 percentage points, and the paired interval
 ranged from $-0.13$ to 1.06 points. Since the interval crosses zero, the
-experiment does not establish a reliable improvement. Retaining the component
-is defensible because its cost is small and its semantic role is clear, but it
-should not be described as necessary. A larger or more position-diverse
+experiment does not establish a reliable improvement. Its low cost and clear
+semantic role provide a practical reason for retention. The evidence is not
+strong enough to describe it as necessary. A larger or more position-diverse
 evaluation would be needed to resolve the effect.
 
 The selected model was trained with binary cross-entropy on positive and
 negative outfits, then used as a scorer for candidate ranking. A scalar
-compatibility estimate can order candidates, so this use is coherent, but it
-is not equivalent to directly optimising FITB or user preference. A tested
-pairwise ranking objective did not improve the retained evaluation and was not
-selected. This negative result is informative: changing the loss alone did not
-overcome limitations in candidate construction and representation.
+compatibility estimate can order candidates, so this use is coherent. It does
+not directly optimise FITB. Under the tested setup, the pairwise ranking-loss
+variant did not improve the retained evaluation and was not selected.
 
-Generalisation evidence is mixed. Validation and test AUC differed by only
-0.00145, supporting the use of validation performance for checkpoint
-selection. By contrast, training AUC exceeded test AUC by 0.1116, and
-validation performance declined after epoch 6. The model therefore overfit the
-training distribution, although early stopping selected a checkpoint that
-transferred consistently to the held-out test split. Early stopping controlled
-the observed deterioration; it did not eliminate overfitting
+Held-out test performance closely matched validation performance, with an AUC
+difference of 0.00145. This supports the consistency of checkpoint selection
+within the processed split. Training AUC exceeded test
+AUC by 0.1116, and validation performance declined after epoch 6, showing that
+the model overfit the training distribution. Early stopping controlled the
+observed deterioration; it did not eliminate overfitting
 \parencite{prechelt1998early}.
 
 Temperature scaling reduced validation negative log-likelihood and expected
 calibration error without changing candidate ordering, consistent with its
 role as a post-hoc calibration method \parencite{guo2017calibration}. These
-improvements apply to the validation distribution and do not convert
-compatibility scores into probabilities of human approval. Similarly,
+improvements apply to the validation distribution. Similarly,
 outfit-length weighting was rejected because a small gain in overall AUC
 coincided with weaker performance for the lowest-performing length group and a
 larger group gap. The decision follows the predefined acceptance gate rather
-than establishing that weighting is generally ineffective.
+than a change selected from overall AUC alone.
 
 \section{Answer to RQ3: candidate search and system control}
 
 RQ3 concerned the trade-off between quota-limited retrieval and exact
 constrained search over abstract garment states. In the 18-query comparison,
 the quota path examined only 3.41\% of combinations on average. This reduced
-median CPU time from 0.474 seconds for exact search to 0.028 seconds, but it
-recovered the exact highest-scoring result in only 27.78\% of queries and
+median CPU time from 0.474 seconds for exact search to 0.028 seconds. At this
+lower cost, it recovered the exact highest-scoring result in only 27.78\% of queries and
 achieved 24.44\% mean recall of the exact top ten. Mean score loss was positive,
 with a bootstrap interval that did not include zero.
 
-For the measured candidate space, exact enumeration therefore improved
+The cases were generated deterministically to cover every supported style
+twice and every fixed clothing position at least four times. They were not a
+random sample of possible users or contexts. The comparison therefore provides
+evidence about the implemented search procedures on a bounded coverage set,
+not a population-level estimate of retrieval failure.
+
+For the measured candidate space, exact enumeration improved
 completeness according to the deployed model objective, while retaining a
 median runtime below half a second and a maximum of 3.206 seconds. This supports
 its use in the current prototype. It does not show that exact search will
 remain practical for an unrestricted catalogue. The number of complete
 combinations grows multiplicatively with the candidates in each position, so
 later expansion may require pruning or approximate retrieval. Techniques for
-large-scale similarity search are well established \parencite{johnson2021similarity},
-but adopting one would create a new recall--latency trade-off that should be
+large-scale similarity search are well established \parencite{johnson2021similarity}.
+Adopting one would introduce a new recall--latency trade-off that should be
 measured rather than assumed.
 
 The abstract candidate representation also changed the role of recommendation.
@@ -153,72 +137,61 @@ colour, style and clothing range. This matches the interface, which displays a
 coloured icon unless an item belongs to the user's local wardrobe. Compared
 with the earlier retailer-derived space, the artefact increased visible
 type--colour combinations from 122 to 271. This shows broader representational
-coverage; it does not prove that every combination is available in shops or
-will be preferred by a user.
+coverage within the abstract representation.
 
 Search remained subordinate to explicit feasibility rules. The user's
 selected item was fixed, weather logic could mask the outer-layer position,
 and clothing range was selected manually. All 36 weather--style coverage cases
 retained the four logical positions. These checks support functional
-completeness within the defined representation. They do not assess whether
-every recommendation is seasonally or culturally appropriate, and the
-deterministic fallback ensures continuity rather than stylistic correctness.
+completeness within the defined representation.
 
 \section{Achievement of the research objectives}
 
-The seven objectives were achieved to different degrees. O1 was addressed by
-the critical review of fashion compatibility, transferable visual
-representations, evaluation, search and responsible recommendation. O2 was
-achieved within the approved secondary-data scope. O3 was achieved through the
-frozen-SigLIP compatibility pipeline and saved lightweight head.
-
-O4 was achieved through random and cosine controls, a mean-pooled logistic
-model, and controlled recurrent, type-aware and attention-based models. These
-are architecture-family comparisons rather than exact reproductions. O5 was
-substantially achieved through discrimination metrics, FITB, calibration,
-ablation, three seeds, confidence intervals, overfitting, length imbalance,
-runtime and domain diagnostics. It was not achieved for demographic fairness
-or user-centred outcomes because those variables were neither available nor
-collected. O6 was achieved within the bounded prototype through abstract
-candidates, exact search, explicit constraints and fallback. O7 is addressed
-by distinguishing demonstrated system behaviour from unsupported claims about
-users and markets.
-
-These objectives support completion of the stated investigation, but not every
-problem in fashion recommendation. Benchmark coverage, menswear
-representation, target-domain validation and human evaluation remain partial
-or untested. Reporting them in this way preserves the connection between the
-research plan and the evidence produced.
+O1 was met through a critical review that informed a reproducible
+secondary-data method and a traceable evidence chain. O2 was met by developing
+the frozen-SigLIP compatibility pipeline and comparing its
+379,265-parameter head with non-learned, linear, recurrent, type-aware and
+attention-based controls, alongside FITB, calibration, ablation, repeated-seed
+and overfitting analyses. O3 was met within the prototype boundary by
+integrating abstract candidates, exact search, weather and clothing-range
+constraints, local wardrobe management and a tested fallback. The interface
+uses a short home-page route, soft colour themes and an explicit
+menswear--womenswear selector; these are implemented design features rather
+than measured usability outcomes. O4 is addressed through the validity and
+limitation analysis below, which bounds the findings by FITB coverage, sparse
+menswear evidence, source-domain difference and the absence of participant
+evaluation.
 
 \section{Validity and confidence in the findings}
 
 Construct validity is limited by the operational definition of compatibility.
 The model learned from observed Polyvore outfits and same-category
-replacements. These labels are reproducible, but they cannot capture every
-reason why a person might combine garments. FITB is closer to candidate
+replacements. These labels are reproducible and cannot capture every reason
+why a person might combine garments. FITB is closer to candidate
 completion than binary classification, yet it remains an offline choice among
-four supplied answers. Confidence should therefore be placed in
-dataset-relative ranking, not in a universal judgement of style.
+four supplied answers. The resulting evidence therefore concerns ranking
+under this dataset-derived definition of compatibility.
 
 Internal validity was strengthened by common splits, frozen features, fixed
 comparison settings, validation-based checkpointing and paired analysis. The
-disjoint split reduces product memorisation across the main divisions.
-Nevertheless, the comparison architectures were adaptations, and
-implementation choices may favour some models. Three seeds reveal part of the
-training variation but do not characterise all hyperparameter uncertainty.
+local overlap audit found zero shared outfit identifiers, while non-zero item
+identifier overlap means that strict product-level disjointness was not
+verified and some memorisation risk remains.
+The comparison architectures were adaptations, and implementation choices may
+favour some models. Three seeds reveal only part of the training variation and
+do not characterise all hyperparameter uncertainty.
 Bootstrap intervals describe uncertainty conditional on the retained samples
 and scoring procedure; they do not correct sampling bias in the original data
-\parencite{efron1993bootstrap,bouthillier2021variance}.
+\parencite{efron1994bootstrap,bouthillier2021variance}.
 
 External validity is more restricted. The feature-domain classifier separated
 Polyvore and Zara embeddings with AUC 1.000. This shows that the two sampled
-sources were readily distinguishable in the chosen representation, but it does
+sources were readily distinguishable in the chosen representation. It does
 not quantify how much compatibility performance would change on new retail or
 user photographs. The four-position representation excludes dresses and other
 multi-position garments, and only 29.50\% of official FITB questions were
-evaluable. Menswear evidence is particularly sparse. The findings should
-therefore be generalised only to similar processed data and supported garment
-structures.
+evaluable. Menswear evidence is particularly sparse. The scope of the findings
+is limited to similar processed data and supported garment structures.
 
 Ecological validity is also untested because no participant study was
 conducted. The application demonstrates that its components can be integrated
@@ -246,14 +219,10 @@ garments saved by the user. Local wardrobe storage and the absence of automatic
 gender inference are consistent with the prototype's privacy boundary. These
 are implemented properties, not measured user benefits.
 
-Industrial or commercial value remains prospective. The system could support
-wardrobe organisation, style exploration or later links to retailers and
-independent designers, but conversion, retention, willingness to pay and
-designer outcomes were not measured. Deployment would also require current
-product data, verified image permissions, accessibility work, security review,
-service monitoring and evidence across clothing ranges and styles. The
-dissertation can therefore present a working and extensible research artefact,
-not a validated business.
+A later version could link abstract recommendations to optional product matches
+from participating retailers or independent designers. This prospective route
+would require verified permissions, current product data and separate
+commercial evaluation.
 
 \section{Implications for applied AI practice}
 
@@ -262,8 +231,7 @@ treated as the main indication of technical quality. The proposed head trained
 faster than the controlled recurrent model and used a similar or smaller number
 of trainable parameters than the neural alternatives. Its stronger result came
 from an architecture that matched the relational task, especially the explicit
-pairwise summary. This does not establish that small models are generally more
-accurate. It shows that, once a transferable representation is available, a
+pairwise summary. Once a transferable representation is available, a
 focused downstream component can be sufficient for a bounded application.
 
 The development process also shows the value of treating data transformation
@@ -273,24 +241,23 @@ the model can learn and which cases can be evaluated. These choices are not
 neutral preparation steps. For example, the exclusion of multi-position
 garments directly caused part of the FITB coverage loss, while sparse
 menswear-labelled data restricted subgroup conclusions. An applied system
-should therefore version its data mapping and report coverage together with
+should version its data mapping and report coverage together with
 performance, rather than presenting only the final checkpoint.
 
 The same principle applies to candidate generation. The learned score did not
 produce useful recommendations until possible garment states were represented,
 filtered and searched. The exact-search experiment showed that an apparently
 efficient quota could change the result before the model had an opportunity to
-score most combinations. In a larger system, retrieval quality would therefore
+score most combinations. In a larger system, retrieval quality would
 need its own acceptance criteria. Improving the ranker while leaving an
 unmeasured retrieval bottleneck could produce no visible improvement for the
 user.
 
-Finally, auditability came from ordinary engineering controls rather than from
-one explanation method. Saved configurations, fixed seeds, hashes, separate
+Finally, saved configurations, fixed seeds, hashes, separate
 evaluation outputs, explicit constraints, failure-aware loading and a rule
-fallback make the path from evidence to interface more inspectable. They do not
-make the neural representation fully interpretable, but they reduce ambiguity
-about what was trained, selected and deployed. For an MSc Applied AI project,
+fallback make the path from evidence to interface more inspectable. The neural
+representation remains only partly interpretable; these controls reduce
+ambiguity about what was trained, selected and deployed. For an MSc Applied AI project,
 this system-level traceability is part of technical competence because it
 connects an experimental result to reproducible software behaviour.
 
@@ -310,41 +277,18 @@ set of complete outfits from a contemporary target domain should be labelled
 under a documented protocol. It could test whether compatibility ordering
 transfers beyond Polyvore and whether calibration remains valid. If
 performance falls, carefully bounded encoder adaptation or domain-robust
-training could be compared with the frozen baseline. This work requires
-additional computing time and permission review, but reliable data are the
-main requirement.
+training could be compared with the frozen baseline. Reliable data and
+permission review are the main requirements, alongside additional computing
+time.
 
 The third priority is participant evaluation after ethics approval. A study
 could compare recommendations from the learned model, the rule fallback and a
 controlled baseline while measuring perceived usefulness, choice diversity
 and trust. Recruitment, informed consent, withdrawal, secure data handling and
-a defined analysis plan would be required. Until such a study is completed,
-interface completeness cannot be used as evidence of satisfaction.
+a defined analysis plan would be required.
 
 The fourth priority is candidate-search scaling. Exact enumeration should
 remain the reference while the current candidate space is bounded. If a larger
 catalogue makes latency unacceptable, structured pruning or approximate search
 should be evaluated against exact top-$k$ recall, score loss and runtime. This
 would preserve a measurable accuracy--efficiency trade-off.
-
-Long-term local personalisation has a lower priority than these validation
-tasks. Learning from clicks can create feedback loops in which early exposure
-shapes later observations \parencite{chaney2018confounding}. A future personal
-model would need explicit consent, reset and deletion controls, exploration,
-exposure logging and evaluation that separates repeated exposure from genuine
-preference. Local execution reduces data transfer but does not remove these
-methodological requirements.
-
-\section{Summary}
-
-The findings answer the primary question to a meaningful but restricted
-extent. A lightweight relational head on frozen SigLIP embeddings produced
-stronger offline discrimination than the controlled alternatives, and the
-pairwise component clearly contributed to completion ranking. Exact
-constrained search improved completeness according to the model score at
-acceptable latency for the measured candidate space. Confidence is highest
-for these within-data and bounded-system claims. It is lower for unsupported
-garment structures, menswear, new image domains and all claims involving human
-preference. The project's value lies in the controlled evidence and the clear
-boundary between what was implemented, what was measured and what remains
-untested.

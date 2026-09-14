@@ -64,6 +64,14 @@
   {\normalfont\itshape\color{wmgblue}}
   {\thesubsubsection}{1em}{}
 
+% The report-class section-number box is too narrow once a chapter reaches
+% section 10 (for example, 2.10). Widening it prevents the number and title
+% from running together in the table of contents.
+\makeatletter
+\renewcommand*\l@section{\@dottedtocline{1}{1.5em}{3.0em}}
+\renewcommand*\l@subsection{\@dottedtocline{2}{4.5em}{3.8em}}
+\makeatother
+
 \captionsetup{font={small,it},labelfont=it,justification=centering}
 \setlist{itemsep=3pt,topsep=5pt}
 \setlength{\parindent}{0pt}
@@ -77,10 +85,10 @@
 \fancyfoot[R]{\thepage}
 \renewcommand{\headrulewidth}{0pt}
 
-\newcommand{\projecttitle}{Design and Evaluation of a Lightweight Complete-Outfit Recommendation System Using Frozen SigLIP Representations, Task-Specific Compatibility Learning and Constrained Candidate Search}
-\newcommand{\studentname}{[Student name]}
-\newcommand{\studentid}{[Student ID]}
-\newcommand{\submissiondate}{[Month Year]}
+\newcommand{\projecttitle}{Design and Evaluation of a Complete-Outfit Recommendation System Using Frozen SigLIP Representations, a Lightweight Task-Specific Compatibility Head and Constrained Candidate Search}
+\newcommand{\studentname}{Junyuan Yao}
+\newcommand{\studentid}{5736642}
+\newcommand{\submissiondate}{2 September 2026}
 \newcommand{\checkedbox}{$\boxtimes$}
 \newcommand{\emptybox}{$\square$}
 

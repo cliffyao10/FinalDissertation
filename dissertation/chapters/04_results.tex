@@ -48,7 +48,10 @@ A separate fixed-seed baseline experiment produced an AUC of 0.4940 for
 deterministic random scores and 0.7012 for mean pairwise SigLIP cosine
 similarity. The learned head in that experiment reached 0.8573. These values
 came from an earlier controlled baseline run and are reported separately from
-the selected model result of 0.8583.
+the selected model result of 0.8583. A mean-pooled frozen-SigLIP logistic
+baseline, evaluated on the same processed test rows, reached AUC 0.5532. Its
+deterministic preprocessing produced the same value in the three recorded seed
+files.
 
 \section{Controlled architecture comparison}
 
@@ -99,6 +102,9 @@ Mean reciprocal rank was 0.7705 and normalised discounted cumulative gain was
 0.8289.
 
 The structural ablation used the same 4,468 questions and three random seeds.
+The 0.6025 result above belongs to the selected seed-42 checkpoint; the complete
+model row below is the mean of three separately retrained seed runs and is
+therefore 0.5994.
 \Cref{tab:ablation-results} reports the mean accuracy and the paired difference
 between the complete model and each reduced variant.
 
@@ -111,7 +117,7 @@ between the complete model and each reduced variant.
     Configuration & Mean accuracy & Full minus variant & Paired 95\% interval \\
     \midrule
     Complete model & 0.5994 & --- & --- \\
-    Without clothing-position embedding & 0.5947 & 0.0047 & $-0.0013$--0.0106 \\
+    Without clothing-position embedding & 0.5947 & 0.0047 & -0.0013--0.0106 \\
     Without pairwise module & 0.4966 & 0.1028 & 0.0896--0.1157 \\
     \bottomrule
   \end{tabularx}
@@ -151,7 +157,8 @@ between the saved epoch and the last observed epoch.
 Validation-only temperature scaling produced a temperature of 1.5760.
 Validation negative log-likelihood decreased from 0.5081 to 0.4776, while
 expected calibration error decreased from 0.0772 to 0.0588. Candidate ordering
-was unchanged by the calibration step.
+was unchanged by the calibration step. Expected calibration error used ten
+equal-width probability bins over the 3,274 validation examples.
 
 \section{Outfit-length imbalance and feature-domain results}
 

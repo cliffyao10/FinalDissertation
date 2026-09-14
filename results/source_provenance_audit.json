@@ -1,0 +1,32 @@
+{
+  "audit_date": "2026-09-01",
+  "polyvore_outfits_disjoint": {
+    "public_record": "https://github.com/mvasil/fashion-compatibility",
+    "local_directory": "data/polyvore_disjoint",
+    "local_creation_date": "2026-08-21",
+    "licence_boundary": "The repository code licence is not treated as a verified image-redistribution licence.",
+    "overlap_audit": "results/polyvore_disjoint_overlap_audit.json"
+  },
+  "maryland_polyvore_metadata": {
+    "repository": "https://github.com/xthan/polyvore-dataset",
+    "local_commit": "ba8aa71b6589e8920d172a8b5df84746be724d00",
+    "local_creation_date": "2026-08-11",
+    "licence_boundary": "Apache-2.0 applies to the repository package and is not treated as permission to redistribute third-party images."
+  },
+  "zara_products": {
+    "public_record": "https://www.kaggle.com/datasets/maparla/zara-products",
+    "local_directory": "data/zara_products",
+    "local_creation_date": "2026-08-11",
+    "source_file_date": "2024-03-02",
+    "licence_boundary": "The Kaggle record displays MIT; third-party brand-image rights were not independently verified, so images are not redistributed."
+  },
+  "siglip": {
+    "model_id": "google/siglip-base-patch16-224",
+    "local_cached_revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+    "model_card": "https://huggingface.co/google/siglip-base-patch16-224"
+  },
+  "weather": {
+    "service": "Open-Meteo",
+    "documentation": "https://open-meteo.com/en/docs"
+  }
+}

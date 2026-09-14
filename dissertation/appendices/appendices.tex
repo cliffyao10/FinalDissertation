@@ -1,10 +1,80 @@
 \chapter{Evidence of Required Ethics Training}
 
-[Insert the student's evidence of completing all required ethics training.]
+The following records were supplied by the student as evidence of completing
+the required training. The two-page Epigeum certificate records completion of
+\emph{Research Integrity: Core} with an overall score of 97\% on 11 May 2026.
+The subsequent University of Warwick Moodle emails record completion of
+\emph{Information Security Smart} and award of the \emph{WMG Student Ethics
+Training} badge.
 
-\chapter{Confirmation of Ethical Approval Waiver}
+\begin{figure}[p]
+  \centering
+  \includegraphics[height=0.78\textheight]{assets/ethics_evidence/research_integrity_core-1.png}
+  \caption{Research Integrity: Core certificate, page 1 of 2}
+  \label{fig:ethics-research-integrity-1}
+\end{figure}
 
-[Insert the confirmation email showing that ethical approval was waived.]
+\begin{figure}[p]
+  \centering
+  \includegraphics[height=0.78\textheight]{assets/ethics_evidence/research_integrity_core-2.png}
+  \caption{Research Integrity: Core certificate, page 2 of 2}
+  \label{fig:ethics-research-integrity-2}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.94\textwidth,trim=0 570 0 0,clip]{assets/ethics_evidence/information_security_smart-1.png}
+  \caption{University of Warwick Moodle confirmation of Information Security Smart completion}
+  \label{fig:ethics-information-security}
+\end{figure}
+
+\clearpage
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.94\textwidth,trim=0 490 0 0,clip]{assets/ethics_evidence/wmg_student_ethics_training-1.png}
+  \caption{University of Warwick Moodle confirmation of the WMG Student Ethics Training badge}
+  \label{fig:ethics-wmg-training}
+\end{figure}
+
+\clearpage
+
+\chapter{Completed Supervisor Delegated Approval Record}
+
+The following five-page Qualtrics response summary is the complete Supervisor
+Delegated Approval record supplied by the student. It identifies Junyuan Yao,
+student ID 5736642, the MSc Applied Artificial Intelligence course and the
+supervisor, Giovanni Strano. The record gives student ethics-form version 1 and
+confirms that ethical approval was waived because the research uses publicly
+available secondary data only. It records the earlier concise project title
+\emph{AI Outfit Recommendation System Using Computer Vision}.
+
+\clearpage
+\thispagestyle{plain}
+{\centering
+\includegraphics[page=1,width=\textwidth,height=0.94\textheight,keepaspectratio]{assets/ethics_evidence/supervisor_delegated_approval_complete.pdf}\par}
+
+\clearpage
+\thispagestyle{plain}
+{\centering
+\includegraphics[page=2,width=\textwidth,height=0.94\textheight,keepaspectratio]{assets/ethics_evidence/supervisor_delegated_approval_complete.pdf}\par}
+
+\clearpage
+\thispagestyle{plain}
+{\centering
+\includegraphics[page=3,width=\textwidth,height=0.94\textheight,keepaspectratio]{assets/ethics_evidence/supervisor_delegated_approval_complete.pdf}\par}
+
+\clearpage
+\thispagestyle{plain}
+{\centering
+\includegraphics[page=4,width=\textwidth,height=0.94\textheight,keepaspectratio]{assets/ethics_evidence/supervisor_delegated_approval_complete.pdf}\par}
+
+\clearpage
+\thispagestyle{plain}
+{\centering
+\includegraphics[page=5,width=\textwidth,height=0.94\textheight,keepaspectratio]{assets/ethics_evidence/supervisor_delegated_approval_complete.pdf}\par}
+
+\clearpage
 
 \chapter{Supplementary Experimental Results}
 
@@ -16,14 +86,47 @@ menswear subset and 0.6043 for the womenswear subset. The menswear result is not
 treated as a reliable group comparison because its sample is substantially
 smaller.
 
+\chapter{Data Sources and Reproducibility}
+\label{app:reproducibility}
+
+This appendix provides direct links to the external resources used in the
+project. The research method, dataset preparation and evaluation procedure are
+described in Chapters 3 and 4.
+
+\begin{itemize}
+  \item \textbf{Polyvore Outfits disjoint dataset:}
+  \href{https://github.com/mvasil/fashion-compatibility}{authors' code and dataset repository}
+  \parencite{vasileva2018repository}. This was the main source for compatibility
+  training and evaluation.
+  \item \textbf{Maryland Polyvore metadata:}
+  \href{https://github.com/xthan/polyvore-dataset}{dataset repository}. This
+  supplied supporting product-category metadata.
+  \item \textbf{Zara Products:}
+  \href{https://www.kaggle.com/datasets/maparla/zara-products}{Kaggle dataset page}
+  \parencite{parrenolara2024zara}. This was used for recognition preparation
+  and the feature-domain comparison reported in the dissertation.
+  \item \textbf{SigLIP:}
+  \href{https://huggingface.co/google/siglip-base-patch16-224}{model card and checkpoint page}
+  \parencite{google2024siglipmodelcard}. The encoder was used in frozen form.
+  \item \textbf{Open-Meteo:}
+  \href{https://open-meteo.com/en/docs}{forecast API documentation}
+  \parencite{openmeteo2026}. This supplied the weather context used by the
+  prototype.
+\end{itemize}
+
+The project repository contains the code, tests and machine-readable result
+files used to record the experiments. Key model settings, sample sizes,
+confidence-interval procedures and limitations are reported in the main
+chapters so that the findings can be interpreted without relying on this
+appendix.
+
 \chapter{Supplementary Software-Design Artefacts}
 \label{app:software-design}
 
 This appendix documents the implemented prototype at a level below the
-methodology diagrams. Cove does not contain accounts, administrator roles,
-repository interfaces or relational database tables. The views therefore use
-UML conventions where they match the code and identify the persistent entities
-as a logical file schema.
+methodology diagrams. The views use UML conventions where they match the
+function-oriented code and represent persistent entities as a logical local
+file schema.
 
 \section{Use cases}
 
@@ -36,10 +139,10 @@ does not receive wardrobe images.
 
 \section{Overall software structure}
 
-The application is predominantly function-oriented, so an overall class
-diagram would invent classes that do not exist. Figure~\ref{fig:overall-architecture}
-uses a UML-style component view to show the real source modules, external
-service and stored artefacts.
+The application is predominantly function-oriented.
+Figure~\ref{fig:overall-architecture} therefore uses a UML-style component
+view to show the implemented source modules, external service and stored
+artefacts.
 
 \input{assets/diagrams/overall_architecture}
 

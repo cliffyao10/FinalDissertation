@@ -1,85 +1,39 @@
 \chapter{Conclusion}
 
-This dissertation investigated whether a lightweight outfit-compatibility
-model, built on frozen vision--language embeddings and combined with
-constrained search over abstract garment states, could support accurate,
-practical and auditable complete-outfit recommendation using secondary data.
-The result is a working research prototype and a controlled body of offline
-evidence. It is not a universal fashion model, a complete reproduction of
-published systems or a validated measure of human taste.
+This dissertation investigated whether a small project-specific compatibility
+head on frozen vision--language embeddings, combined with constrained search
+over abstract garment states, could support practical and auditable
+complete-outfit recommendation. The result is a working prototype and a
+controlled body of offline evidence.
 
-Within the processed Polyvore disjoint setting, the selected model achieved
-test AUC of 0.8583 and FITB accuracy of 0.6025 on the retained four-position
-subset. Across three seeds, its mean AUC of 0.8596 exceeded the controlled
-recurrent, type-aware and attention-based alternatives. Structural ablation
-identified the pairwise module as the clearest useful component: removing it
-reduced mean FITB accuracy by 10.28 percentage points. The effect of
-clothing-position embeddings remained inconclusive because its paired interval
-crossed zero.
+The primary research question can be answered positively within the evaluated
+boundary. The head showed stronger held-out discrimination than the non-learned
+and controlled learned alternatives, while corrected FITB evaluation supported
+completion ranking on the retained subset. Explicit pairwise comparison had the
+clearest architectural support: removing it reduced mean FITB accuracy by
+10.28 percentage points. The effect of clothing-position embeddings remained
+inconclusive.
 
-The model generalised consistently from validation to test, but the larger
-train--test gap showed that overfitting remained present. Early stopping
-selected the epoch-six checkpoint, temperature scaling improved validation
-calibration, and an outfit-length weighting alternative was rejected because
-it weakened the lowest-performing group and increased the group gap. These
-decisions illustrate a central methodological conclusion of the project:
-model selection should depend on several aligned measures and predefined
-acceptance conditions, not on one favourable aggregate score.
+Held-out test performance closely matched validation performance, supporting
+the consistency of checkpoint selection within the processed Polyvore split.
+The larger train--test gap showed overfitting, and the
+domain diagnostic warned against assuming unchanged performance on contemporary
+catalogue images. These results justify the use of early stopping and several
+aligned evaluation measures rather than selection by one favourable score.
 
-The system contribution extended beyond classification. A training-derived
-artefact represented 1,670 product-independent garment concepts rather than
-restricting recommendations to Zara products. Exact constrained search
-recovered solutions that the quota-limited path frequently missed, with a
-recorded median CPU latency of 0.474 seconds. Weather, clothing-range,
-fixed-item and position constraints remained explicit, and a deterministic
-fallback supported operation when learned artefacts were unavailable. This
-separation among learned compatibility, feasible candidate generation and
-interface state made the system easier to inspect and test.
+The system contribution extends beyond classification. Product-independent
+states describe broad garment types and colours without making one retailer the
+recommendation source. Exact constrained search improved completeness under the
+deployed model objective for the bounded candidate space. Weather,
+clothing-range, fixed-item and position rules remained explicit, while local
+wardrobe management and a deterministic fallback separated learned scoring from
+operational control.
 
-The primary research question can therefore be answered as follows: the
-lightweight approach provides useful and comparatively strong offline
-compatibility ranking, together with practical exact search for the present
-bounded candidate space, but only for the garment structures and data
-distributions that were evaluated. Confidence is reduced by 29.50\% FITB
-coverage, sparse menswear evidence, the strong Polyvore--Zara domain
-distinction, the exclusion of one-piece garments and the absence of participant
-evaluation. No conclusion is drawn about user satisfaction, demographic
-fairness, retail conversion or universal style quality.
-
-The seven objectives were addressed sufficiently to complete the stated
-investigation. The literature review, secondary-data pipeline, lightweight
-model, controlled baselines, multifaceted evaluation and integrated prototype
-were delivered. The objectives relating to bias and practical benefit were
-achieved only as critical audits: demographic performance and real user
-benefit remain unmeasured. This distinction is important because unavailable
-evidence should not be replaced by speculation.
-
-Several results changed the direction of the project rather than merely
-confirming its initial design. The pairwise ablation provided a stronger reason
-to retain relational comparison than the position-embedding experiment, whose
-effect remained uncertain. The overfitting audit showed why the highest
-training result was not an appropriate checkpoint. The length-weighting study
-prevented a marginal aggregate gain from being selected at the expense of the
-weakest observed group. The search experiment replaced an assumed efficiency
-benefit with a measured trade-off between latency and recovery. These outcomes
-demonstrate evaluation-led development: components were retained, rejected or
-limited according to evidence rather than because they were present in an
-earlier prototype.
-
-The negative findings are equally relevant to the final assessment. The
-position embedding cannot be claimed as empirically necessary, the current
-data do not support a dependable comparison between clothing ranges, and the
-domain diagnostic warns against assuming unchanged transfer to contemporary
-catalogue images. The interface and functional tests address implementation
-quality, not human acceptance. Stating these limits narrows the claim, but also
-makes the positive evidence easier to interpret.
-
-The most valuable next step is a licensed evaluation base with broader
-clothing-range representation, explicit one-piece structures and contemporary
-target-domain outfits. Repeating the controlled evaluation would test whether
-the relational design transfers. A participant study could follow ethics
-approval. Approximate search and consent-based local preference learning should
-be introduced only when catalogue scale and validated user needs justify them.
-Overall, the project contributes an evidence-backed and auditable combination
-of a frozen representation, focused relational model, controlled comparisons,
-exact search and explicit constraints.
+The findings remain limited by 29.50\% FITB coverage, sparse menswear evidence,
+the Polyvore--Zara domain distinction, excluded one-piece garments and the
+absence of participant evaluation. The principal contribution is an
+evidence-backed, auditable integration of a frozen
+representation, a focused relational head, controlled comparisons, exact
+search and explicit constraints. Future work should prioritise licensed
+contemporary evaluation data with broader garment coverage, followed by a
+participant study if ethical approval is obtained.

@@ -4,20 +4,20 @@
   \begin{tikzpicture}[
     font=\small,
     box/.style={draw=wmgdarkblue!55, rounded corners=2pt, align=center,
-      text width=34mm, minimum height=11mm, fill=wmgblue!6},
+      text width=31mm, minimum height=12mm, fill=wmgblue!6},
     key/.style={box, fill=wmgblue!14, draw=wmgblue!75},
     score/.style={box, fill=green!8, draw=green!45!black},
     arrow/.style={-{Latex[length=2.2mm]}, thick, draw=wmgdarkblue!70}
   ]
-    \node[box] (input) at (0,3.2) {Four 768-dimensional\\SigLIP item embeddings\\plus position mask};
-    \node[key] (projection) at (4.6,3.2) {Layer normalisation,\\linear projection and GELU};
-    \node[key] (slots) at (9.2,3.2) {Concatenate learned\\position embeddings};
+    \node[box] (input) at (0,4.8) {Four 768-dimensional\\SigLIP item embeddings\\plus position mask};
+    \node[key] (projection) at (5.0,4.8) {Layer normalisation,\\linear projection and GELU};
+    \node[key] (slots) at (10.0,4.8) {Concatenate learned\\position embeddings};
 
-    \node[box] (pooled) at (6.9,1.2) {Masked mean\\outfit summary};
-    \node[box] (pairs) at (11.5,1.2) {Six absolute pairwise\\difference vectors\\and masked mean};
-    \node[key] (concat) at (9.2,-0.9) {Concatenate global and\\pairwise summaries};
-    \node[key] (mlp) at (13.8,-0.9) {Two-layer MLP\\with GELU and dropout};
-    \node[score] (logit) at (18.4,-0.9) {Compatibility logit\\and calibrated score};
+    \node[box] (pooled) at (5.0,1.5) {Masked mean\\outfit summary};
+    \node[box] (pairs) at (10.0,1.5) {Six absolute pairwise\\difference vectors\\and masked mean};
+    \node[key] (concat) at (7.5,-1.8) {Concatenate global and\\pairwise summaries};
+    \node[key] (mlp) at (12.5,-1.8) {Two-layer MLP\\with GELU and dropout};
+    \node[score] (logit) at (17.5,-1.8) {Compatibility logit\\and calibrated score};
 
     \draw[arrow] (input) -- (projection);
     \draw[arrow] (projection) -- (slots);
