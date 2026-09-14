@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pandas as pd
 
-from release_check import REQUIRED_FILES, run_checks
+from release_check import REQUIRED_FILES, git_ignored, run_checks
 
 
 class ReleaseCheckTests(unittest.TestCase):
@@ -49,6 +49,19 @@ class ReleaseCheckTests(unittest.TestCase):
             self.make_minimum_project(root)
             report = run_checks(root, strict_artifacts=True)
         self.assertFalse(report["passed"])
+
+    def test_absent_private_directory_uses_child_probe(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess_result = type("Result", (), {"returncode": 0})()
+            with patch(
+                "release_check.subprocess.run", return_value=subprocess_result
+            ) as run:
+                self.assertTrue(git_ignored(root, "data/wardrobe_images"))
+            command = run.call_args.args[0]
+            self.assertEqual(
+                command[-1], str(Path("data/wardrobe_images") / ".privacy-check")
+            )
 
 
 if __name__ == "__main__":

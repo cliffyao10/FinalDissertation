@@ -44,9 +44,15 @@ def record(checks, name, status, detail):
 
 
 def git_ignored(root, relative_path):
+    # A directory-only ignore rule (for example ``data/wardrobe_images/``)
+    # does not match the bare path when that directory has not been created
+    # yet. Probe a hypothetical child so the check behaves consistently in a
+    # clean CI checkout and in a local workspace where the directory exists.
+    candidate = Path(relative_path)
+    probe = candidate / ".privacy-check" if not candidate.suffix else candidate
     try:
         result = subprocess.run(
-            ["git", "check-ignore", "--quiet", relative_path],
+            ["git", "check-ignore", "--quiet", "--no-index", str(probe)],
             cwd=root,
             check=False,
             capture_output=True,
